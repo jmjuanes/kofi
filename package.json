@@ -8,6 +8,10 @@
     "browser": "dist/kofi.umd.min.js",
     "unpkg": "dist/kofi.umd.min.js",
     "jsdelivr": "dist/kofi.umd.min.js",
+    "scripts": {
+        "build": "rollup -c rollup.config.js",
+        "test": "npm run build && mocha  --recursive --reporter spec"
+    },
     "files": [
         "docs/*.md",
         "src",

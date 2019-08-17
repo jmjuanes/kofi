@@ -1,5 +1,5 @@
 let assert = require("assert");
-let kofi = require("../.bundle/kofi-utils.js");
+let kofi = require("../../dist/kofi.cjs.js");
 
 describe("average", function() { 
     it("returns the average of the values in an array", function(done) {

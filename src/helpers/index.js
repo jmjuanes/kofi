@@ -6,6 +6,7 @@ export {default as deepClone} from "./deep-clone.js";
 export {default as delay} from "./delay.js";
 export {default as digits} from "./digits.js";
 export {default as each} from "./each.js";
+export {default as equal} from "./equal.js";
 export {default as fill} from "./fill.js";
 export {default as format} from "./format.js";
 export {default as kebabCase} from "./kebab-case.js";

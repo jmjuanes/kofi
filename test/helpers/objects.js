@@ -1,5 +1,5 @@
 let assert = require("assert");
-let kofi = require("../.bundle/kofi-utils.js");
+let kofi = require("../../dist/kofi.cjs.js");
 
 //Testing object
 let obj = {
@@ -104,37 +104,6 @@ describe("equal", function () {
         assert.equal(kofi.equal(obj1, obj4), false);
         assert.equal(kofi.equal(arr1, arr2), true);
         assert.equal(kofi.equal(arr1, arr3), false);
-        return done();
-    });
-});
-
-describe("extract", function () {
-    it("generated a new object with only the provided keys", function (done) {
-        let obj = {a: 1, b: 2, c: 3};
-        let newObj = kofi.extract(obj, ["a", "c"]);
-        assert.equal(newObj["a"], obj["a"]);
-        assert.equal(typeof newObj["b"], "undefined");
-        assert.equal(newObj["c"], obj["c"]);
-        return done();
-    });
-});
-
-describe("keys", function () {
-    it("returns all keys of an object", function (done) {
-        let keys = kofi.keys(obj);
-        assert.equal(keys.length, 3);
-        assert.equal(keys[0], "name");
-        return done();
-    });
-});
-
-describe("omit", function () {
-    it("omits the provided keys from the object", function (done) {
-        let obj = {a: 1, b: 2, c: 3};
-        let newObj = kofi.omit(obj, ["b"]);
-        assert.equal(obj["a"], newObj["a"]);
-        assert.equal(typeof newObj["b"], "undefined");
-        assert.equal(obj["c"], newObj["c"]);
         return done();
     });
 });

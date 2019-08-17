@@ -1,5 +1,5 @@
 let assert = require("assert");
-let kofi = require("../.bundle/kofi-utils.js");
+let kofi = require("../../dist/kofi.cjs.js");
 
 describe("camelCase", function () {
     it("converts a string to camel-case format", function (done) {
@@ -80,7 +80,7 @@ describe("uniqueId", function () {
         let ids = [];
         let j = 0;
         while (j < 100) {
-            let id = kofi.uniqueId();
+            let id = kofi.tempid();
             assert.equal(ids.indexOf(id), -1);
             ids.push(id);
             j++
