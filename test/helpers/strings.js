@@ -89,3 +89,12 @@ describe("uniqueId", function () {
     });
 });
 
+describe("reverse", function() {
+    it("reverses a string", function(done) {
+        let str = "hello world";
+        let reversed = kofi.reverse(str);
+        assert.equal("dlrow olleh", reversed);
+        return done();
+    });
+});
+

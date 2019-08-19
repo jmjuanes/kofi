@@ -16,6 +16,7 @@ export {default as pad} from "./pad.js";
 export {default as random} from "./random.js";
 export {default as range} from "./range.js";
 export {default as repeat} from "./repeat.js";
+export {default as reverse} from "./reverse.js";
 export {default as sign} from "./sign.js";
 export {default as snakeCase} from "./snake-case.js";
 export {default as tempid} from "./tempid.js";

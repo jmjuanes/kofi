@@ -235,6 +235,14 @@ Repeats a string `n` times.
 kofi.repeat("x", 5);  // -> "xxxxx"
 ```
 
+#### kofi.reverse(str)
+
+Returns the reverse of the string `str`.
+
+```javascript
+kofi.reverse("hello world"); // -> "dlrow olleh"
+```
+
 #### kofi.snakeCase(str)
 
 Returns the snake-case form of the string `str`.
