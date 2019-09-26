@@ -1,7 +1,7 @@
 {
     "name": "kofi",
     "version": "0.2.0",
-    "description": "Tasty takeaway browser utilities. Just pour it and go!",
+    "description": "Tasty takeaway frontend utilities. Just pour it and go!",
     "private": false,
     "main": "dist/kofi.cjs.js",
     "module": "dist/kofi.esm.js",
@@ -13,7 +13,6 @@
         "test": "npm run build && mocha  --recursive --reporter spec"
     },
     "files": [
-        "docs/*.md",
         "src",
         "dist/*.js"
     ],
@@ -27,8 +26,7 @@
         "utility",
         "utils",
         "browser",
-        "nodejs",
-        "node"
+        "fronted"
     ],
     "author": "Josemi Juanes <josemijuanes@gmail.com>",
     "license": "MIT",
@@ -37,10 +35,10 @@
     },
     "homepage": "https://github.com/jmjuanes/kofi#readme",
     "devDependencies": {
-        "eslint": "^6.0.1",
-        "mocha": "^5.0.4",
-        "rollup": "^1.16.4",
+        "eslint": "^6.4.0",
+        "mocha": "^6.2.0",
+        "rollup": "^1.21.4",
         "rollup-plugin-cleanup": "^3.1.1",
-        "rollup-plugin-terser": "^5.1.0"
+        "rollup-plugin-terser": "^5.1.2"
     }
 }
