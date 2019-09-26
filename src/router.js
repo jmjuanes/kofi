@@ -1,27 +1,8 @@
 import {qs} from "./query-string.js";
-
-//Parse a pattern string 
-let parseUrlPattern = function (str) {
-    //Split the pattern string by slashes
-    let pattern = str.trim().split("/");
-    //Check for empty pattern
-    if (pattern.length === 0) {
-        return [];
-    }
-    //Check for empty first item
-    if (pattern[0].trim().length === 0) {
-        pattern.shift()
-    }
-    //Check for empty las item
-    if (pattern[pattern.length - 1].trim().legnth === 0) {
-        pattern.pop();
-    }
-    //Return the parsed pattern
-    return pattern;
-};
+import {url} from "./url.js";
 
 //Build router
-class Router {
+export class Router {
     constructor() {
         this._currentUrl = "/";
         this._routes = [];
@@ -40,28 +21,28 @@ class Router {
         });
     }
     //Open a route
-    _open(url) {
+    load(str) {
         let self = this;
         //Check for invalid url
-        if (typeof url !== "string" || url.charAt(0) !== "/") {
+        if (typeof str !== "string" || str.charAt(0) !== "/") {
             throw new Error("Url must be a string and begin with a slash /");
         }
         //Save the current url 
-        this._currentUrl = url;
+        this._currentUrl = str;
         //Initialize the request object 
         let request = {
-            "path": url,
-            "pathname": url,
+            "path": str,
+            "pathname": str,
             "query": {},
             "params": {}
         };
         //Parse the query values
-        let queryIndex = url.indexOf("?");
+        let queryIndex = str.indexOf("?");
         if (queryIndex !== -1) {
             request.query = qs.parse(url.substring(queryIndex + 1));
-            request.pathname = url.slice(0, queryIndex);
+            request.pathname = str.slice(0, queryIndex);
         }
-        let urlPattern = parseUrlPattern(request.pathname);
+        let urlPattern = url.split(request.pathname);
         let findRoute = function (index) {
             if (index >= self._routes.length) {
                 //Check if the not found listener is provided
@@ -72,7 +53,7 @@ class Router {
             }
             let route = self._routes[index];
             if (route.pattern !== "*") {
-                let routePattern = parseUrlPattern(route.pattern);
+                let routePattern = url.split(route.pattern);
                 //Check if the number of items of the pattern is the same
                 if (routePattern.length !== urlPattern.length) {
                     //Continue with the next route
@@ -102,13 +83,9 @@ class Router {
         //Find the route
         return findRoute(0);
     }
-    //Load a route 
-    load(url) {
-        return this._open(url);
-    }
     //Reload the current route 
     reload() {
-        return this._open(this._currentUrl);
+        return this.load(this._currentUrl);
     }
     //Register the notfound route 
     notFound (listener) {
@@ -118,63 +95,8 @@ class Router {
     }
 };
 
-//Get the current hashbang 
-let getHashbang function () {
-    //Decode the current hash
-    //let hash = window.decodeURIComponent(window.location.hash.substring(1));
-    let hash = window.location.hash.substring(1);
-    //Check for empty hash
-    if (hash.trim() === "") {
-        hash = "!/";
-    }
-    //Check for no hashbang hash
-    if (hash.charAt(0) !== "!") {
-        return null;
-    }
-    //Remove the last hash
-    hash = hash.replace(/\/$/, "");
-    //Return the hash
-    return hash;
+//Create a router instance
+export const router = function () {
+    return new Router();
 };
-
-//Hashbang change listener
-let onHashbangChange = function (listener) {
-    //Add hash listener
-    window.addEventListener("hashchange", function () {
-        //Get the current hash
-        let hash = getHashbang();
-        //Check for valid hashbang
-        if (hash !== null) {
-            //Call the listener with this url
-            return listener.call(null, hash);
-        }
-    });
-};
-
-//Change the hashbang url
-let setHashbang = function (url) {
-    //Replace the starting hash and the excalamtion
-    let parsedUrl = url.replace("#", "").replace("!", "");
-    //Check for emptu url 
-    if (parsedUrl === "") {
-        parsedUrl = "/";
-    }
-    //Change the current hash location
-    window.location.hash = "#!" + parsedUrl;
-};
-
-//Export router wrapper
-export const router = {
-    "create": function () {
-        return new Router();
-    },
-    "Router": Router,
-    "parseUrlPattern": parseUrlPattern,
-    "hashbang": {
-        "get": getHashbang,
-        "set": setHashbang,
-        "onChange": onHashbangChange
-    }
-};
-
 
