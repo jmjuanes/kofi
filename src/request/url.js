@@ -1,18 +1,18 @@
 //Default delimiter
-const delimiter = "/";
+export const delimiter = "/";
 
 //Resolves a target URL relative to a base URL
 //Inspired in: https://nodejs.org/api/url.html#url_url_resolve_from_to
 // Examples: 
 // url.resolve("http://example.com/", "/one");  ---> "http://example.com/one"
-export function resolveUrl (from, to) {
+export const resolve = function (from, to) {
     return new URL(to, from).href;
-}
+};
 
 //Parse an url
-export function parseUrl (urlString) {
-    return new URL(urlString);
-}
+export const parse = function (str) {
+    return new URL(str);
+};
 
 //Redirect to a provided url
 //export function redirectTo (urlString) {
@@ -20,7 +20,7 @@ export function parseUrl (urlString) {
 //}
 
 //Join urls
-export function joinUrl (base) {
+export const join = function (base) {
     //Initialize the joined url
     let joinedUrl = (base.charAt(base.length -1) !== delimiter) ? base + delimiter : base;
     //Append all urls
@@ -39,13 +39,12 @@ export function joinUrl (base) {
     }
     //Return the joined url
     return joinedUrl;
-}
+};
 
 //Split an url
-export function splitUrl (path) {
+export const split = function (path) {
     return path.split(delimiter).filter(function (path) {
         return path.length !== 0;
     });
-}
-
+};
 
