@@ -1,26 +1,26 @@
 //Default delimiter
-export const delimiter = "/";
+let delimiter = "/";
 
 //Resolves a target URL relative to a base URL
 //Inspired in: https://nodejs.org/api/url.html#url_url_resolve_from_to
 // Examples: 
 // url.resolve("http://example.com/", "/one");  ---> "http://example.com/one"
-export const resolve = function (from, to) {
+let resolve = function (from, to) {
     return new URL(to, from).href;
 };
 
 //Parse an url
-export const parse = function (str) {
+let parse = function (str) {
     return new URL(str);
 };
 
 //Redirect to a provided url
-//export function redirectTo (urlString) {
-//    window.location.href = urlString;
-//}
+let redirect = function (str) {
+    window.location.href = str;
+};
 
 //Join urls
-export const join = function (base) {
+let join = function (base) {
     //Initialize the joined url
     let joinedUrl = (base.charAt(base.length -1) !== delimiter) ? base + delimiter : base;
     //Append all urls
@@ -42,9 +42,32 @@ export const join = function (base) {
 };
 
 //Split an url
-export const split = function (path) {
+let split = function (path) {
     return path.split(delimiter).filter(function (path) {
         return path.length !== 0;
     });
+};
+
+//Get the current hashbang 
+let getHash = function () {
+    //return window.decodeURIComponent(window.location.hash.substring(1));
+    return window.location.hash.substring(1);
+};
+
+//Change the hashbang url
+let setHash = function (str) {
+    window.location.hash = "#" + str.replace(/^#/, "");
+};
+
+//Export url methods
+export const url = {
+    delimiter,
+    parse,
+    resolve,
+    redirect,
+    join,
+    split,
+    getHash,
+    setHash
 };
 
