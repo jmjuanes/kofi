@@ -1,4 +1,4 @@
-import * as qs from "./query-string.js";
+import {qs} from "./query-string.js";
 
 //Export default HTTP error
 export class HTTPError extends Error {
