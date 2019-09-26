@@ -1,8 +1,16 @@
-import {HTTPError} from "./http-error.js";
 import * as queryString from "../common/query-string.js";
 
+//Export default HTTP error
+export class HTTPError extends Error {
+    constructor(code, message) {
+        super(message);
+        this.name = "HTTPError";
+        this.code = code;
+    }
+}
+
 //Request method
-export function request(opt, callback) {
+export const request = function (opt, callback) {
     //Check the function arguments
     if (typeof opt === "undefined") {
         throw new Error("Undefined ajax options object");
@@ -136,5 +144,5 @@ export function request(opt, callback) {
     }
     //Return the XMLHttpRequest instance
     return xhttp;
-}
+};
 
