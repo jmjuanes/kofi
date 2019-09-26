@@ -5,6 +5,7 @@
 </div>
 <br>
 <div align="center">
+<img src="https://david-dm.org/jmjuanes/kofi/dev-status.svg?style=flat-square">
 <img src="https://img.shields.io/badge/status-on_development-orange.svg?style=flat-square">
 <img src="https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square">
 <img src="https://img.shields.io/npm/v/kofi.svg?style=flat-square">
