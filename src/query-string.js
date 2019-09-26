@@ -1,10 +1,10 @@
 //Unescape
-export function unescape(str) {
+let unescape = function (str) {
     return decodeURIComponent(str.replace(/\+/g, " "));
-}
+};
 
 //Convert a query object to string
-export function stringify(obj, del) {
+let stringify = function (obj, del) {
     if (typeof obj !== "object") {
         return obj;
     }
@@ -18,10 +18,10 @@ export function stringify(obj, del) {
         str.push(encodeURIComponent(key) + "=" + encodeURIComponent(obj[key]));
     });
     return str.join(del);
-}
+};
 
 //Parse a query string
-export function parse(str, del) {
+let parse = function (str, del) {
     if (typeof str !== "string") {
         return {};
     }
@@ -51,4 +51,12 @@ export function parse(str, del) {
         }
     });
     return obj;
-}
+};
+
+//Export all qs methods
+export const qs = {
+    unescape,
+    stringify,
+    parse
+};
+
