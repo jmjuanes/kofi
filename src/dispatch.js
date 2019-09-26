@@ -1,5 +1,5 @@
 //Dispatch handler
-export class Dispatch {
+export class Dispatcher {
     constructor() {
         this._listeners = {};
     }
@@ -47,7 +47,7 @@ export class Dispatch {
 }
 
 //Build a new dispatcher
-export function dispatcher () {
-    return new Dispatch();
+export function dispatch () {
+    return new Dispatcher();
 }
 
