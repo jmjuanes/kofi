@@ -1,4 +1,4 @@
-import * as queryString from "../common/query-string.js";
+import * as qs from "./query-string.js";
 
 //Export default HTTP error
 export class HTTPError extends Error {
@@ -111,7 +111,7 @@ export const request = function (opt, callback) {
         if (opt.form) {
             xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
             if (opt.processData === true) {
-                data = queryString.stringify(opt.form);
+                data = qs.stringify(opt.form);
             }
             else {
                 data = opt.form;
