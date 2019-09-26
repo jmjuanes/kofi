@@ -48,17 +48,6 @@ let split = function (path) {
     });
 };
 
-//Get the current hashbang 
-let getHash = function () {
-    //return window.decodeURIComponent(window.location.hash.substring(1));
-    return window.location.hash.substring(1);
-};
-
-//Change the hashbang url
-let setHash = function (str) {
-    window.location.hash = "#" + str.replace(/^#/, "");
-};
-
 //Export url methods
 export const url = {
     delimiter,
@@ -66,8 +55,6 @@ export const url = {
     resolve,
     redirect,
     join,
-    split,
-    getHash,
-    setHash
+    split
 };
 
