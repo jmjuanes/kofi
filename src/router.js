@@ -100,3 +100,25 @@ export const router = function () {
     return new Router();
 };
 
+//Get the current hashbang 
+export const getHashbang = function () {
+    //Decode the current hash
+    //let hash = window.decodeURIComponent(window.location.hash.substring(1));
+    let hash = window.location.hash.substring(1);
+    //Check for empty hash
+    if (hash.trim() === "") {
+        hash = "!/";
+    }
+    //Check for no hashbang hash
+    if (hash.charAt(0) !== "!") {
+        return null;
+    }
+    //Remove the last hash and the first !
+    return hash.replace(/^!/, "").replace(/\/$/, "");
+};
+
+//Change the hashbang url
+export const setHashbang = function (str) {
+    window.location.hash = "#!" + str.replace(/^#!/, "");
+};
+
