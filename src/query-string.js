@@ -22,15 +22,16 @@ let stringify = function (obj, del) {
 
 //Parse a query string
 let parse = function (str, del) {
+    //Check for no string provided
     if (typeof str !== "string") {
         return {};
     }
+    //Default delimiter
     if (typeof del !== "string") {
-        //Default delimiter
         del = "&";
     }
     let obj = {};
-    str.trim().split(del).forEach(function (partial) {
+    str.trim().replace(/^\?/, "").split(del).forEach(function (partial) {
         if (partial.trim() === "") {
             return;
         }
