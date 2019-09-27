@@ -42,7 +42,7 @@ export class BaseRouter {
         //Parse the query values
         let queryIndex = str.indexOf("?");
         if (queryIndex !== -1) {
-            request.query = qs.parse(url.substring(queryIndex + 1));
+            request.query = qs.parse(str.substring(queryIndex + 1));
             request.pathname = str.slice(0, queryIndex);
         }
         let urlPattern = url.split(request.pathname);
