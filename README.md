@@ -41,6 +41,16 @@ import {request, dispatch} from "kofi";
 
 ## API
 
+- [kofi.createNode](#koficreatenodetype-attr-children)
+- [kofi.createRef](#koficreateref)
+- [kofi.ready](#kofireadyfn)
+- [kofi.dispatch](#kofidispatch)
+- [kofi.queue](#kofiqueue)
+- [kofi.request](#kofirequestoptions-callback)
+- [kofi.router](#kofirouter)
+- [kofi.helpers](#kofihelpers)
+
+
 ### kofi.createNode(type, attr, ...children)
 
 Based on `React.createElement`, this method creates a new DOM Node element of the specified type. 
