@@ -1,12 +1,29 @@
 import {qs} from "./query-string.js";
 import {url} from "./url.js";
 
+//Get the current hashbang 
+const getHashbang = function () {
+    //Decode the current hash
+    //let hash = window.decodeURIComponent(window.location.hash.substring(1));
+    let hash = window.location.hash.substring(1);
+    //Check for empty hash or not valid hash
+    if (hash.trim() === "" || hash.charAt(0) !== "!") {
+        return "";
+    }
+    //Remove the last hash and the first !
+    return hash.replace(/^!/, "").replace(/\/$/, "");
+};
+
+//Change the hashbang url
+const setHashbang = function (str) {
+    window.location.hash = "#!" + str.replace(/^#!/, "");
+};
+
 //Build router
-export class Router {
+export class BaseRouter {
     constructor() {
-        this._currentUrl = "/";
+        this._current = null;
         this._routes = [];
-        this._notFound = null;
     }
     //Register a new route 
     route(pattern, listener) {
@@ -20,6 +37,14 @@ export class Router {
             "listener": listener
         });
     }
+    //Get the current path
+    get() {
+        return this._current;
+    }
+    //Set the current path
+    set(str) {
+        return setHashbang(str);
+    }
     //Open a route
     load(str) {
         let self = this;
@@ -28,7 +53,7 @@ export class Router {
             throw new Error("Url must be a string and begin with a slash /");
         }
         //Save the current url 
-        this._currentUrl = str;
+        this._current = str;
         //Initialize the request object 
         let request = {
             "path": str,
@@ -44,11 +69,8 @@ export class Router {
         }
         let urlPattern = url.split(request.pathname);
         let findRoute = function (index) {
+            //No listeners found
             if (index >= self._routes.length) {
-                //Check if the not found listener is provided
-                if (typeof self._notFound === "function") {
-                    return self._notFound.call(null, request);
-                }
                 return null;
             }
             let route = self._routes[index];
@@ -84,41 +106,21 @@ export class Router {
         return findRoute(0);
     }
     //Reload the current route 
-    reload() {
-        return this.load(this._currentUrl);
+    refresh() {
+        return this.load((this._current === null) ? getHashbang() : this._current);
     }
-    //Register the notfound route 
-    notFound (listener) {
-        if (typeof listener === "function") {
-            this._notFound = listener;
-        }
+    //Listen to hash changes
+    listen() {
+        let self = this;
+        //Register the hash change listener
+        window.addEventListener("hashchange", function () {
+            return self.load(getHashbang());
+        });
+        //Load the first time
+        return this.refresh();
     }
 };
 
 //Create a router instance
-export const router = function () {
-    return new Router();
-};
-
-//Get the current hashbang 
-export const getHashbang = function () {
-    //Decode the current hash
-    //let hash = window.decodeURIComponent(window.location.hash.substring(1));
-    let hash = window.location.hash.substring(1);
-    //Check for empty hash
-    if (hash.trim() === "") {
-        hash = "!/";
-    }
-    //Check for no hashbang hash
-    if (hash.charAt(0) !== "!") {
-        return null;
-    }
-    //Remove the last hash and the first !
-    return hash.replace(/^!/, "").replace(/\/$/, "");
-};
-
-//Change the hashbang url
-export const setHashbang = function (str) {
-    window.location.hash = "#!" + str.replace(/^#!/, "");
-};
+export const router = new BaseRouter();
 
