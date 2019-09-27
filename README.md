@@ -41,8 +41,11 @@ import {request, dispatch} from "kofi";
 
 ## API
 
-- [kofi.createNode](#koficreatenodetype-attr-children)
-- [kofi.createRef](#koficreateref)
+### Table of contents
+
+- Dom manipulation:
+  - [kofi.createNode](#koficreatenodetype-attr-children)
+  - [kofi.createRef](#koficreateref)
 - [kofi.ready](#kofireadyfn)
 - [kofi.dispatch](#kofidispatch)
 - [kofi.queue](#kofiqueue)
