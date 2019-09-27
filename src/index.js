@@ -27,7 +27,7 @@ const kofi = {
     dispatch,
     queue,
     ready,
-    "helpers"
+    helpers
 };
 
 //Export kofi object
