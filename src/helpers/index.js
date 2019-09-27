@@ -1,7 +1,6 @@
 export {default as camelCase} from "./camel-case.js";
 export {default as capitalize} from "./capitalize.js";
 export {default as concat} from "./concat.js";
-export {default as delay} from "./delay.js";
 export {default as each} from "./each.js";
 export {default as fill} from "./fill.js";
 export {default as format} from "./format.js";
@@ -15,7 +14,6 @@ export {default as repeat} from "./repeat.js";
 export {default as reverse} from "./reverse.js";
 export {default as snakeCase} from "./snake-case.js";
 export {default as tempid} from "./tempid.js";
-export {default as timer} from "./timer.js";
 export {default as timestamp} from "./timestamp.js";
 export {default as truncate} from "./truncate.js";
 export {default as values} from "./values.js";
