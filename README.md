@@ -56,6 +56,7 @@ import {request, dispatch} from "kofi";
   - [kofi.request](#kofirequestoptions-callback)
 - Miscellanea 
   - [kofi.helpers](#kofihelpers)
+  - [kofi.qs](#kofiqs)
   - [kofi.delay](#kofidelaytime-fn)
   - [kofi.timer](#kofitimertime-fn)
   - [kofi.queue](#kofiqueue)
@@ -604,6 +605,29 @@ kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 11, omission: ""})
 kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 15, separator: " "});
 // -> "Lorem ipsum..."
 ```
+
+
+### kofi.qs
+
+Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
+
+#### kofi.qs.parse(str)
+
+Parse a query string into an object. Leading `?` is ignored.
+
+```javascript
+kofi.qs.parse("foo=1&bar=2"); // {"foo": "1", "bar": "2"}
+```
+
+#### kofi.qs.stringify(obj)
+
+Stringify an object into a query string.
+
+```javascript
+kofi.qs.stringify({"foo": "1", "bar": "2"}); // "foo=1&bar=2"
+```
+
+
 
 ### kofi.delay(time, fn)
 
