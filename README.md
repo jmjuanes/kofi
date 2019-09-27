@@ -39,20 +39,25 @@ import {request, dispatch} from "kofi";
 ```
 
 
-## API
+## Table of contents
 
-### Table of contents
-
-- Dom manipulation:
+- Dom manipulation
   - [kofi.createNode](#koficreatenodetype-attr-children)
+  - [kofi.removeNode](#kofiremovenodenode)
   - [kofi.createRef](#koficreateref)
-- [kofi.ready](#kofireadyfn)
-- [kofi.dispatch](#kofidispatch)
-- [kofi.queue](#kofiqueue)
-- [kofi.request](#kofirequestoptions-callback)
-- [kofi.router](#kofirouter)
-- [kofi.helpers](#kofihelpers)
+- Dom state management
+  - [kofi.ready](#kofireadyfn)
+- Event handling
+  - [kofi.dispatch](#kofidispatch)
+  - [kofi.router](#kofirouter)
+- HTTP clients
+  - [kofi.request](#kofirequestoptions-callback)
+- Helpers and other utility methods
+  - [kofi.helpers](#kofihelpers)
+  - [kofi.queue](#kofiqueue)
 
+
+## DOM Manipulation
 
 ### kofi.createNode(type, attr, ...children)
 
@@ -96,6 +101,17 @@ let user = createNode("div", null,
 );
 ```
 
+### kofi.removeNode(node)
+
+Remove the specified DOM element.
+
+```javascript
+import kofi from "kofi";
+
+kofi.removeNode(document.getElementById("#my-element"));
+```
+
+
 ### kofi.createRef()
 
 Creates a new reference that can be attached to a DOM node to save the reference of this node.
@@ -123,6 +139,8 @@ let formNode = (
 
 ```
 
+## DOM state management
+
 ### kofi.ready(fn)
 
 Executes the provided function `fn` when the DOM becomes ready. This utility is similar to [jQuery's ready method](https://api.jquery.com/ready/).
@@ -134,6 +152,7 @@ kofi.ready(function () {
 });
 ```
 
+## Event handling
 
 ### kofi.dispatch();
 
@@ -170,42 +189,84 @@ dispatcher.emit("error", "Error importing file xxxx.json");
 ```
 
 
-### kofi.queue();
+### kofi.router()
 
-Generates a new instance of the queue manager.
+Generates a minimal client-side router utility.
 
-```js
-let queue = kofi.queue();
-```
+```javascript 
+//Initialize a router instance
+let router = kofi.router();
 
-#### queue.then(handler);
+//Register single routes
+router.add("/foo", function () {
+    console.log("Enter to foo");
+});
 
-Registers a new function to the functions queue. This function will be called with a `next` argument, that is a function that will pass to the next function defined with `queue.then`.
+//Register routes with params
+router.add("/foo/:bar", function (req) {
+    console.log("Bar is " + req.params.bar);
+});
 
-Note that calling the `next` argument with an error will make that all functions that were added after this function won't run. Also, this will immediately invoke the `queue.catch` function with the error passed to the `next` function.
+//Read query parameters
+router.add("/bar", function (req) {
+    console.log("Name: " + req.query.name);
+});
 
-```javascript
-queue.then(function (next) {
-    var input = document.getElementById("user-input");
-    setTimeOut(function () {
-        if (input.value === "") {
-            //Abort the queue
-            return next(new Error("User input is empty"));
-        } 
-        //If not, continue with the next registered function
-        return next();
-    }, 5000);
+//Catch all route
+router.add(function (req) {
+    console.log("NOT FOUND!");
 });
 ```
 
-#### queue.finish(handler);
+#### router.add(path, listener)
 
-Registers the function that will be called when all functions registered with `queue.then` has been executed.
+Registers a new listener for the route `path`. The listener receives an object with the request information: 
 
-#### queue.catch(handler);
+- `path`: a string with the full matched url.
+- `pathname`: a string with the matched url without the query segment (the part after que question mark).
+- `query`: an object with all the parsed querystring parametes extracted from the matched path. Default is an empty object `{}`.
+- `params`: an object with all the dynamic parts of the matched path. Default is an empty object `{}`.
 
-Registers the function that will be called when the functions queue was aborted due to an error. 
+```javascript
+router.add("/", function (req) {
+    console.log("Path: " + req.path);
+    console.log("Pathname: " + req.pathname);
+    console.log("Querystring values: ");
+    Object.keys(req.query).forEach(function (key) {
+        console.log("  " + key + " -> " + req.query[key]);
+    });
+    console.log("Params: ");
+    Object.keys(req.params).forEach(function (key) {
+        console.log("  " + key + " -> " + req.params[key]);
+    });
+});
+```
 
+If the provided `path` string is a catch-all path (`"*"`), the `listener` function will also receive a function to continue with the search of the route that matches the path.
+
+```javascript
+router.add("*", function (req, next) {
+    console.log("New request --> " + req.pathname);
+    return next();
+});
+```
+
+Note that the order of how the routes are defined is important, so you should define the catch-all routes first.
+
+#### router.set(url)
+
+Call a handler for the provided `url` string.
+
+#### router.refresh()
+
+Call again the handler for the last url used with `router.set()`.
+
+#### router.get()
+
+Returns the current url. 
+
+
+## HTTP Clients
 
 ### kofi.request(options, callback)
 
@@ -305,82 +366,7 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 ```
 
 
-### kofi.router()
-
-Generates a minimal client-side router utility.
-
-```javascript 
-//Initialize a router instance
-let router = kofi.router();
-
-//Register single routes
-router.add("/foo", function () {
-    console.log("Enter to foo");
-});
-
-//Register routes with params
-router.add("/foo/:bar", function (req) {
-    console.log("Bar is " + req.params.bar);
-});
-
-//Read query parameters
-router.add("/bar", function (req) {
-    console.log("Name: " + req.query.name);
-});
-
-//Catch all route
-router.add(function (req) {
-    console.log("NOT FOUND!");
-});
-```
-
-#### router.add(path, listener)
-
-Registers a new listener for the route `path`. The listener receives an object with the request information: 
-
-- `path`: a string with the full matched url.
-- `pathname`: a string with the matched url without the query segment (the part after que question mark).
-- `query`: an object with all the parsed querystring parametes extracted from the matched path. Default is an empty object `{}`.
-- `params`: an object with all the dynamic parts of the matched path. Default is an empty object `{}`.
-
-```javascript
-router.add("/", function (req) {
-    console.log("Path: " + req.path);
-    console.log("Pathname: " + req.pathname);
-    console.log("Querystring values: ");
-    Object.keys(req.query).forEach(function (key) {
-        console.log("  " + key + " -> " + req.query[key]);
-    });
-    console.log("Params: ");
-    Object.keys(req.params).forEach(function (key) {
-        console.log("  " + key + " -> " + req.params[key]);
-    });
-});
-```
-
-If the provided `path` string is a catch-all path (`"*"`), the `listener` function will also receive a function to continue with the search of the route that matches the path.
-
-```javascript
-router.add("*", function (req, next) {
-    console.log("New request --> " + req.pathname);
-    return next();
-});
-```
-
-Note that the order of how the routes are defined is important, so you should define the catch-all routes first.
-
-#### router.set(url)
-
-Call a handler for the provided `url` string.
-
-#### router.refresh()
-
-Call again the handler for the last url used with `router.set()`.
-
-#### router.get()
-
-Returns the current url. 
-
+## Helpers and other utility methods
 
 
 ### kofi.helpers
@@ -608,6 +594,44 @@ kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 11, omission: ""})
 kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 15, separator: " "});
 // -> "Lorem ipsum..."
 ```
+
+
+### kofi.queue();
+
+Generates a new instance of the queue manager.
+
+```js
+let queue = kofi.queue();
+```
+
+#### queue.then(handler);
+
+Registers a new function to the functions queue. This function will be called with a `next` argument, that is a function that will pass to the next function defined with `queue.then`.
+
+Note that calling the `next` argument with an error will make that all functions that were added after this function won't run. Also, this will immediately invoke the `queue.catch` function with the error passed to the `next` function.
+
+```javascript
+queue.then(function (next) {
+    var input = document.getElementById("user-input");
+    setTimeOut(function () {
+        if (input.value === "") {
+            //Abort the queue
+            return next(new Error("User input is empty"));
+        } 
+        //If not, continue with the next registered function
+        return next();
+    }, 5000);
+});
+```
+
+#### queue.finish(handler);
+
+Registers the function that will be called when all functions registered with `queue.then` has been executed.
+
+#### queue.catch(handler);
+
+Registers the function that will be called when the functions queue was aborted due to an error. 
+
 
 
 ## License
