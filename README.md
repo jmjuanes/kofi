@@ -44,15 +44,16 @@ import {request, dispatch} from "kofi";
 - Dom manipulation
   - [kofi.createNode](#koficreatenodetype-attr-children)
   - [kofi.removeNode](#kofiremovenodenode)
+  - [kofi.removeNodeChildren](#kofiremovenodechildrennode)
   - [kofi.createRef](#koficreateref)
 - Dom state management
   - [kofi.ready](#kofireadyfn)
 - Event handling
   - [kofi.dispatch](#kofidispatch)
   - [kofi.router](#kofirouter)
-- HTTP clients
+- HTTP requests
   - [kofi.request](#kofirequestoptions-callback)
-- Helpers and other utility methods
+- Miscellanea 
   - [kofi.helpers](#kofihelpers)
   - [kofi.queue](#kofiqueue)
 
@@ -111,6 +112,16 @@ import kofi from "kofi";
 kofi.removeNode(document.getElementById("#my-element"));
 ```
 
+### kofi.removeNodeChildren(node)
+
+Removes all children elements of the specified node.
+
+```javascript
+import kofi from "kofi";
+
+kofi.removeNodeChildren(document.getElementById("#my-element"));
+```
+
 
 ### kofi.createRef()
 
@@ -154,7 +165,7 @@ kofi.ready(function () {
 
 ## Event handling
 
-### kofi.dispatch();
+### kofi.dispatch()
 
 Generates a new event dispatcher.
 
@@ -266,7 +277,7 @@ Call again the handler for the last url used with `router.set()`.
 Returns the current url. 
 
 
-## HTTP Clients
+## HTTP requests
 
 ### kofi.request(options, callback)
 
@@ -366,8 +377,8 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 ```
 
 
-## Helpers and other utility methods
 
+## Miscellanea
 
 ### kofi.helpers
 
@@ -596,7 +607,7 @@ kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 15, separator: " "}
 ```
 
 
-### kofi.queue();
+### kofi.queue()
 
 Generates a new instance of the queue manager.
 
@@ -604,7 +615,7 @@ Generates a new instance of the queue manager.
 let queue = kofi.queue();
 ```
 
-#### queue.then(handler);
+#### queue.then(handler)
 
 Registers a new function to the functions queue. This function will be called with a `next` argument, that is a function that will pass to the next function defined with `queue.then`.
 
@@ -624,11 +635,11 @@ queue.then(function (next) {
 });
 ```
 
-#### queue.finish(handler);
+#### queue.finish(handler)
 
 Registers the function that will be called when all functions registered with `queue.then` has been executed.
 
-#### queue.catch(handler);
+#### queue.catch(handler)
 
 Registers the function that will be called when the functions queue was aborted due to an error. 
 
