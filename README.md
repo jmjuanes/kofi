@@ -307,7 +307,7 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 
 ### kofi.router()
 
-Generated a minimal client-side router utility.
+Generates a minimal client-side router utility.
 
 ```javascript 
 //Initialize a router instance
