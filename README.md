@@ -444,14 +444,6 @@ kofi.helpers.timestamp("Current year: YYYY")
 // -> "Current year: 2018"
 ```
 
-#### kofi.helpers.average(array)
-
-Returns the average of the values in `array`. 
-
-```javascript
-kofi.helpers.average([1, 2, 3, 4, 5]); // -> 3
-```
-
 #### kofi.helpers.concat(array[, *values])
 
 Returns a new array concatenating `array` with other arrays or values passed.
@@ -498,14 +490,6 @@ kofi.helpers.range(0, 5); // -> [0, 1, 2, 3, 4, 5]
 kofi.helpers.range(0, 4, 2); // -> [0, 2, 4] 
 ```
 
-#### kofi.helpers.digits(num)
-
-Counts the number of digits of `num`.
-
-```javascript
-kofi.helpers.digits(12345);  // -> 5
-```
-
 #### kofi.helpers.pad(num, length[, chars])
 
 Pad a number `num` adding zeros on the left side if it has less digits than `length`. You can also specify the characters used for padding.
@@ -522,15 +506,6 @@ Returns a random number between `min` and `max` (not included). If this function
 
 ```javascript
 kofi.helpers.random(0, 5);  // -> 3.7561160836655425
-```
-
-#### kofi.helpers.sign(num)
-
-Returns the sign of `num`.
-
-```javascript
-kofi.helpers.sign(-45);  // -> -1
-kofi.helpers.sign(62);  // -> 1
 ```
 
 #### kofi.helpers.values(obj)
