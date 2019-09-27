@@ -46,6 +46,7 @@ import {request, dispatch} from "kofi";
   - [kofi.removeNode](#kofiremovenodenode)
   - [kofi.removeNodeChildren](#kofiremovenodechildrennode)
   - [kofi.createRef](#koficreateref)
+  - [kofi.Fragment](#kofifragment)
 - Dom state management
   - [kofi.ready](#kofireadyfn)
 - Event handling
@@ -151,6 +152,24 @@ let formNode = (
 );
 
 ```
+
+### kofi.Fragment
+
+Renders a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) element.
+
+```jsx
+/** @jsx createNode */
+import {createNode, Fragment} from "kofi";
+
+let wrapper = (
+    <Fragment>
+        <div id="item1">Item 1</div>
+        <div id="item2">Item 2</div>
+        <div id="item3">Item 3</div>
+    </Fragment>
+);
+```
+
 
 ## DOM state management
 
