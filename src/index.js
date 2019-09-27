@@ -9,6 +9,7 @@ import {dispatch} from "./dispatch.js";
 import {queue} from "./queue.js";
 import {ready} from "./ready.js";
 import {router} from "./router.js";
+import {delay, timer} from "./time.js";
 import * as helpers from "./helpers/index.js";
 
 //Build kofi object
@@ -27,7 +28,9 @@ const kofi = {
     dispatch,
     queue,
     ready,
-    helpers
+    helpers,
+    delay,
+    timer
 };
 
 //Export kofi object

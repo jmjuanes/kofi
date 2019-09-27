@@ -55,6 +55,8 @@ import {request, dispatch} from "kofi";
   - [kofi.request](#kofirequestoptions-callback)
 - Miscellanea 
   - [kofi.helpers](#kofihelpers)
+  - [kofi.delay](#kofidelaytime-fn)
+  - [kofi.timer](#kofitimertime-fn)
   - [kofi.queue](#kofiqueue)
 
 
@@ -384,16 +386,6 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 
 Utility functions for working with arrays, numbers, objects and strings.
 
-#### kofi.helpers.delay(time, fn)
-
-This is just [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout) but with the arguments reversed (first the delay `time` in ms, then the callback `fn` function).
-
-```javascript
-kofi.helpers.delay(1000, function () {
-    console.log("Hello after 1 second!!");
-});
-```
-
 #### kofi.helpers.each(array, fn)
 
 Iterates over an `array` or an `object`.
@@ -420,18 +412,6 @@ kofi.helpers.each({"key1": "value1", "key2": "value2"}, function (key, value) {
 });
 // key1 -> value1
 // key2 -> value2
-```
-
-#### kofi.helpers.timer(time, fn)
-
-This is just [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval) but with the arguments reversed (first the delay `time` in ms and then the callback `fn` function).
-
-```javascript
-let counter = 0;
-kofi.helpers.timer(1000, function () {
-    counter = counter + 1;
-    console.log(counter);
-});
 ```
 
 #### kofi.helpers.timestamp(pattern)
@@ -606,6 +586,30 @@ kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 15, separator: " "}
 // -> "Lorem ipsum..."
 ```
 
+### kofi.delay(time, fn)
+
+This is just [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout) 
+but with the arguments reversed (first the delay `time` in ms, then the callback `fn` function).
+
+```javascript
+kofi.delay(1000, function () {
+    console.log("Hello after 1 second!!");
+});
+```
+
+
+### kofi.timer(time, fn)
+
+This is just [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval) 
+but with the arguments reversed (first the delay `time` in ms and then the callback `fn` function).
+
+```javascript
+let counter = 0;
+kofi.timer(1000, function () {
+    counter = counter + 1;
+    console.log(counter);
+});
+```
 
 ### kofi.queue()
 
