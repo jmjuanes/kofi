@@ -1,32 +1,14 @@
 import {qs} from "./query-string.js";
 import {url} from "./url.js";
 
-//Get the current hashbang 
-const getHashbang = function () {
-    //Decode the current hash
-    //let hash = window.decodeURIComponent(window.location.hash.substring(1));
-    let hash = window.location.hash.substring(1);
-    //Check for empty hash or not valid hash
-    if (hash.trim() === "" || hash.charAt(0) !== "!") {
-        return "";
-    }
-    //Remove the last hash and the first !
-    return hash.replace(/^!/, "").replace(/\/$/, "");
-};
-
-//Change the hashbang url
-const setHashbang = function (str) {
-    window.location.hash = "#!" + str.replace(/^#!/, "");
-};
-
 //Build router
 export class BaseRouter {
     constructor() {
-        this._current = null;
+        this._current = "/";
         this._routes = [];
     }
     //Register a new route 
-    route(pattern, listener) {
+    add(pattern, listener) {
         if (typeof pattern === "function") {
             //Register the route as a global route
             return this.route("*", pattern);
@@ -43,10 +25,6 @@ export class BaseRouter {
     }
     //Set the current path
     set(str) {
-        return setHashbang(str);
-    }
-    //Open a route
-    load(str) {
         let self = this;
         //Check for invalid url
         if (typeof str !== "string" || str.charAt(0) !== "/") {
@@ -107,20 +85,12 @@ export class BaseRouter {
     }
     //Reload the current route 
     refresh() {
-        return this.load((this._current === null) ? getHashbang() : this._current);
-    }
-    //Listen to hash changes
-    listen() {
-        let self = this;
-        //Register the hash change listener
-        window.addEventListener("hashchange", function () {
-            return self.load(getHashbang());
-        });
-        //Load the first time
-        return this.refresh();
+        return this.set(this._current);
     }
 };
 
 //Create a router instance
-export const router = new BaseRouter();
+export const router = function () {
+    return new BaseRouter();
+};
 

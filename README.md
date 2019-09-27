@@ -305,33 +305,36 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 ```
 
 
-### kofi.router
+### kofi.router()
 
-A minimal client-side router utility.
+Generated a minimal client-side router utility.
 
 ```javascript 
+//Initialize a router instance
+let router = kofi.router();
+
 //Register single routes
-kofi.router.add("/foo", function () {
+router.add("/foo", function () {
     console.log("Enter to foo");
 });
 
 //Register routes with params
-kofi.router.add("/foo/:bar", function (req) {
+router.add("/foo/:bar", function (req) {
     console.log("Bar is " + req.params.bar);
 });
 
 //Read query parameters
-kofi.router.add("/bar", function (req) {
+router.add("/bar", function (req) {
     console.log("Name: " + req.query.name);
 });
 
 //Catch all route
-kofi.router.add(function (req) {
+router.add(function (req) {
     console.log("NOT FOUND!");
 });
 ```
 
-#### kofi.router.add(path, listener)
+#### router.add(path, listener)
 
 Registers a new listener for the route `path`. The listener receives an object with the request information: 
 
@@ -341,7 +344,7 @@ Registers a new listener for the route `path`. The listener receives an object w
 - `params`: an object with all the dynamic parts of the matched path. Default is an empty object `{}`.
 
 ```javascript
-kofi.router.add("/", function (req) {
+router.add("/", function (req) {
     console.log("Path: " + req.path);
     console.log("Pathname: " + req.pathname);
     console.log("Querystring values: ");
@@ -358,7 +361,7 @@ kofi.router.add("/", function (req) {
 If the provided `path` string is a catch-all path (`"*"`), the `listener` function will also receive a function to continue with the search of the route that matches the path.
 
 ```javascript
-kofi.router.add("*", function (req, next) {
+router.add("*", function (req, next) {
     console.log("New request --> " + req.pathname);
     return next();
 });
@@ -366,26 +369,18 @@ kofi.router.add("*", function (req, next) {
 
 Note that the order of how the routes are defined is important, so you should define the catch-all routes first.
 
-#### kofi.router.set(url)
+#### router.set(url)
 
 Call a handler for the provided `url` string.
 
-#### kofi.router.refresh()
+#### router.refresh()
 
-Call again the handler for the last url used with `kofi.router.set`.
+Call again the handler for the last url used with `router.set()`.
 
-#### kofi.router.get()
+#### router.get()
 
-Returns the current hasbang navigation url. 
+Returns the current url. 
 
-```javascript
-// Current url: localhost#!/foo/bar
-kofi.router.get(); // --> "/foo/bar"
-```
-
-#### kofi.router.listen()
-
-Starts the router listening for hashbang changes.
 
 
 ### kofi.helpers
