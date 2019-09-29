@@ -1,6 +1,6 @@
 {
     "name": "kofi",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "description": "Tasty takeaway frontend utilities. Just pour it and go!",
     "private": false,
     "main": "dist/kofi.cjs.js",
