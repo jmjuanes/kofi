@@ -1,7 +1,7 @@
 import {request} from "./request.js";
 
 //Default oprions
-let defaultOtpions = {
+let defaultOptions = {
     "file": null,
     "url": null,
     "chunkSize": 1048576, // 1MB Chunk size
@@ -90,7 +90,7 @@ export function fileUpload (args, callback) {
         //Prepare request values
         let chunkRequest = {
             "method": state.method,
-            "url": getPropertyValue(state.url, chunkProps),
+            "url": callfn(state.url, chunkProps),
             "headers": assign({}, callfn(state.headers, chunkProps)),
             "formData": formData
         };
