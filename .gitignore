@@ -3,4 +3,5 @@ package-lock.json
 *.swp
 dist
 tmp
+.DS_Store
 
