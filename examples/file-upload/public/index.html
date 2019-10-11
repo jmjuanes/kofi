@@ -1,0 +1,46 @@
+<html>
+    <head>
+        <title>File uploader demo</title>
+        <script type="text/javascript" src="/kofi.js"></script>
+    </head>
+    <body>
+        <div align="left">
+            <input type="file" id="file" />
+        </div>
+        <div align="left">
+            <button id="submit">Upload selected file</button>
+        </div>
+        <script type="text/javascript">
+            //Method to handle file upload
+            let handleUpload = function () {
+                let file = document.getElementById("file").files[0];
+                console.log(file);
+                //Build the upload options
+                let uploadOptions = {
+                    //"file": document.getElementById("file").files[0],
+                    "file": file,
+                    "method": "post",
+                    "url": "/upload",
+                    "query": {
+                        "fileName": file.name
+                    },
+                    "onChunkError": function (chunk, index) {
+                        console.error("Something went wrong uploading chunk " + index);
+                    },
+                    "onChunkUploadStart": function (chunk, index) {
+                        console.log("Uploading chunk " + index);
+                    },
+                    "onChunkUploadEnd": function (chunk, index) {
+                        console.log("Chunk " + index + " uploaded");
+                    }
+                };
+                //Run file upload
+                kofi.fileUpload(uploadOptions, function () {
+                    console.log("FILE UPLOADED");
+                });
+            };
+            //Register upload event
+            document.getElementById("submit").addEventListener("click", handleUpload, false);
+        </script>
+    </body>
+</html>
