@@ -5,6 +5,7 @@ import {createRef} from "./dom/ref.js";
 import {qs} from "./query-string.js";
 import {url} from "./url.js";
 import {request, HTTPError} from "./request.js";
+import {fileUpload} from "./file-upload.js";
 import {dispatch} from "./dispatch.js";
 import {queue} from "./queue.js";
 import {ready} from "./ready.js";
@@ -22,6 +23,7 @@ const kofi = {
     createRef,
     request,
     HTTPError,
+    fileUpload,
     url,
     qs,
     router,
