@@ -438,15 +438,10 @@ To handle the file upload, the following extra fields will be attached with the 
 - `chunkRetires`: number of retries to upload the current chunk.
 - `totalChunks`: number of chunks that will be uploaded.
 - `totalSize`: total size of the file.
-- `isFirstChunk`: `true` if this is the first chunk, `false` in other case.
-- `isLastChunk`: `true` if this is the last chunk, `false` in other case.
+- `isFirstChunk`: `"true"` if this is the first chunk, `"false"` in other case.
+- `isLastChunk`: `"true"` if this is the last chunk, `"false"` in other case.
 
 Also, other multipart parameters can be added using the `query` option.
-
-
-#### Examples
-
-See the [examples folder](./examples).
 
 
 ## Miscellanea
