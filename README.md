@@ -54,6 +54,7 @@ import {request, dispatch} from "kofi";
   - [kofi.router](#kofirouter)
 - HTTP requests
   - [kofi.request](#kofirequestoptions-callback)
+  - [kofi.fileUpload](#kofifileuploadoptions-callback)
 - Miscellanea 
   - [kofi.helpers](#kofihelpers)
   - [kofi.qs](#kofiqs)
@@ -398,6 +399,54 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 });
 ```
 
+### kofi.fileUpload(options, callback)
+
+This method allows you to upload large files through HTTP. The main idea is to split the large file into small chunks, and upload each chunk to the server. 
+
+This method only performs the file split and the upload of each chunk to the specified `url` and with the specified `options` (see available options below). The server implementation and the chunk reassembly is not provided on this package, but you can explore some of our [examples](./examples) that we used to test it.
+
+#### `options`
+
+An object with the options to perform the file upload. The following entries are allowed:
+
+- `file`: the HTML5 File object instance that will be uploaded to the server.
+- `url`: the target url form the post request.
+- `method`: method to use for sending the chunk. Default is `post`.
+- `chunkSize`: the maximum size in bytes of each uploaded chunk. Default is `1048576` (1Mb).
+- `chunkRetry`: number of times to retry chunk upload. Default is `0`.
+- `headers`: extra headers to add to each chunk request. Allowed values: `function` or `object`. Default is `{}`.
+- `query`: extra parameters to include in the multipart request. Allowed values: `function` or `object`. Default is `{}`.
+- `fileParam`: the name of the file parameter in the multipart request. Default is `file`.
+- `onFinish`: a `function` that will be called (if no `callback` argument is provided) when all chunks have been uploaded.  
+- `onChunkRequest`: a `function` that will be called with the request object that will be passed to `kofi.request` for each chunk.
+- `onChunkUploadStart`: a `function` that will be called before the chunk is sent to the server.
+- `onChunkUploadEnd`: a `function` that will be called when the chunk has been uploaded to the server.
+- `onChunkError`: a `function` that will be called when an error occurred during upload of a specific chunk.
+
+#### `callback`
+
+The callback function that will be executed when all chunks has been uploaded to the server.
+
+#### Preparing the server
+
+To handle the file upload, the following extra fields will be attached with the multipart request:
+
+- `chunkNumber`: the index of the current chunk. The first chunk starts at index `1`.
+- `chunkStart`: the starting byte of the chunk.
+- `chunkEnd`: the ending byte of the chunk.
+- `chunkSize`: the size of this chunk.
+- `chunkRetires`: number of retries to upload the current chunk.
+- `totalChunks`: number of chunks that will be uploaded.
+- `totalSize`: total size of the file.
+- `isFirstChunk`: `true` if this is the first chunk, `false` in other case.
+- `isLastChunk`: `true` if this is the last chunk, `false` in other case.
+
+Also, other multipart parameters can be added using the `query` option.
+
+
+#### Examples
+
+See the [examples folder](./examples).
 
 
 ## Miscellanea
