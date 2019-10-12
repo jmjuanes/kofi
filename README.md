@@ -403,14 +403,14 @@ kofi.request({url: "/process/uploads", method: "post", formData: formData}, func
 
 This method allows you to upload large files through HTTP. The main idea is to split the large file into small chunks, and upload each chunk to the server. 
 
-This method only performs the file split and the upload of each chunk to the specified `url` and with the specified `options` (see available options below). The server implementation and the chunk reassembly is not provided on this package, but you can explore some of our [examples](./examples) that we used to test it.
+This method only performs the file split and the upload of each chunk to the specified `url` and with the specified `options` (see available options below). The server implementation and the chunk reassembly are not provided in this package, but you can explore some of our [examples](./examples) that we used to test it.
 
 #### `options`
 
 An object with the options to perform the file upload. The following entries are allowed:
 
 - `file`: the HTML5 File object instance that will be uploaded to the server.
-- `url`: the target url form the post request.
+- `url`: the target url for the post request.
 - `method`: method to use for sending the chunk. Default is `post`.
 - `chunkSize`: the maximum size in bytes of each uploaded chunk. Default is `1048576` (1Mb).
 - `chunkRetry`: number of times to retry chunk upload. Default is `0`.
