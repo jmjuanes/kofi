@@ -1,6 +1,4 @@
-import {qs} from "./query-string.js";
-
-//Export default HTTP error
+//HTTP error class
 export class HTTPError extends Error {
     constructor(code, message) {
         super(message);
@@ -9,140 +7,177 @@ export class HTTPError extends Error {
     }
 }
 
-//Request method
-export const request = function (opt, callback) {
-    //Check the function arguments
-    if (typeof opt === "undefined") {
-        throw new Error("Undefined ajax options object");
+//Default HTTP methods
+export const httpMethods = [
+    "get", 
+    "post", 
+    "patch", 
+    "put", 
+    "delete", 
+    "options"
+];
+
+//Default status code validator
+//By default, reject if the status code is greater than or equal to 300
+function validateStatus (status) {
+    return status >= 300;
+}
+
+//Convert a query object to string
+// queryString({"a": 1, "b": 2}); // -> "a=1&b=2"
+export function queryString (items) {
+    if (typeof items !== "object") {
+        return items;
     }
-    if (typeof callback !== "function") {
-        throw new Error("Undefined ajax callback function");
-    }
-    if (typeof opt.url === "undefined") {
-        throw new Error("Undefined url");
+    let output = []; //Output list
+    Object.keys(items).forEach(function (key) {
+        output.push(encodeURIComponent(key) + "=" + encodeURIComponent(items[key]));
+    });
+    //Join all items 
+    return output.join("&");
+}
+
+//Perform the request with the given configuration
+export function request (options) {
+    //Check the url
+    if (typeof options.url !== "string") {
+        throw new Error("No url provided");
     }
     //Parse and check the method
-    opt.method = (typeof opt.method !== "string") ? "get" : opt.method.trim().toLowerCase();
-    if (opt.method === "head") {
-        throw new Error("Method HEAD not allowed");
+    options.method = (typeof options.method !== "string") ? "get" : options.method.trim().toLowerCase();
+    else if (httpMethods.indexOf(options.method) === -1) {
+        throw new Error(`Method ${options.method} not available`);
     }
     //Parse the options
-    opt.json = (typeof opt.json !== "boolean") ? false : opt.json;
-    opt.body = (typeof opt.body === "string" || typeof opt.body === "object") ? opt.body : "";
-    opt.form = (typeof opt.form === "object") ? opt.form : null;
-    opt.formData = (typeof opt.formData === "object" && opt.formData instanceof FormData) ? opt.formData : null;
-    opt.processData = (typeof opt.processData === "boolean") ? opt.processData : true;
-    opt.auth = (typeof opt.auth === "object") ? opt.auth : null;
-    opt.headers = (typeof opt.headers === "object") ? opt.headers : {};
-    //Initialize the new XMLHttpRequest object
-    let xhttp = new XMLHttpRequest();
-    //Add the ready state change listener
-    xhttp.onreadystatechange = function () {
-        if (this.readyState !== 4) {
-            return;
-        }
-        //Initilize the response object
-        let response = {
-            "method": opt.method,
-            "statusCode": this.status,
-            "statusMessage": this.statusText,
-            "url": opt.url,
-            "headers": {},
-            "rawHeaders": this.getAllResponseHeaders().split("\n")
-        };
-        //Parse all the headers and save to the headers object
-        response.rawHeaders.forEach(function (line) {
-            if (line.trim().length === 0) {
-                return;
+    options.json = (typeof options.json !== "boolean") ? false : options.json;
+    options.body = (typeof options.body === "string" || typeof options.body === "object") ? options.body : "";
+    options.form = (typeof options.form === "object") ? options.form : null;
+    options.formData = (typeof options.formData === "object" && options.formData instanceof FormData) ? options.formData : null;
+    options.processData = (typeof options.processData === "boolean") ? options.processData : true;
+    options.headers = (typeof options.headers === "object") ? options.headers : {};
+    //options.auth = (typeof opt.auth === "object") ? opt.auth : null; // <<< Deprecated (use headers instead)
+    options.validateStatus = (typeof options.validateStatus === "function") ? options.validateStatus : validateStatus;
+    //Return the request promise
+    return new Promise(function (resolve, reject) {
+        //Initialize the new XMLHttpRequest object
+        let xhttp = new XMLHttpRequest();
+        //Add the ready state change listener
+        xhttp.onreadystatechange = function () {
+            if (this.readyState !== 4) {
+                return; // --> Request not ready yet
             }
-            let items = line.split(": ");
-            if (items.length !== 2) {
-                return;
-            }
-            //Save the header
-            response.headers[items[0].toLowerCase().trim()] = items[1].trim();
-        });
-        //Initialize the response body content
-        let body = null;
-        try {
-            //Check for parsing the body string as a JSON
-            body = (opt.json === true) ? JSON.parse(this.responseText) : this.responseText;
-        }
-        catch (error) {
-            return callback(error, response, this.responseText);
-        }
-        //Check for http request error
-        if (response.statusCode >= 300) {
-            //Call the callback with an HTTPError
-            return callback(new HTTPError(response.statusCode, response.statusMessage), response, body);
-        } else {
-            //Call without error
-            return callback(null, response, body);
-        }
-    };
-    //Check and add the progress listener
-    if (typeof opt.onProgress === "function") {
-        xhttp.upload.onprogress = opt.onProgress;
-    }
-    //Open the connection
-    xhttp.open(opt.method.toUpperCase(), opt.url, true);
-    //Assign the headers
-    Object.keys(opt.headers).forEach(function (key) {
-        xhttp.setRequestHeader(key.toLowerCase(), opt.headers[key]);
-    });
-    //Check for authentication information
-    if (opt.auth) {
-        //Check the authentication type
-        //https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication#Authentication_schemes
-        if (typeof opt.auth.bearer === "string") {
-            //Register the bearer token authentication
-            xhttp.setRequestHeader("authorization", "Bearer " + opt.auth.bearer);
-        }
-        else if (typeof opt.auth.basic === "string") {
-            //Register the basic token authentication
-            xhttp.setRequestHeader("authorization", "Basic " + opt.auth.basic);
-        }
-    }
-    //Check for non GET request
-    if (opt.method !== "get") {
-        //Initialize the data
-        let data = (typeof opt.body === "string") ? opt.body : "";
-        //Check for form data
-        if (opt.form) {
-            xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-            if (opt.processData === true) {
-                data = qs.stringify(opt.form);
-            }
-            else {
-                data = opt.form;
-            }
-        }
-        else if (opt.formData) {
-            //Set the content type
-            //Don't add the content-type header --> https://stackoverflow.com/a/5976031
-            //xhttp.setRequestHeader("content-type", "multipart/form-data");
-            data = opt.formData;
-        }
-        else if (opt.json === true) {
-            //Add the JSON headers
-            xhttp.setRequestHeader("accept", "application/json");
-            xhttp.setRequestHeader("content-type", "application/json");
+            //Initilize the response object
+            let response = {
+                "error": null,
+                "method": options.method,
+                "statusCode": this.status,
+                "statusMessage": this.statusText,
+                "url": options.url,
+                "headers": {},
+                "rawHeaders": this.getAllResponseHeaders().split("\n"),
+                "body": this.responseText
+            };
+            //Parse all the headers and save to the headers object
+            response.rawHeaders.forEach(function (line) {
+                if (line.trim().length === 0) {
+                    return; // --> Empty header (TODO: throw error)
+                }
+                let items = line.split(": ");
+                if (items.length !== 2) {
+                    return; // --> Invalid header (TODO: throw error)
+                }
+                //Save the header
+                response.headers[items[0].toLowerCase().trim()] = items[1].trim();
+            });
+            //Parse the body 
             try {
-                //Serialize the body data
-                data = (typeof opt.body === "object" && opt.processData === true) ? JSON.stringify(opt.body) : opt.body;
+                //Check for parsing the body string as a JSON
+                if (options.json === true) {
+                    response.body = JSON.parse(this.responseText);
+                }
             }
-            catch (e) {
-                return callback(e, null, null);
+            catch (error) {
+                //Error parsing body data --> reject
+                return reject(Object.assign(response, {
+                    "error": errori
+                }));
+            }
+            //Check for http request error
+            if (options.validateStatus(response.statusCode) !== true) {
+                //return reject(new HTTPError(response.statusCode, response.statusMessage));
+                return reject(Object.assign(response, {
+                    "error": new HTTPError(response.statusCode, response.statusMessage)
+                }));
+            }
+            //Call without error
+            return resolve(response);
+        };
+        //Add the upload started listener
+        if (typeof options.onUploadStart === "function") {
+            xhttp.upload.onloadstart = function (event) {
+                return options.onUploadStart(event);
+            };
+        }
+        //Add the upload progress listener
+        if (typeof options.onUploadProgress === "function") {
+            //Create a wrapper for calling the provided on-progress method
+            // event: an event instance with the following wanted fields
+            //  - loaded: amount of data currently transfered
+            //  - total: total amount of data to be transferred
+            xhttp.upload.onprogress = function (event) {
+                return options.onUploadProgress(event);
+            };
+        }
+        //Add the upload end listener
+        if (typeof options.onUploadEnd === "function") {
+            xhttp.upload.onload = function (event) {
+                return options.onUploadEnd(event);
+            };
+        }
+        //Open the connection
+        xhttp.open(options.method.toUpperCase(), options.url, true);
+        //Assign the headers
+        Object.keys(options.headers).forEach(function (key) {
+            xhttp.setRequestHeader(key.toLowerCase(), options.headers[key]);
+        });
+        //Prepare the data to send to the server
+        let data = null;
+        //Check for non GET request
+        if (options.method !== "get") {
+            //Initialize the data
+            let data = (typeof options.body === "string") ? opt.body : "";
+            //Check for form data
+            if (options.form) {
+                xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
+                data = (options.processData) ? queryString(options.form) : options.form;
+            }
+            //Check for formdata object provided
+            else if (options.formData) {
+                //Don't add the content-type header --> https://stackoverflow.com/a/5976031
+                //xhttp.setRequestHeader("content-type", "multipart/form-data");
+                data = options.formData;
+            }
+            else if (options.json === true) {
+                //Add the JSON headers
+                xhttp.setRequestHeader("accept", "application/json");
+                xhttp.setRequestHeader("content-type", "application/json");
+                //Serialize the body data
+                try {
+                    if (typeof options.body === "object" && options.processData === true) {
+                        data = JSON.stringify(options.body);  // <<-- Stringify and save the body
+                    }
+                }
+                catch (error) {
+                    return reject(error); // <<-- Error parsing body data
+                }
             }
         }
-        //Send the parsed data
+        //Check the before send option
+        if (typeof options.beforeSend === "function") {
+            options.beforeSend.call(null, xhttp); // <--- Provide the xhttp instance
+        }
+        //Send the request
         xhttp.send(data);
-    }
-    else {
-        //Send the request without data
-        xhttp.send(null);
-    }
-    //Return the XMLHttpRequest instance
-    return xhttp;
-};
+    });
+}
 
