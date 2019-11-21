@@ -1,11 +1,9 @@
 //Create a dom element
 export function createElement (type, props) {
-    if(typeof props !== "object") { 
+    if(typeof props !== "object" || props === null) { 
         props = {}; 
     }
-    //Initialize the children list
-    let children = [];
-    //Check the number of arguments
+    let children = []; //Initialize the chinldren list
     if (arguments.length >= 3) {
         //Insert all children elements
         for (let i = 2; i < arguments.length; i++) {
@@ -20,7 +18,11 @@ export function createElement (type, props) {
     }
     //Parse the element type
     if (typeof type === "string") {
-        return {"type": type.toLowerCase().trim(), "props": props, "children": children};
+        return {
+            "type": type.toLowerCase().trim(), 
+            "props": props, 
+            "children": children
+        };
     }
     else {
         //Render the component and return the generated element tree
@@ -29,7 +31,7 @@ export function createElement (type, props) {
 }
 
 //Mount an element
-export function mountElement (el, parent, refs) {
+export function render (el, parent, refs) {
     if (typeof refs !== "object" || refs === null) {
         refs = {};
     }
@@ -47,7 +49,7 @@ export function mountElement (el, parent, refs) {
         });
         //Mount each children in the new node
         el.children.forEach(function(child) {
-            return mountElement(child, node, refs);
+            return render(child, node, refs);
         });
     }
     //Mount the new node
@@ -58,7 +60,7 @@ export function mountElement (el, parent, refs) {
 }
 
 //Update an element
-export function updateElement (newNode, oldNode, parent, refs, index) {
+export function update (newNode, oldNode, parent, refs, index) {
     if (typeof refs !== "object" || refs === null) {
         refs = {};
     }
@@ -67,7 +69,7 @@ export function updateElement (newNode, oldNode, parent, refs, index) {
     }
     //Check for no old node --> mount this new element
     if (!oldNode) { 
-        return mountElement(newNode, parent, refs); 
+        return render(newNode, parent, refs); 
     }
     //If there is not new element --> remove the old element
     else if (!newNode) { 
@@ -75,7 +77,7 @@ export function updateElement (newNode, oldNode, parent, refs, index) {
     }
     //If nodes has changed
     else if (nodesDiffs(newNode, oldNode)) {
-        return parent.replaceChild(mountElement(newNode, null, refs), parent.childNodes[index]);
+        return parent.replaceChild(render(newNode, null, refs), parent.childNodes[index]);
     }
     //Change the properties only if element is not an string
     else if (typeof newNode !== "string") {
@@ -99,7 +101,7 @@ export function updateElement (newNode, oldNode, parent, refs, index) {
             //Get the nodes to update
             let newChildren = (i < newNode.children.length) ? newNode.children[i] : null;
             let oldChildren = (i < oldNode.children.length) ? oldNode.children[i] : null;
-            updateElement(newChildren, oldChildren, parent.childNodes[index], refs, i);
+            update(newChildren, oldChildren, parent.childNodes[index], refs, i);
         }
     }
 }
@@ -132,9 +134,9 @@ function setProperty (parent, name, value, refs) {
     else if (name === "ref") {
         refs[value] = parent;
     }
-    //Check for class property
-    else if (name === "className") {
-        parent.setAttribute("class", value);
+    //Check for class|checked|value  property
+    else if (name === "className" || name === "checked" || name === "value") {
+        parent[name] = value;
     }
     //Check for style property
     else if (name === "style") {
@@ -147,16 +149,16 @@ function setProperty (parent, name, value, refs) {
         });
     }
     //Check for event listener property
-    else if (isEventProperty(name) === true) {
-        //Register the event listener
+    else if (typeof value === "function" && name.startsWith("on")) {
         parent.addEventListener(name.slice(2).toLowerCase(), value);
     }
+    //Check for boolean attribute
     else if (value === true) {
         parent[name] = true;
         parent.setAttribute(name, "true");
     }
+    //Default: set the attribute name
     else {
-        //Default, set the attribute value
         parent.setAttribute(name, value);
     }
 }
@@ -172,7 +174,7 @@ function removeProperty (parent, name, value, refs) {
     else if (name === "ref") {
         delete refs[value];
     }
-    else if (isEventProperty(name) === true) {
+    else if (typeof value === "function" && name.startsWith("on")) {
         //Remove the event listener
         parent.removeEventListener(name.slice(2).toLowerCase(), value);
     }
@@ -185,11 +187,5 @@ function removeProperty (parent, name, value, refs) {
         //Default, remove the attribute value
         parent.removeAttribute(name);
     }
-}
-
-//Check if the property is an event listener
-function isEventProperty (name) {
-    //Return if the property name starts with "on"
-    return /^on/.test(name);
 }
 
