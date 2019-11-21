@@ -1,3 +1,5 @@
+import {buildQueryString} from "./query-string.js";
+
 //HTTP error class
 export class HTTPError extends Error {
     constructor(code, message) {
@@ -21,20 +23,6 @@ export const httpMethods = [
 //By default, reject if the status code is greater than or equal to 300
 function validateStatus (status) {
     return status >= 300;
-}
-
-//Convert a query object to string
-// queryString({"a": 1, "b": 2}); // -> "a=1&b=2"
-export function queryString (items) {
-    if (typeof items !== "object") {
-        return items;
-    }
-    let output = []; //Output list
-    Object.keys(items).forEach(function (key) {
-        output.push(encodeURIComponent(key) + "=" + encodeURIComponent(items[key]));
-    });
-    //Join all items 
-    return output.join("&");
 }
 
 //Perform the request with the given configuration
@@ -149,7 +137,7 @@ export function request (options) {
             //Check for form data
             if (options.form) {
                 xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-                data = (options.processData) ? queryString(options.form) : options.form;
+                data = (options.processData) ? buildQueryString(options.form) : options.form;
             }
             //Check for formdata object provided
             else if (options.formData) {
