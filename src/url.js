@@ -5,22 +5,17 @@ let delimiter = "/";
 //Inspired in: https://nodejs.org/api/url.html#url_url_resolve_from_to
 // Examples: 
 // url.resolve("http://example.com/", "/one");  ---> "http://example.com/one"
-let resolve = function (from, to) {
+export function resolveUrl (from, to) {
     return new URL(to, from).href;
-};
+}
 
 //Parse an url
-let parse = function (str) {
+export function parseUrl(str) {
     return new URL(str);
-};
-
-//Redirect to a provided url
-let redirect = function (str) {
-    window.location.href = str;
-};
+}
 
 //Join urls
-let join = function (base) {
+export function joinUrl (base) {
     //Initialize the joined url
     let joinedUrl = (base.charAt(base.length -1) !== delimiter) ? base + delimiter : base;
     //Append all urls
@@ -39,22 +34,12 @@ let join = function (base) {
     }
     //Return the joined url
     return joinedUrl;
-};
+}
 
 //Split an url
-let split = function (path) {
+export function splitUrl (path) {
     return path.split(delimiter).filter(function (path) {
         return path.length !== 0;
     });
-};
-
-//Export url methods
-export const url = {
-    delimiter,
-    parse,
-    resolve,
-    redirect,
-    join,
-    split
-};
+}
 
