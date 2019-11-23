@@ -1,90 +1,93 @@
-import {mountElement, updateElement} from "./element.js";
+import {render, update} from "./element.js";
+import {isObject, isFunction, freeze} from "./helpers.js";
 
-//Create a new component
-export function createComponent(obj) {
-    if (typeof obj !== "object" || obj === null) {
-        throw new Error("createComponent argument must ve a valid object");
+//Create a new kofi app
+export function createApp (value) {
+    if (isObject(value) === false) {
+        throw new Error("kofi.createApp argument must ve a valid object");
     }
-    //Component default configuration
-    let component = {
-        //"state": null,
-        //"props": null,
-        //"refs": null,
-        "getDefaultState": function () {
-            return {};
-        },
-        "getDefaultProps": function () {
-            return {};
-        }
-    };
-    //Assign the functions defined in the provided object
-    Object.keys(obj).forEach(function (key) {
-        //Check for invalid component key
-        if (key === "state" || key === "props") {
-            throw new Error("Invalid function name '" + key + "'. This name is already reserved");
-        }
-        if (typeof obj[key] === "function") {
-            component[key] = obj[key];
-        }
-        //console.warn("Invalid type '" + key + "'. Only functions are allowed");
-    });
-    //Undefined component render
-    if (typeof component.render !== "function") {
-        throw new Error("You must implement the component's 'render' method");
+    //Check for no render method provided
+    if (!isFunction(value.render)) {
+        throw new Error("You must implement a 'render' method");
     }
-    //Return the new component
-    return component;
+    //Return the app definition
+    return value;
 }
 
-//Mount a component
-export function mountComponent(originalComponent, props, parent) {
-    //Clone the component
-    let component = Object.assign({}, originalComponent);
-    Object.keys(component).forEach(function (key) {
-        if (typeof component[key] === "function") {
-            component[key] = component[key].bind(component);
+//Render app
+let renderApp = function (instance) {
+    let vdom = instance.render.call(instance); 
+    //Check for not object or string provided after calling the render method
+    if (typeof vdom !== "object" && typeof vdom !== "string") {
+        throw new Error("Invalid content returned from 'render' method.");
+    }
+    //Return the vdom tree
+    return vdom;
+};
+
+//Create a kofi application
+export function app (obj, props, parent) {
+    //Undefined renderer
+    if (!isFunction(obj.render)) {
+        throw new Error("You must implement a 'render' method");
+    }
+    //Initialize a new instance on the app component
+    let instance = Object.assign({}, obj);
+    Object.keys(instance).forEach(function (key) {
+        if (typeof instance[key] === "function") {
+            instance[key] = instance[key].bind(instance);
         }
     });
-    let currentContent = null;
-    //Get the initial state, refs and props
-    component.props = Object.assign(component.getDefaultProps(), props);
-    component.state = component.getDefaultState();
-    component.refs = {};
-    //Render the component content
-    let renderComponent = function () {
-        let content = component.render.call(component, component.props, component.state);
-        if (typeof content !== "object") {
-            throw new Error("Invalid content returned from 'render' method.");
-        }
-        return content;
-    };
-    //Call the component created
-    if (typeof component.onCreated === "function") {
-        component.onCreated.call(component);
+    //Initialize instance state and props
+    Object.assign(instance, {
+        "props": freeze((isObject(props) === true) ? props : {}), 
+        //"state": {}, //getDefaultValues(obj.initstate, {}),
+        "refs": {},
+        "__vdom": null,
+        "__parent": parent
+    });
+    //Call the app init method
+    if (isFunction(instance.oninit)) {
+        instance.oninit.call(instance);
     }
-    //Define component set state method
-    component.setState = function (newState, cb) {
-        if (typeof newState !== "object" || newState === null) {
-            throw new Error("New state must be an object");
+    //Define app update method
+    instance.update = function (cb) {
+        let self = this;
+        //if (isObject(newState) === true) {
+        //    //throw new Error("New state must be an object");
+        //    Object.assign(self.state, newState); //Update the instance state
+        //}
+        let vdom = renderApp(self); //Get a new vdom tree
+        update(vdom, self.__vdom, self.__parent, self.refs);
+        self.__vdom = vdom; //Update the current rendererd vdom tree
+        if (isFunction(self.onupdate)) {
+            self.onupdate.call(self);
         }
-        component.state = Object.assign(component.state, newState);
-        let content = renderComponent();
-        updateElement(content, currentContent, parent, component.refs);
-        currentContent = content;
-        if (typeof component.onUpdated === "function") {
-            component.onUpdated.call(component);
-        }
-        if (typeof cb === "function") {
-            return cb.call(component);
+        //Check if a callback has been provided
+        if (isFunction(cb)) {
+            return cb.call(null);
         }
     };
-    component.setState = component.setState.bind(this);
+    //Bind update method
+    instance.update = instance.update.bind(instance);
+    //Register destroy method
+    instance.destroy = function () {
+        let self = this;
+        if (isFunction(self.onremove)) {
+            self.onremove.call(self);
+        }
+        //Remove all nodes from parent
+        while(self.__parent.lastElementChild) {
+            self.__parent.removeChild(self.__parent.lastElementChild);
+        }
+    };
     //Mount the component
-    currentContent = renderComponent();
-    mountElement(currentContent, parent, component.refs);
-    if (typeof component.onMounted === "function") {
-        component.onMounted.call(component);
+    instance.__vdom = renderApp(instance);
+    render(instance.__vdom, instance.__parent, instance.refs);
+    if (isFunction(instance.onmount)) {
+        instance.onmount.call(instance);
     }
-    return component;
+    //Return the app instance
+    return instance;
 }
 
