@@ -2,16 +2,17 @@ import {qs} from "./query-string.js";
 import {url} from "./url.js";
 
 //Build router
-export class BaseRouter {
+export class Router {
     constructor() {
-        this._current = "/";
+        this._path = "/";
+        this._instance = null; 
         this._routes = [];
     }
     //Register a new route 
     add(pattern, listener) {
         if (typeof pattern === "function") {
             //Register the route as a global route
-            return this.route("*", pattern);
+            return this.add("*", pattern);
         }
         //Register this route
         this._routes.push({
@@ -90,7 +91,5 @@ export class BaseRouter {
 };
 
 //Create a router instance
-export const router = function () {
-    return new BaseRouter();
-};
+export const router = new Router();
 
