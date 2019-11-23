@@ -33,7 +33,7 @@ export function request (options) {
     }
     //Parse and check the method
     options.method = (typeof options.method !== "string") ? "get" : options.method.trim().toLowerCase();
-    else if (httpMethods.indexOf(options.method) === -1) {
+    if (httpMethods.indexOf(options.method) === -1) {
         throw new Error(`Method ${options.method} not available`);
     }
     //Parse the options
