@@ -1,5 +1,5 @@
 //Create a dom element
-export function createElement (type, props) {
+export function element (type, props) {
     if(typeof props !== "object" || props === null) { 
         props = {}; 
     }
