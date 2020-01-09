@@ -1,3 +1,4 @@
+import {isObject, isArray, delay} from "./helpers.js";
 import {buildQueryString} from "./query-string.js";
 
 //HTTP error class
@@ -25,6 +26,28 @@ function validateStatus (status) {
     return status >= 300;
 }
 
+////Default retry options
+//let defaultRetryOptions = {
+//    "codes": [408, 413, 429, 500, 501, 502, 503, 504],
+//    "limit": 0
+//};
+//
+////Parse retry option
+//function parseRetryOption (option) {
+//    //Check for number value --> use it as the retyr limit
+//    if (typeof option === "number" && option > 0) {
+//        return Object.assign({}, defaultRetryOptions, {
+//            "limit": option
+//        });
+//    }
+//    //Check for object --> merge with the default options
+//    else if (isObject(option) === true) {
+//        return Object.assign({}, defaultRetryOptions, option);
+//    }
+//    //Default --> return the default retry options
+//    return defaultRetryOptions;
+//}
+
 //Perform the request with the given configuration
 export function request (options) {
     //Check the url
@@ -45,6 +68,8 @@ export function request (options) {
     options.headers = (typeof options.headers === "object") ? options.headers : {};
     //options.auth = (typeof opt.auth === "object") ? opt.auth : null; // <<< Deprecated (use headers instead)
     options.validateStatus = (typeof options.validateStatus === "function") ? options.validateStatus : validateStatus;
+    //options.retry = parseRetryOption(options.retry);
+    //options.currentRetry = 0;
     //Return the request promise
     return new Promise(function (resolve, reject) {
         //Initialize the new XMLHttpRequest object
@@ -87,7 +112,7 @@ export function request (options) {
             catch (error) {
                 //Error parsing body data --> reject
                 return reject(Object.assign(response, {
-                    "error": errori
+                    "error": error
                 }));
             }
             //Check for http request error
@@ -156,7 +181,7 @@ export function request (options) {
                     }
                 }
                 catch (error) {
-                    return reject(error); // <<-- Error parsing body data
+                    return reject({"error": error}); // <<-- Error parsing body data
                 }
             }
         }
