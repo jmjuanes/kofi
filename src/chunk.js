@@ -35,4 +35,7 @@ export function chunk (blob, size, callback) {
     });
 }
 
+//Export chunk default size: 1MB
+export const chunkDefaultSize = 1048576;
+
 

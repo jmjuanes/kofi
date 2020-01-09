@@ -1,5 +1,5 @@
 import {app, createApp} from "./app.js";
-import {chunk} from "./chunk.js";
+import {chunk, chunkDefaultSize} from "./chunk.js";
 import {getCookie, setCookie, deleteCookie} from "./cookies.js";
 import {dispatch} from "./dispatch.js";
 import {element, render} from "./element.js";
@@ -15,6 +15,7 @@ const kofi = {
     app,
     createApp,
     chunk,
+    chunkDefaultSize,
     getCookie,
     setCookie,
     deleteCookie,
