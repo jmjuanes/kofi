@@ -16,6 +16,7 @@
                 let file = document.getElementById("file").files[0];
                 console.log(file);
                 let chunkPromise = kofi.chunk(file, 1024*1024, function (chunk, resolve, reject) {
+                    //console.log(chunk);
                     let formData = new FormData();
                     formData.append("file", chunk.blob);
                     formData.append("fileName", file.name);
