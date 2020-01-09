@@ -35,7 +35,7 @@ class RouteUpload(object):
         ## Handle multipart/form-data:
         ## https://falcon.readthedocs.io/en/stable/user/faq.html#how-can-i-access-posted-files
         ## Save the uploaded file
-        chunk_index = int(req.get_param("chunkNumber")) - 1
+        chunk_index = int(req.get_param("chunkIndex"))
         total_chunks = int(req.get_param("totalChunks"))
         print("Chunk index: " + str(chunk_index))
         ## Save the uploaded chunk
