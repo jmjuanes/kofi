@@ -23,7 +23,7 @@ export const httpMethods = [
 //Default status code validator
 //By default, reject if the status code is greater than or equal to 300
 function validateStatus (status) {
-    return status >= 300;
+    return status < 300;
 }
 
 ////Default retry options
@@ -158,7 +158,7 @@ export function request (options) {
         //Check for non GET request
         if (options.method !== "get") {
             //Initialize the data
-            let data = (typeof options.body === "string") ? opt.body : "";
+            let data = (typeof options.body === "string") ? options.body : "";
             //Check for form data
             if (options.form) {
                 xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
