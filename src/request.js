@@ -158,7 +158,7 @@ export function request (options) {
         //Check for non GET request
         if (options.method !== "get") {
             //Initialize the data
-            let data = (typeof options.body === "string") ? options.body : "";
+            data = (typeof options.body === "string") ? options.body : "";
             //Check for form data
             if (options.form) {
                 xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
