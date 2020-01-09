@@ -17,11 +17,11 @@ let getChunkPath = function (index) {
 //Handle file upload
 let handleFileUpload = function (req, res) {
     //Print upload metadata
-    console.log(req.body);
+    //console.log(req.body);
     //console.log(req.file);
     let isFirstChunk = req.body.isFirstChunk === "true";
     let isLastChunk = req.body.isLastChunk === "true";
-    let chunkIndex = parseInt(req.body.chunkNumber) - 1;
+    let chunkIndex = parseInt(req.body.chunkIndex);
     let totalChunks = parseInt(req.body.totalChunks);
     //console.log("Chunk index: " + chunkIndex);
     //console.log("Total chunks: " + totalChunks);
