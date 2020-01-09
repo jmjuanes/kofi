@@ -15,28 +15,45 @@
             let handleUpload = function () {
                 let file = document.getElementById("file").files[0];
                 console.log(file);
-                //Build the upload options
-                let uploadOptions = {
-                    //"file": document.getElementById("file").files[0],
-                    "file": file,
-                    "method": "post",
-                    "url": "/upload",
-                    "query": {
-                        "fileName": file.name
-                    },
-                    "onChunkError": function (chunk, index) {
-                        console.error("Something went wrong uploading chunk " + index);
-                    },
-                    "onChunkUploadStart": function (chunk, index) {
-                        console.log("Uploading chunk " + index);
-                    },
-                    "onChunkUploadEnd": function (chunk, index) {
-                        console.log("Chunk " + index + " uploaded");
-                    }
-                };
+                let chunkPromise = kofi.chunk(file, 1024*1024, function (chunk, resolve, reject) {
+                    let formData = new FormData();
+                    formData.append("file", chunk.blob);
+                    formData.append("fileName", file.name);
+                    formData.append("chunkIndex", chunk.index);
+                    //formData.append("chunkSize", chunk.size);
+                    formData.append("totalChunks", chunk.total);
+                    formData.append("isFirstChunk", (chunk.index === 0) ? "true" : "false");
+                    formData.append("isLastChunk", (chunk.index + 1 === chunk.total) ? "true" : "false");
+                    let request = kofi.request({
+                        "method": "post",
+                        "url": "/upload",
+                        "formData": formData,
+                        "onUploadStart": function () {
+                            console.log("Uploading chunk " + chunk.index);
+                        },
+                        "onUploadEnd": function () {
+                            console.log("Chunk " + chunk.index + " uploaded");
+                        }
+                    });
+                    //Upload completed
+                    request.then(function (response) {
+                        console.log(response);
+                        return resolve(null);
+                    });
+                    //Upload error
+                    request.catch(function (response) {
+                        console.error("Something went wrong uploading chunk " + chunk.index);
+                        console.log(response);
+                        return reject(null);
+                    });
+                });
                 //Run file upload
-                kofi.fileUpload(uploadOptions, function () {
+                chunkPromise.then(function () {
                     console.log("FILE UPLOADED");
+                });
+                //Run file error
+                chunkPromise.catch(function () {
+                    console.log("Error uploading file");
                 });
             };
             //Register upload event
