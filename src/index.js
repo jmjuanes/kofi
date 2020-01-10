@@ -1,4 +1,4 @@
-import {app, createApp} from "./app.js";
+import {mount} from "./app.js";
 import {chunk, chunkDefaultSize} from "./chunk.js";
 import {getCookie, setCookie, deleteCookie} from "./cookies.js";
 import {dispatch} from "./dispatch.js";
@@ -12,8 +12,7 @@ import {joinUrl, parseUrl, splitUrl, resolveUrl} from "./url.js";
 
 //Build kofi object
 const kofi = {
-    app,
-    createApp,
+    mount,
     chunk,
     chunkDefaultSize,
     getCookie,
