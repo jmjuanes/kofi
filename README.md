@@ -84,8 +84,49 @@ kofi.element(Welcome, {"name": "Bob"});
 
 #### Props
 
-The `props` argument is an object with the data of the element. This can include HTML attributes or custom properties that our functional element will use.
+The `props` argument is an object with the data of the element. This can include HTML attributes, events listeners or custom properties that our functional element will use.
 
+```javascript
+kofi.element("div", {
+    "className": "button",
+    "onclick": function (event) { /* Handle click event */},
+    "id": "button1"
+});
+```
+
+##### Class names
+
+Use the `className` property to set the CSS class.
+
+```javascript
+kofi.element("div", {"className": "button"}, "Button");
+```
+
+##### Events
+
+Attach a callback listener to an event.
+
+```javascript
+kofi.element("div", {
+    "onclick": function (event) { /* Handle click event */},
+    "onmousedown": function (event) { /* Handle mouse down event */},
+    "onmouseup": function (event) { /* Handle mouse up event */}
+});
+```
+
+##### Styles
+
+You can provide an object with the style of the element. All styles attributes should be in camel-case format.
+
+```javascript
+kofi.element("div", {
+    "style": {
+        "backgroundColor": "blue",
+        "color": "white"
+    },
+    "align": "center"
+}, "Hello");
+```
 
 
 #### Use it with JSX
