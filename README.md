@@ -174,7 +174,7 @@ The first argument is the parent DOM element, and the second arguments is the VD
 
 ### kofi.app(spec)
 
-Creates a new kofi app component.
+This method creates and validates a new kofi app component.
 
 ```javascript
 let MyApp = kofi.app({
@@ -193,9 +193,51 @@ let MyApp = kofi.app({
 });
 ```
 
+A kofi app component is just an object with a `render` method. 
+
+#### State and updating
+
+The `state` is an object that holds information about the application and is managed only by the application. Each time the state of the application changes, the application is re-rendered.
+
+
+Usually the state gets it's initial data in the `oninit()` method. This is the only place where you should update the state manually.
+
+#### App lifecycle
+
+Apps components can have lifecycle methods, which will be invoked at various points during the lifecycle of your application component. 
+
+##### oninit()
+
+This method is invoked before the app is mounted. This is the recommended place to initialize the application state.
+
+```javascript
+kofi.app({
+    "oninit": function () {
+        this.state = {
+            "count": 0
+        };
+    },
+    . . .
+});
+```
+
+**You should not call update() in the oninit() method**. Instead, update the `this.state` object directly in the **oninit()** method.
+
+##### onmount()
+
+This method is invoked immediately after the app is mounted.
+
+##### onupdate()
+
+This method is invoked immediately after updating occurs. This method is not called for the initial render.
+
+
 ### kofi.mount(parent, app, props)
 
-Mounts the result of a `kofi.app` call to the parent DOM element.
+Mounts the result of a `kofi.app` call to the parent DOM element. 
+This method is similar to `kofi.render`, but instead of drawing the DOM element once, it will update the DOM element each time the `update` method is called.
+
+For example, let's mount the following app component:
 
 ```javascript
 let MyApp = kofi.app({
@@ -215,6 +257,17 @@ let MyApp = kofi.app({
 
 kofi.mount(document.getElementById("root"), MyApp, {"initialValue": 0});
 ```
+
+This will render the first time as follows:
+
+```html
+<div>
+    <div>Count: 0</div>
+    <button>Increment</button>
+</div>
+```
+
+Each time that the user clicks on the button, the `count` variable will be increment in one unit and the DOM will be updated with the new count value.
 
 
 ### kofi.request(options)
