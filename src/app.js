@@ -72,7 +72,7 @@ export function mount (parent, obj, props) {
     };
     //Mount the component
     instance.__vdom = renderApp(instance);
-    render(instance.__vdom, instance.__parent, instance.refs);
+    render(instance.__parent, instance.__vdom, instance.refs);
     if (isFunction(instance.onmount)) {
         instance.onmount.call(instance);
     }
