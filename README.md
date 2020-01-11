@@ -39,141 +39,7 @@ import {request, dispatch} from "kofi";
 ```
 
 
-## Table of contents
-
-- Dom manipulation
-  - [kofi.createNode](#koficreatenodetype-attr-children)
-  - [kofi.removeNode](#kofiremovenodenode)
-  - [kofi.removeNodeChildren](#kofiremovenodechildrennode)
-  - [kofi.createRef](#koficreateref)
-  - [kofi.Fragment](#kofifragment)
-- Dom state management
-  - [kofi.ready](#kofireadyfn)
-- Event handling
-  - [kofi.dispatch](#kofidispatch)
-  - [kofi.router](#kofirouter)
-- HTTP requests
-  - [kofi.request](#kofirequestoptions-callback)
-  - [kofi.fileUpload](#kofifileuploadoptions-callback)
-- Miscellanea 
-  - [kofi.helpers](#kofihelpers)
-  - [kofi.qs](#kofiqs)
-  - [kofi.delay](#kofidelaytime-fn)
-  - [kofi.timer](#kofitimertime-fn)
-  - [kofi.queue](#kofiqueue)
-
-
-## DOM Manipulation
-
-### kofi.createNode(type, attr, ...children)
-
-Based on `React.createElement`, this method creates a new DOM Node element of the specified type. 
-
-#### Node type
-
-The `type` argument can be either a tag name string (such as `"div"` or `"a"`) or a function.
-
-#### Node attributes
-
-The `attr` argument can be an object with the attributes of the node or `null` if no attributes will be specified. The attributes object follows the same syntax of React attributes.
-
-#### Use it with JSX
-
-You can use the babel's plugin [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) for creating DOM elements using JSX. 
-
-This example using JSX: 
-
-```jsx
-/** @jsx createNode */
-import {createNode} from "kofi";
-
-let user = (
-    <div>
-        <img className="avatar" src="/path/to/user.png" />
-        <span>Hello user</span>
-    </div>
-);
-```
-
-Compiles to:
-
-```javascript
-/** @jsx createNode */
-let createNode = require("kofi").createNode;
-
-let user = createNode("div", null, 
-    createNode("img", {"className": "avatar", "src": "/path/to/user.png"}),
-    createNode("span", null, "Hello user")
-);
-```
-
-### kofi.removeNode(node)
-
-Remove the specified DOM element.
-
-```javascript
-import kofi from "kofi";
-
-kofi.removeNode(document.getElementById("#my-element"));
-```
-
-### kofi.removeNodeChildren(node)
-
-Removes all children elements of the specified node.
-
-```javascript
-import kofi from "kofi";
-
-kofi.removeNodeChildren(document.getElementById("#my-element"));
-```
-
-
-### kofi.createRef()
-
-Creates a new reference that can be attached to a DOM node to save the reference of this node.
-
-```jsx
-/** @jsx createNode */
-import {createNode, createRef} from "kofi";
-
-//Referenced node
-let inputRef = createRef();
-
-//Submit function
-let onSubmit = function () {
-    console.log("Your name: " + inputRef.current.value);
-};
-
-//Form element
-let formNode = (
-    <div>
-        <label>Type your name: </label>
-        <input ref={inputRef} type="text" placeholder="Your name..." />
-        <button onClick={onSubmit}>Send</button>
-    </div>
-);
-
-```
-
-### kofi.Fragment
-
-Renders a [DocumentFragment](https://developer.mozilla.org/en-US/docs/Web/API/DocumentFragment) element.
-
-```jsx
-/** @jsx createNode */
-import {createNode, Fragment} from "kofi";
-
-let wrapper = (
-    <Fragment>
-        <div id="item1">Item 1</div>
-        <div id="item2">Item 2</div>
-        <div id="item3">Item 3</div>
-    </Fragment>
-);
-```
-
-
-## DOM state management
+## API
 
 ### kofi.ready(fn)
 
@@ -186,7 +52,179 @@ kofi.ready(function () {
 });
 ```
 
-## Event handling
+### kofi.element(type, props[, ...children])
+
+Creates a new VDOM Node element of the specified `type`, with the specified `props` and `children`.
+
+```javascript
+kofi.element("div", {"align": "center"}); // --> <div align="center"></div>
+
+kofi.element("div", {}, "Hello world"); // --> <div>Hello world</div>
+```
+
+#### Node type
+
+The `type` argument can be either a tag name string (such as `"div"` or `"a"`) or a function.
+
+#### Node props
+
+The `props` argument can be an object with the attributes of the node or `null` if no attributes will be specified. The attributes object follows the same syntax of React attributes.
+
+#### Use it with JSX
+
+You can use the babel's plugin [@babel/plugin-transform-react-jsx](https://babeljs.io/docs/en/babel-plugin-transform-react-jsx) for creating DOM elements using JSX. 
+
+This example using JSX: 
+
+```jsx
+/** @jsx kofi.element */
+import kofi from "kofi";
+
+let user = (
+    <div>
+        <img className="avatar" src="/path/to/user.png" />
+        <span>Hello user</span>
+    </div>
+);
+```
+
+Compiles to:
+
+```javascript
+/** @jsx kofi.element */
+let kofi = require("kofi");
+
+let user = kofi.element("div", null, 
+    kofi.element("img", {"className": "avatar", "src": "/path/to/user.png"}),
+    kofi.element("span", null, "Hello user")
+);
+```
+
+### kofi.mount(parent, component, props)
+
+
+### kofi.request(options)
+
+Performs a request to the specified url in the `options` object, and returns a new Promise that resolves if the request has been successful executed, or rejects if there was an error performing the request.
+
+The `options` argument is an object with all the options to perform the request. The following entries are allowed: 
+
+- `url` **mandatory**: a string with the url. This is the only mandatory field of the options object.
+- `method`: a string with the http method. Default is `"get"`.
+- `headers`: an object with the HTTP headers. Default is `{}`.
+- `body`: a string data to be sent with the request (not working with GET requests). If the `json` option is set to `true`, `body` must be a valid JSON object that will be converted to string using `JSON.stringify`.
+- `json`: if set to `true`, the request body is serialized as a JSON and adds the `Content-type: application/json` header to the request. It also evaluates the response body as a JSON and returns a JSON object instead of a string. Default is `false`.
+- `form`: if an object is passed on this option, the request body is set to it's query-string representation. It also adds the `Content-type: application/x-www-form-urlencoded` header to the request.
+- `formData`: an instance of [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) with the data to perform a `multipart/form-data` request. 
+- `processData`: set to `false` to send non-process data with the request (data passed with the `form` option won't be serialized as a query-string, and the body won't be serialized as a JSON when the `json` option is set to `true`). Default is `true`.
+- `validateStatus`: a function to define if the request should be resolved or rejected for a given HTTP response status code. If this method returns `true`, the promise will be resolved. By default, all status >= 300 will be rejected. 
+
+#### Response schema
+
+The response of the request will have the following schema:
+
+```json
+{
+    // error: an instance of `Error` if something went wrong doing the request of parsing the response, 
+    // or an instance of `kofi.HTTPError` if the request has been rejected using the validateStatus option.
+    // If the promise has been resolved, this field will be `null`.
+    "error": null,
+    
+    // statusCode: a number with the HTTP response status code
+    "statusCode": 200,
+    
+    // statusMessage: a string with the HTTP response status message
+    "statusMessage": "OK",
+    
+    // method: a string with the request method
+    "method": "get",
+
+    // url: a string with the request url
+    "url": "/test",
+    
+    // headers: a parsed object with the response headers
+    "headers": {},
+
+    // body: the response body string or object (if the `json` option is provided).
+    "body": null
+}
+```
+
+#### Basic example
+
+```javascript
+//Import a JSON file
+let request = kofi.request({
+    "method": "get", 
+    "url": "./data.json", 
+    "json": true,
+    "validateStatus": function (code) {
+        return code < 300;
+    }
+});
+
+//Request has been resolved
+request.then(function (response){
+    //Print the response status code
+    console.log("Status code: " + response.statusCode);
+    //Print the result
+    console.log(response.body);
+});
+
+//Request has been rejected --> response.error contains the error
+request.catch(function (response) {
+    console.log(response.error);
+});
+```
+
+#### Sending JSON object
+
+```javascript
+let request = kofi.request({
+    "url": "/register", 
+    "method": "put", 
+    "json": true, 
+    "body": {
+        "name": "Bob",
+        "registered": false,
+        "password": "12345"
+    }
+});
+```
+
+#### application/x-www-form-urlencoded 
+
+Use the `form` option to send URL-encoded forms: 
+
+```javascript
+let request = kofi.request({
+    "url": "/my/service", 
+    "method": "post", 
+    "form": {
+        "name": "Bob",
+        "age": "30",
+        "city": "New York"
+    }
+});
+```
+
+#### multipart/form-data
+
+Use the `formData` option to send `multipart/form-data` forms. Check the [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) interface documentation for more information.
+
+```javascript 
+let formData = new FormData();
+formData.append("username", "Bob"); //Append values
+formData.append("userpic", fileInput.files[0], "avatar.jpg"); //Append files
+
+//Send to the server
+let request = kofi.request({
+    "url": "/process/uploads",
+    "method": "post", 
+    "formData": formData
+});
+```
+
 
 ### kofi.dispatch()
 
@@ -222,265 +260,41 @@ Trigger all listeners of the event called `name`. All the extra arguments passed
 dispatcher.emit("error", "Error importing file xxxx.json");
 ```
 
+### kofi.each(items, fn)
 
-### kofi.router()
-
-Generates a minimal client-side router utility.
-
-```javascript 
-//Initialize a router instance
-let router = kofi.router();
-
-//Register single routes
-router.add("/foo", function () {
-    console.log("Enter to foo");
-});
-
-//Register routes with params
-router.add("/foo/:bar", function (req) {
-    console.log("Bar is " + req.params.bar);
-});
-
-//Read query parameters
-router.add("/bar", function (req) {
-    console.log("Name: " + req.query.name);
-});
-
-//Catch all route
-router.add(function (req) {
-    console.log("NOT FOUND!");
-});
-```
-
-#### router.add(path, listener)
-
-Registers a new listener for the route `path`. The listener receives an object with the request information: 
-
-- `path`: a string with the full matched url.
-- `pathname`: a string with the matched url without the query segment (the part after que question mark).
-- `query`: an object with all the parsed querystring parametes extracted from the matched path. Default is an empty object `{}`.
-- `params`: an object with all the dynamic parts of the matched path. Default is an empty object `{}`.
-
-```javascript
-router.add("/", function (req) {
-    console.log("Path: " + req.path);
-    console.log("Pathname: " + req.pathname);
-    console.log("Querystring values: ");
-    Object.keys(req.query).forEach(function (key) {
-        console.log("  " + key + " -> " + req.query[key]);
-    });
-    console.log("Params: ");
-    Object.keys(req.params).forEach(function (key) {
-        console.log("  " + key + " -> " + req.params[key]);
-    });
-});
-```
-
-If the provided `path` string is a catch-all path (`"*"`), the `listener` function will also receive a function to continue with the search of the route that matches the path.
-
-```javascript
-router.add("*", function (req, next) {
-    console.log("New request --> " + req.pathname);
-    return next();
-});
-```
-
-Note that the order of how the routes are defined is important, so you should define the catch-all routes first.
-
-#### router.set(url)
-
-Call a handler for the provided `url` string.
-
-#### router.refresh()
-
-Call again the handler for the last url used with `router.set()`.
-
-#### router.get()
-
-Returns the current url. 
-
-
-## HTTP requests
-
-### kofi.request(options, callback)
-
-Performs a request to the specified url in the `options` object, and executes the provided `callback` function when the request is done or an error is produced generating the request.
-
-#### `options`
-
-The first argument of `kofi.request` is an object with all the options to perform the request. The following entries are allowed: 
-
-- `url` **mandatory**: a string with the url. This is the only mandatory field of the options object.
-- `method`: a string with the http method. Default is `"get"`.
-- `headers`: an object with the HTTP headers. Default is `{}`.
-- `body`: a string data to be sent with the request (not working with GET requests). If the `json` option is set to `true`, `body` must be a valid JSON object that will be converted to string using `JSON.stringify`.
-- `json`: if set to `true`, the request body is serialized as a JSON and adds the `Content-type: application/json` header to the request. It also evaluates the response body as a JSON and returns a JSON object instead of a string. Default is `false`.
-- `form`: if an object is passed on this option, the request body is set to it's query-string representation. It also adds the `Content-type: application/x-www-form-urlencoded` header to the request.
-- `formData`: an instance of [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) with the data to perform a `multipart/form-data`request. 
-- `processData`: set to `false` to send non-process data with the request (data passed with the `form` option won't be serialized as a query-string, and the body won't be serialized as a JSON when the `json` option is set to `true`). Default is `true`.
-- `auth`: an object with the credentials to authenticate users. Only `basic` or `bearer` authentication schemes are supported. Default is `{}`. 
-
-#### `callback` 
-
-The callback function. This function will get three arguments: 
-
-- `error`: an instance of `Error` if something went wrong doing the request of parsing the response, or an instance of `kofi.HTTPError` if the request returns non-200 status codes (feature added in **v0.2.0**).
-  - On `v0.2.0`, non-200 status codes will be treated as errors. 
-- `response` an object with the basic information about the generated response. This object will contain the following entries: 
-  - `statusCode`: a number with the HTTP response status code. For example, `404`.
-  - `statusMessage`: a string with the HTTP response status message. For example, `Not found`.
-  - `method`: a string with the request method. 
-  - `url`: a string with the request url.
-  - `headers`: a parsed object with the response headers.
-  - `rawHeaders`: an array with the raw response headers.
-- `body`: the response body string or object (if the `json` option is provided).
-
-
-#### Basic example
-
-```javascript
-//Import a JSON file
-kofi.request({method: "get", url: "./data.json", json: true}, function (error, response, body){
-    //Check for error processing the request 
-    if (error) {
-        return console.error(error.message);
-    } 
-    //Print the response status code
-    console.log("Status code: " + response.statusCode);
-    //Print the result
-    console.log(body);
-});
-```
-
-#### Sending JSON object
-
-```javascript
-let obj = {
-    "name": "Bob",
-    "registered": false,
-    "password": null
-};
-kofi.request({url: "/register", method: "put", json: true, body: obj}, function (error, res, body) {
-    /* ... */
-}); 
-```
-
-#### application/x-www-form-urlencoded 
-
-Use the `form` option to send URL-encoded forms: 
-
-```javascript
-let form = {
-    "name": "Bob",
-    "age": "30",
-    "city": "New York"
-};
-kofi.request({url: "/my/service", method: "post", form: form}, function (error, res, body) {
-    /* ... */
-});
-```
-
-#### multipart/form-data
-
-Use the `formData` option to send `multipart/form-data` forms. Check the [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) interface documentation for more information.
-
-```javascript 
-let formData = new FormData();
-
-//Append key/value pains
-formData.append("username", "Bob");
-
-//Append files
-formData.append("userpic", fileInput.files[0], "avatar.jpg");
-
-//Send to the server
-kofi.request({url: "/process/uploads", method: "post", formData: formData}, function (error, res, body) {
-    /* do your magic with the response */
-});
-```
-
-### kofi.fileUpload(options, callback)
-
-This method allows you to upload large files through HTTP. The main idea is to split the large file into small chunks, and upload each chunk to the server. 
-
-This method only performs the file split and the upload of each chunk to the specified `url` and with the specified `options` (see available options below). The server implementation and the chunk reassembly are not provided in this package, but you can explore some of our [examples](./examples) that we used to test it.
-
-#### `options`
-
-An object with the options to perform the file upload. The following entries are allowed:
-
-- `file`: the HTML5 File object instance that will be uploaded to the server.
-- `url`: the target url for the post request.
-- `method`: method to use for sending the chunk. Default is `post`.
-- `chunkSize`: the maximum size in bytes of each uploaded chunk. Default is `1048576` (1Mb).
-- `chunkRetry`: number of times to retry chunk upload. Default is `0`.
-- `headers`: extra headers to add to each chunk request. Allowed values: `function` or `object`. Default is `{}`.
-- `query`: extra parameters to include in the multipart request. Allowed values: `function` or `object`. Default is `{}`.
-- `fileParam`: the name of the file parameter in the multipart request. Default is `file`.
-- `onFinish`: a `function` that will be called (if no `callback` argument is provided) when all chunks have been uploaded.  
-- `onChunkRequest`: a `function` that will be called with the request object that will be passed to `kofi.request` for each chunk.
-- `onChunkUploadStart`: a `function` that will be called before the chunk is sent to the server.
-- `onChunkUploadEnd`: a `function` that will be called when the chunk has been uploaded to the server.
-- `onChunkError`: a `function` that will be called when an error occurred during upload of a specific chunk.
-
-#### `callback`
-
-The callback function that will be executed when all chunks has been uploaded to the server.
-
-#### Preparing the server
-
-To handle the file upload, the following extra fields will be attached with the multipart request:
-
-- `chunkNumber`: the index of the current chunk. The first chunk starts at index `1`.
-- `chunkStart`: the starting byte of the chunk.
-- `chunkEnd`: the ending byte of the chunk.
-- `chunkSize`: the size of this chunk.
-- `chunkRetires`: number of retries to upload the current chunk.
-- `totalChunks`: number of chunks that will be uploaded.
-- `totalSize`: total size of the file.
-- `isFirstChunk`: `"true"` if this is the first chunk, `"false"` in other case.
-- `isLastChunk`: `"true"` if this is the last chunk, `"false"` in other case.
-
-Also, other multipart parameters can be added using the `query` option.
-
-
-## Miscellanea
-
-### kofi.helpers
-
-Utility functions for working with arrays, numbers, objects and strings.
-
-#### kofi.helpers.each(array, fn)
-
-Iterates over an `array` or an `object`.
+Async iterates over an `array` or an `object` and returns a new promise that resolves if all items has been processed, or rejects if there was an error processing an item.
 
 - `items`: `array` or `object` you want to iterate.
 - `fn`: function that will be called with each item of the `items` array or object with the following arguments: 
   - First argument: the property name if `items` is an object, or the index if `items` is an array.
   - Second argument: the property value if `items` is an object, or the value if `items` is an array.
+  - Last argument: a `next` function. 
 
-You can stop the iteration by returning `false` in the iterator function
+Calling the `next` function invokes the next item. If you pass anything to the `next` function, this will be treated as an error, the each loop will be stopped and the promise will be rejected.
 
 ```javascript
 //Iterate over an array 
-kofi.helpers.each([1, 2, 3], function (index, value) {
+kofi.each([1, 2, 3], function (index, value, next) {
     console.log(index + " -> " + value);
+    return next();
 });
 // 0 -> 1
 // 1 -> 2
 // 2 -> 3
 
 //Iterate over an object 
-kofi.helpers.each({"key1": "value1", "key2": "value2"}, function (key, value) {
+kofi.each({"key1": "value1", "key2": "value2"}, function (key, value, next) {
     console.log(key + " -> " + value);
+    return next();
 });
 // key1 -> value1
 // key2 -> value2
 ```
 
-#### kofi.helpers.timestamp(pattern)
+### kofi.timestamp(pattern)
 
 Returns a formatted timestamp. The `pattern` argument is a string where the following matches will be replaced:
+
 - `YYYY`: replaced with the current full year.
 - `MM`: replaced with the current month.
 - `DD`: replaced with the current day.
@@ -489,75 +303,11 @@ Returns a formatted timestamp. The `pattern` argument is a string where the foll
 - `ss`: replaced with the current seconds.
 
 ```javascript
-kofi.helpers.timestamp("Current year: YYYY")
+kofi.timestamp("Current year: YYYY")
 // -> "Current year: 2018"
 ```
 
-#### kofi.helpers.concat(array[, *values])
-
-Returns a new array concatenating `array` with other arrays or values passed.
-
-```javascript
-kofi.helpers.concat([1, 2, 3, 4], [5, 6], [7]); // -> [1, 2, 3, 4, 5, 6, 7]
-
-kofi.helpers.concat([1], 2, [3, 4], null); // -> [1, 2, 3, 4, null]
-```
-
-#### kofi.helpers.fill(length, value)
-Returns a new array with size `length` filled with `value`. Only `string` or `number` values are allowed. 
-
-```javascript
-//Fill an array with a number
-kofi.helpers.fill(5, 0); // -> [0, 0, 0, 0, 0]
-
-//Fill an array with a string
-kofi.helpers.fill(3, "abc"); // -> ["abc", "abc", "abc"]
-```
-
-#### kofi.helpers.max(array)
-
-Returns the maximum value in `array`. 
-
-```javascript
-kofi.helpers.max([1, 2, 3, 4, 5]); // -> 5
-```
-
-#### kofi.helpers.min(array)
-
-Returns the minimum value in `array`.
-
-```javascript
-kofi.helpers.min([1, 2, 3, 4, 5]); // -> 1
-```
-
-#### kofi.helpers.range(start, end\[, step\])
-
-Returns a new array with values starting in `start` to `end` (included). You can specify the distance between each number in the sequence by providing a `step` value. Default `step` value is `1`.
-
-```javascript
-kofi.helpers.range(0, 5); // -> [0, 1, 2, 3, 4, 5]
-kofi.helpers.range(0, 4, 2); // -> [0, 2, 4] 
-```
-
-#### kofi.helpers.pad(num, length[, chars])
-
-Pad a number `num` adding zeros on the left side if it has less digits than `length`. You can also specify the characters used for padding.
-
-```javascript
-kofi.helpers.pad(1234, 5);  // -> "01234"
-kofi.helpers.pad(1234, 3);  // -> "1234"
-kofi.helpers.pad(1234, 6, "-");  // -> "--1234"
-```
-
-#### kofi.helpers.random(min, max)
-
-Returns a random number between `min` and `max` (not included). If this functions is called only with one argumet, it returns a random number between `0` and that number.
-
-```javascript
-kofi.helpers.random(0, 5);  // -> 3.7561160836655425
-```
-
-#### kofi.helpers.values(obj)
+### kofi.values(obj)
 
 Returns an array of a given object's own enumerable property values. It's a ponyfill of the [ `Object.values`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values) method.
 
@@ -567,111 +317,40 @@ let obj = {
     b: 2,
     c: "hello"
 };
-let values = kofi.helpers.values(obj); // -> values = [1, 2, "hello"]
+let values = kofi.values(obj); // -> values = [1, 2, "hello"]
 ```
 
-#### kofi.helpers.camelCase(str)
-
-Returns the camel-case format of `str`.
-
-```javascript
-kofi.helpers.camelCase("hello world");  // -> "helloWorld"
-```
-
-#### kofi.helpers.capitalize(str)
-
-Returns the capitalized format of `str`.
-
-```javascript
-kofi.helpers.capitalize("hello world");  // -> "Hello world"
-```
-
-#### kofi.helpers.format(str, obj)
+### kofi.format(str, obj)
 
 Replace all handlebars expressions from `str` with values of `obj`.
 
 ```javascript
-kofi.helpers.format('My car is {{ color }}!', { color: 'blue' }); // --> "My car is blue!"
+kofi.format('My car is {{ color }}!', { color: 'blue' }); // --> "My car is blue!"
 ```
 
-#### kofi.helpers.kebabCase(str)
-
-Returns the kebab-case form of the string `str`.
-
-```javascript
-kofi.helpers.kebabCase("hello world");  // -> "hello-world"
-```
-
-#### kofi.helpers.repeat(str, n)
-
-Repeats a string `n` times.
-
-```javascript
-kofi.helpers.repeat("x", 5);  // -> "xxxxx"
-```
-
-#### kofi.helpers.reverse(str)
-
-Returns the reverse of the string `str`.
-
-```javascript
-kofi.helpers.reverse("hello world"); // -> "dlrow olleh"
-```
-
-#### kofi.helpers.snakeCase(str)
-
-Returns the snake-case form of the string `str`.
-
-```javascript
-kofi.helpers.snakeCase("hello world");  // -> "hello_world"
-```
-
-#### kofi.helpers.tempid()
+### kofi.tempid()
 
 Generates a unique random string of 15 characters.
 
 ```javascript
-kofi.helpers.tempid();  // -> str = "wv1ufiqj5e6xd3k"
+kofi.tempid();  // -> str = "wv1ufiqj5e6xd3k"
 ```
 
-#### kofi.helpers.truncate(str, opt)
-
-Truncates the provided `str` text if is longer than a provided `length`. The `opt` argument is an `object` with the following entries:
-- `length`: (**mandatory**) a `number` with the maximum length of `str`.
-- `separator`: a `string` used to truncate the string `str`.
-- `omission`: the `string` to be used to represent clipped text. Default is `"..."`. This text is added to the returned string, so the ammount of text displayed from `str` will be decreased.
-
-```javascript
-kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 11}) 
-// -> "Lorem ip..."
-kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 11, omission: ""})
-// -> "Lorem ipsum"
-kofi.helpers.truncate("Lorem ipsum dolor sit amet", {length: 15, separator: " "});
-// -> "Lorem ipsum..."
-```
-
-
-### kofi.qs
-
-Parse and stringify URL [query strings](https://en.wikipedia.org/wiki/Query_string)
-
-#### kofi.qs.parse(str)
+### kofi.parseQueryString(str)
 
 Parse a query string into an object. Leading `?` is ignored.
 
 ```javascript
-kofi.qs.parse("foo=1&bar=2"); // {"foo": "1", "bar": "2"}
+kofi.parseQueryString("foo=1&bar=2"); // {"foo": "1", "bar": "2"}
 ```
 
-#### kofi.qs.stringify(obj)
+### kofi.buildQueryString(obj)
 
 Stringify an object into a query string.
 
 ```javascript
-kofi.qs.stringify({"foo": "1", "bar": "2"}); // "foo=1&bar=2"
+kofi.buildQueryString({"foo": "1", "bar": "2"}); // "foo=1&bar=2"
 ```
-
-
 
 ### kofi.delay(time, fn)
 
@@ -683,58 +362,6 @@ kofi.delay(1000, function () {
     console.log("Hello after 1 second!!");
 });
 ```
-
-
-### kofi.timer(time, fn)
-
-This is just [`setInterval`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setInterval) 
-but with the arguments reversed (first the delay `time` in ms and then the callback `fn` function).
-
-```javascript
-let counter = 0;
-kofi.timer(1000, function () {
-    counter = counter + 1;
-    console.log(counter);
-});
-```
-
-### kofi.queue()
-
-Generates a new instance of the queue manager.
-
-```js
-let queue = kofi.queue();
-```
-
-#### queue.then(handler)
-
-Registers a new function to the functions queue. This function will be called with a `next` argument, that is a function that will pass to the next function defined with `queue.then`.
-
-Note that calling the `next` argument with an error will make that all functions that were added after this function won't run. Also, this will immediately invoke the `queue.catch` function with the error passed to the `next` function.
-
-```javascript
-queue.then(function (next) {
-    var input = document.getElementById("user-input");
-    setTimeOut(function () {
-        if (input.value === "") {
-            //Abort the queue
-            return next(new Error("User input is empty"));
-        } 
-        //If not, continue with the next registered function
-        return next();
-    }, 5000);
-});
-```
-
-#### queue.finish(handler)
-
-Registers the function that will be called when all functions registered with `queue.then` has been executed.
-
-#### queue.catch(handler)
-
-Registers the function that will be called when the functions queue was aborted due to an error. 
-
-
 
 ## License
 
