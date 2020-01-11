@@ -264,7 +264,7 @@ This method is invoked immediately after the component is mounted.
 This method is invoked immediately after updating occurs. This method is not called for the initial render.
 
 
-### kofi.mount(parent, app, props)
+### kofi.mount(parent, component, props)
 
 Mounts the result of a `kofi.component` call to the parent DOM element. 
 This method is similar to `kofi.render`, but instead of drawing the DOM element once, it will update the DOM element each time the `update` method is called.
