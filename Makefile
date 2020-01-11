@@ -32,7 +32,10 @@ clean:
 publish: 
 	echo "Publishing version v$(shell make version)" 
 	sleep 5 
-	npm publish
+	${MAKE} build
+	cp README.md ./dist/
+	cp package.json ./dist/
+	cd ./dist && npm publish
 
 # Display the version of the package
 version: 
