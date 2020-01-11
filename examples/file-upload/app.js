@@ -69,14 +69,17 @@ let handleFileUpload = function (req, res) {
 //Mount app
 process.nextTick(function () {
     let app = express();
-    //Host public stuff
-    app.use(express.static(path.join(__dirname, "public")));
     //Post file
     app.post("/upload", upload.single("file"), handleFileUpload); 
-    //Get kofi module
     app.get("/kofi.js", function (req, res) {
         return res.sendFile(path.resolve(__dirname, "../../dist/kofi.umd.js"));
-    }); 
+    });
+    app.get("/index.js", function (req, res) {
+        return res.sendFile(path.join(__dirname, "index.js"));
+    });
+    app.get("/", function (req, res) {
+        return res.sendFile(path.join(__dirname, "index.html"));
+    });
     //Listen 
     app.listen(3000);
 });
