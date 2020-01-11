@@ -193,7 +193,7 @@ let MyApp = kofi.app({
 });
 ```
 
-A kofi app component is just an object with a `render` method. This method should return 
+A kofi app component is just an object with a `render` method. This method should return a new `kofi.element` that will be rendered in the DOM. Each time the application is updated, the `render` method will be invoked, and the new generated VDOM will replace the current DOM. 
 
 #### State and updating
 
@@ -203,11 +203,24 @@ Usually the state gets it's initial data in the `oninit()` method. This is the o
 To update the state, you should use the `update` method. This method accepts two arguments:
 
 - An object with the new state that will be merged with the current state of the application.
-- A callback method that will be invoked after the application is updated.
+- Optionally, a callback method that will be invoked after the application is updated.
+
+The new state will be merged with the current state using `Object.assign`, so you should only pass the new data that has been changed.
 
 ```javascript
 kofi.app({
-    "oninit": function () {}
+    "oninit": function () {
+        this.state = {
+            "name": "Bob",
+            "count": 1
+        };
+    },
+    "handleSomeEvent": function () {
+        return this.update({
+            "count": this.state.count + 1
+        });
+    },
+    . . .
 });
 ```
 
