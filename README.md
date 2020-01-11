@@ -62,13 +62,31 @@ kofi.element("div", {"align": "center"}); // --> <div align="center"></div>
 kofi.element("div", {}, "Hello world"); // --> <div>Hello world</div>
 ```
 
-#### Node type
+This method does not return a DOM element. It returns a Virtual DOM Node element, which is a JSON representation of the DOM element. 
+To transform it into a real DOM element, use `kofi.render`.
+
+#### Type
 
 The `type` argument can be either a tag name string (such as `"div"` or `"a"`) or a function.
 
-#### Node props
+```javascript
+//Using a tag name
+kofi.element("a", {"href": "https://google.es"}, "Click me!"); 
+//Renders to: <a href="https://google.es">Click me!</a>
 
-The `props` argument can be an object with the attributes of the node or `null` if no attributes will be specified. The attributes object follows the same syntax of React attributes.
+//Using a function
+let Welcome = function (props, children) {
+    return kofi.element("span", {}, `Hello ${props.name}`);
+};
+kofi.element(Welcome, {"name": "Bob"}); 
+//Renders to: <span>Hello Bob</span>
+```
+
+#### Props
+
+The `props` argument is an object with the data of the element. This can include HTML attributes or custom properties that our functional element will use.
+
+
 
 #### Use it with JSX
 
@@ -99,6 +117,8 @@ let user = kofi.element("div", null,
     kofi.element("span", null, "Hello user")
 );
 ```
+
+### kofi.render(parent, element)
 
 ### kofi.mount(parent, component, props)
 
