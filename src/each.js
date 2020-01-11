@@ -44,7 +44,7 @@ export function each (items, fn) {
             let key = (isArray === true) ? index : keys[index];
             let value = items[key];
             return fn.call(null, key, value, function (error) {
-                if (typeof error !== "undefined") {
+                if (typeof error !== "undefined" && error !== null) {
                     return reject(error); //End the each loop
                 }
                 //Continue
