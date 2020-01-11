@@ -4,7 +4,7 @@ import {getCookie, setCookie, deleteCookie} from "./cookies.js";
 import {dispatch} from "./dispatch.js";
 import {element, render} from "./element.js";
 import {isObject, isArray, isFunction} from "./helpers.js";
-import {values, delay, format, tempid, range} from "./helpers.js";
+import {values, delay, format, tempid, timestamp} from "./helpers.js";
 import {each} from "./each.js";
 import {ready} from "./ready.js";
 import {buildQueryString, parseQueryString} from "./query-string.js";
@@ -39,7 +39,7 @@ const kofi = {
     each,
     format,
     tempid,
-    range,
+    timestamp,
     parseQueryString,
     buildQueryString
 };
