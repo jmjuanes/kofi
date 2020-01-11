@@ -123,7 +123,7 @@ The `options` argument is an object with all the options to perform the request.
 
 The response of the request will have the following schema:
 
-```json
+```javascript
 {
     // error: an instance of `Error` if something went wrong doing the request of parsing the response, 
     // or an instance of `kofi.HTTPError` if the request has been rejected using the validateStatus option.
