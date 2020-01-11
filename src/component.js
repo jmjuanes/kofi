@@ -1,21 +1,21 @@
 import {render, update} from "./element.js";
 import {isObject, isFunction, freeze} from "./helpers.js";
 
-//Created a kofi app
-export function app (value) {
+//Create a kofi component
+export function component (value) {
    if (isObject(value) === false) {
-        throw new Error("kofi.app argument must ve a valid object");
+        throw new Error("kofi.component argument must ve a valid object");
     }
     //Check for no render method provided
     if (!isFunction(value.render)) {
         throw new Error("You must implement a 'render' method");
     }
-    //Return the app definition
+    //Return the component definition
     return value; 
 }
 
-//Render app
-let renderApp = function (instance) {
+//Render component
+let renderComponent = function (instance) {
     let vdom = instance.render.call(instance, instance.props, instance.state); 
     //Check for not object or string provided after calling the render method
     if (typeof vdom !== "object" && typeof vdom !== "string") {
@@ -25,13 +25,13 @@ let renderApp = function (instance) {
     return vdom;
 };
 
-//Mount a kofi application
+//Mount a kofi component
 export function mount (parent, obj, props) {
     //Undefined renderer
     if (!isFunction(obj.render)) {
         throw new Error("You must implement a 'render' method");
     }
-    //Initialize a new instance on the app component
+    //Initialize a new instance on the component
     let instance = Object.assign({}, obj);
     Object.keys(instance).forEach(function (key) {
         if (typeof instance[key] === "function") {
@@ -46,17 +46,17 @@ export function mount (parent, obj, props) {
         "__vdom": null,
         "__parent": parent
     });
-    //Call the app init method
+    //Call the component init method
     if (isFunction(instance.oninit)) {
         instance.oninit.call(instance);
     }
-    //Define app update method
+    //Define component update method
     instance.update = function (newState, cb) {
         let self = this;
         if (isObject(newState) === true) {
             Object.assign(self.state, newState); //Update the instance state
         }
-        let vdom = renderApp(self); //Get a new vdom tree
+        let vdom = renderComponent(self); //Get a new vdom tree
         update(vdom, self.__vdom, self.__parent, self.refs);
         self.__vdom = vdom; //Update the current rendererd vdom tree
         if (isFunction(self.onupdate)) {
@@ -84,12 +84,12 @@ export function mount (parent, obj, props) {
         }
     };
     //Mount the component
-    instance.__vdom = renderApp(instance);
+    instance.__vdom = renderComponent(instance);
     render(instance.__parent, instance.__vdom, instance.refs);
     if (isFunction(instance.onmount)) {
         instance.onmount.call(instance);
     }
-    //Return the app instance
+    //Return the component instance
     return instance;
 }
 
