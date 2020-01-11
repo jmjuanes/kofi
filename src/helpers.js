@@ -68,8 +68,8 @@ export function timestamp (pattern, currentDate) {
     }
     let date = (typeof currentDate === "undefined") ? new Date() : currentDate;
     let result = {};
-    let regex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).\d\d\dZ/g;
-    let current = regex.exec(date.toJSON());
+    let currentRegex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).\d\d\dZ/g;
+    let current = currentRegex.exec(date.toJSON());
     if (current === null || current.length < 7) {
         return pattern;
     }
