@@ -46,35 +46,46 @@ export function tempid () {
     return Math.random().toString(36).slice(2, 9) + Date.now().toString(36);
 }
 
-//Returns a new array with values starting in `start` to `end` (included). 
-//You can specify the distance between each number in the sequence by providing a `step` value. Default `step` value is `1`.
-//range(5); // -> [0, 1, 2, 3, 4, 5]
-//range(0, 5); // -> [0, 1, 2, 3, 4, 5]
-//range(0, 4, 2); // -> [0, 2, 4] 
-export function range (start, end, step) {
-    if (typeof start !== "number") {
-        return []; //Calling without arguments returns an empty array
+// Returns a formatted timestamp. The `pattern` argument is a string where the following matches will be replaced:
+// -`YYYY`: replaced with the current full year.
+// - `MM`: replaced with the current month.
+// - `DD`: replaced with the current day.
+// - `hh`: replaced with the current hours.
+// - `mm`: replaced with the current minutes.
+// - `ss`: replaced with the current seconds.
+//
+// kofi.timestamp("Current year: YYYY")
+// // -> "Current year: 2018"
+///
+
+//Available values
+let timestampValues = ["YYYY", "MM", "DD", "hh", "mm", "ss"];
+
+//Parse the provided pattern and return the wanted timestamp
+export function timestamp (pattern, currentDate) {
+    if (typeof pattern !== "string") {
+        pattern = "YYYY-MM-DD hh:mm:ss";
     }
-    if (typeof end !== "number") {
-        end = start;
-        start = 0;
+    let date = (typeof currentDate === "undefined") ? new Date() : currentDate;
+    let result = {};
+    let regex = /(\d\d\d\d)-(\d\d)-(\d\d)T(\d\d):(\d\d):(\d\d).\d\d\dZ/g;
+    let current = regex.exec(date.toJSON());
+    if (current === null || current.length < 7) {
+        return pattern;
     }
-    //Check if start < end and if start is not negative
-    if (0 <= start && start < end) {
-        if (typeof step !== "number") {
-            step = 1; //Default step
+    for (let i = 0; i < timestampValues.length; i++) {
+        //The first element is the full matched string
+        result[timestampValues[i]] = current[i + 1];
+    }
+    let regex = new RegExp("(" + timestampValues.join("|") + ")", "g");
+    return pattern.replace(regex, function (match) {
+        let value = result[match];
+        while (value.length < match.length) {
+            value = "0" + value;
         }
-        if (step <= 0) {
-            throw new Error("Step value must not be zero or negative");
-        }
-        let len = Math.floor((end - start) / step);
-        return Array(len).fill().map(function (el, index) {
-            return start + (index * step);
-        });
-    } else {
-        //Start or end values not valid, return an empty array
-        return [];
-    }
+        return value;
+        //return pad(result[match], match.length);
+    });
 }
 
 // Replace all handlebars expressions from `str` with values of `obj`.
