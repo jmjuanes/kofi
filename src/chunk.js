@@ -20,15 +20,14 @@ export function chunk (blob, size, callback) {
                 "end": end,
                 "total": total
             };
-            //Resolve this chunk
-            let resolveChunk = function () {
-                return processChunk(index + 1); //Next chunk
-            };
-            let rejectChunk = function (reason) {
-                return reject(reason); //Stop the chunk processing
-            };
             //Call the provided callback method
-            return callback(nextChunk, resolveChunk, rejectChunk);
+            return callback(nextChunk, function (error) {
+                if (typeof error !== "undefined") {
+                    return reject(error); //Stop the chunk processing
+                }
+                //Next chunk
+                return processChunk(index + 1);
+            });
         };
         //Initialize the chunk processing
         return processChunk(0);
