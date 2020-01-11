@@ -24,8 +24,7 @@ describe("each", function () {
         });
         eachPromise.then(function () {
             assert.equal(executed, 0);
-        });
-        eachPromise.catch(function () {
+        }).catch(function () {
             assert.equal(executed, 3);
             return done();
         });
@@ -64,8 +63,7 @@ describe("each", function () {
         });
         eachPromise.then(function () {
             assert.equal(j, 0);
-        });
-        eachPromise.catch(function () {
+        }).catch(function () {
             assert.equal(j, 2);
             return done();
         });
