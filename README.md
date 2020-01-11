@@ -172,12 +172,12 @@ kofi.render(document.getElementById("root"), el);
 The first argument is the parent DOM element, and the second arguments is the VDOM Node to render. Returns a reference to the rendered DOM element.
 
 
-### kofi.app(spec)
+### kofi.component(spec)
 
-This method creates and validates a new kofi app component.
+This method creates and validates a new kofi component.
 
 ```javascript
-let MyApp = kofi.app({
+let Counter = kofi.component({
     "oninit": function () {
         this.state = {"count": 0};
     },
@@ -193,22 +193,22 @@ let MyApp = kofi.app({
 });
 ```
 
-A kofi app component is just an object with a `render` method. This method should return a new `kofi.element` that will be rendered in the DOM. Each time the application is updated, the `render` method will be invoked, and the new generated VDOM will replace the current DOM. 
+A kofi component is just an object with a `render` method. This method should return a new `kofi.element` that will be rendered in the DOM. Each time the component is updated, the `render` method will be invoked, and the new generated VDOM will replace the current DOM. 
 
 #### State and updating
 
-The `state` is an object that holds information about the application that may change over time and is managed only by the application. Each time the state of the application changes, the `render` method of the application will be called again and the DOM will be updated.
+The `state` is an object that holds information about the component that may change over time and is managed only by the component. Each time the state of the component changes, the `render` method of the component will be called again and the DOM will be updated.
 
 Usually the state gets it's initial data in the `oninit()` method. This is the only place where you should update the state manually. 
 To update the state, you should use the `update` method. This method accepts two arguments:
 
-- An object with the new state that will be merged with the current state of the application.
-- Optionally, a callback method that will be invoked after the application is updated.
+- An object with the new state that will be merged with the current state of the component.
+- Optionally, a callback method that will be invoked after the component is updated.
 
 The new state will be merged with the current state using `Object.assign`, so you should only pass the new data that has been changed.
 
 ```javascript
-kofi.app({
+kofi.component({
     "oninit": function () {
         this.state = {
             "name": "Bob",
@@ -224,26 +224,26 @@ kofi.app({
 });
 ```
 
-If you call `update` without a new state object, the application will be re-rendered without updating the state.
+If you call `update` without a new state object, the component will be re-rendered without updating the state.
 
 
 #### Passing data
 
-Data can be passed to the application and will be stored as an object in the `props` field of the application. You can use the initial data passed to the application as props to initialize the state.
+Data can be passed to the component and will be stored as an object in the `props` field of the component. You can use the initial data passed to the component as props to initialize the state.
 
 Note that you should avoid changing the props object. Instead, store the data that may change in the state object.
 
 
-#### App lifecycle
+#### Component lifecycle
 
-Apps components can have lifecycle methods, which will be invoked at various points during the lifecycle of your application component. 
+Components can have lifecycle methods, which will be invoked at various points during the lifecycle of your component. 
 
 ##### oninit()
 
-This method is invoked before the app is mounted. This is the recommended place to initialize the application state.
+This method is invoked before the app is mounted. This is the recommended place to initialize the component state.
 
 ```javascript
-kofi.app({
+kofi.component({
     "oninit": function () {
         this.state = {
             "count": 0
@@ -257,7 +257,7 @@ kofi.app({
 
 ##### onmount()
 
-This method is invoked immediately after the app is mounted.
+This method is invoked immediately after the component is mounted.
 
 ##### onupdate()
 
@@ -266,13 +266,13 @@ This method is invoked immediately after updating occurs. This method is not cal
 
 ### kofi.mount(parent, app, props)
 
-Mounts the result of a `kofi.app` call to the parent DOM element. 
+Mounts the result of a `kofi.component` call to the parent DOM element. 
 This method is similar to `kofi.render`, but instead of drawing the DOM element once, it will update the DOM element each time the `update` method is called.
 
-For example, let's mount the following app component:
+For example, let's mount the following component:
 
 ```javascript
-let MyApp = kofi.app({
+let Counter = kofi.component({
     "oninit": function () {
         this.state = {"count": this.props.initialValue};
     },
@@ -287,7 +287,7 @@ let MyApp = kofi.app({
     }
 });
 
-kofi.mount(document.getElementById("root"), MyApp, {"initialValue": 0});
+kofi.mount(document.getElementById("root"), Counter, {"initialValue": 0});
 ```
 
 This will render the first time as follows:
