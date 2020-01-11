@@ -161,7 +161,60 @@ let user = kofi.element("div", null,
 
 ### kofi.render(parent, element)
 
-### kofi.mount(parent, component, props)
+Renders a VDOM Node to the DOM.
+
+```javascript
+let el = kofi.element("div", {}, "Hello world!");
+
+kofi.render(document.getElementById("root"), el);
+```
+
+The first argument is the parent DOM element, and the second arguments is the VDOM Node to render. Returns a reference to the rendered DOM element.
+
+
+### kofi.app(spec)
+
+Creates a new kofi app component.
+
+```javascript
+let MyApp = kofi.app({
+    "oninit": function () {
+        this.state = {"count": 0};
+    },
+    "handleClick": function () {
+        return this.update({"count": this.state.count + 1});
+    },
+    "render": function () {
+        return kofi.element("div", {}, 
+            kofi.element("div", {}, `Count: ${this.state.count}`),
+            kofi.element("button", {"onclick": this.handleClick}, "Increment")
+        );
+    }
+});
+```
+
+### kofi.mount(parent, app, props)
+
+Mounts the result of a `kofi.app` call to the parent DOM element.
+
+```javascript
+let MyApp = kofi.app({
+    "oninit": function () {
+        this.state = {"count": this.props.initialValue};
+    },
+    "handleClick": function () {
+        return this.update({"count": this.state.count + 1});
+    },
+    "render": function () {
+        return kofi.element("div", {}, 
+            kofi.element("div", {}, `Count: ${this.state.count}`),
+            kofi.element("button", {"onclick": this.handleClick}, "Increment")
+        );
+    }
+});
+
+kofi.mount(document.getElementById("root"), MyApp, {"initialValue": 0});
+```
 
 
 ### kofi.request(options)
