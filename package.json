@@ -3,19 +3,15 @@
     "version": "0.4.0",
     "description": "Tasty takeaway frontend framework. Just pour it and go!",
     "private": false,
-    "main": "dist/kofi.cjs.js",
-    "module": "dist/kofi.esm.js",
-    "browser": "dist/kofi.umd.min.js",
-    "unpkg": "dist/kofi.umd.min.js",
-    "jsdelivr": "dist/kofi.umd.min.js",
+    "main": "kofi.cjs.js",
+    "module": "kofi.esm.js",
+    "browser": "kofi.umd.min.js",
+    "unpkg": "kofi.umd.min.js",
+    "jsdelivr": "kofi.umd.min.js",
     "scripts": {
         "build": "rollup -c rollup.config.js",
         "test": "npm run build && mocha  --recursive --reporter spec"
     },
-    "files": [
-        "src",
-        "dist/*.js"
-    ],
     "repository": {
         "type": "git",
         "url": "https://github.com/jmjuanes/kofi.git"
