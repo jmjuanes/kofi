@@ -1,6 +1,19 @@
 import {render, update} from "./element.js";
 import {isObject, isFunction, freeze} from "./helpers.js";
 
+//Created a kofi app
+export function app (value) {
+   if (isObject(value) === false) {
+        throw new Error("kofi.app argument must ve a valid object");
+    }
+    //Check for no render method provided
+    if (!isFunction(value.render)) {
+        throw new Error("You must implement a 'render' method");
+    }
+    //Return the app definition
+    return value; 
+}
+
 //Render app
 let renderApp = function (instance) {
     let vdom = instance.render.call(instance, instance.props, instance.state); 
