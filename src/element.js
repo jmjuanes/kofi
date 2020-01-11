@@ -31,7 +31,7 @@ export function element (type, props) {
 }
 
 //Mount an element
-export function render (el, parent, refs) {
+export function render (parent, el, refs) {
     if (typeof refs !== "object" || refs === null) {
         refs = {};
     }
@@ -49,7 +49,7 @@ export function render (el, parent, refs) {
         });
         //Mount each children in the new node
         el.children.forEach(function(child) {
-            return render(child, node, refs);
+            return render(node, child, refs);
         });
     }
     //Mount the new node
@@ -69,7 +69,7 @@ export function update (newNode, oldNode, parent, refs, index) {
     }
     //Check for no old node --> mount this new element
     if (!oldNode) { 
-        return render(newNode, parent, refs); 
+        return render(parent, newNode, refs); 
     }
     //If there is not new element --> remove the old element
     else if (!newNode) { 
@@ -77,7 +77,7 @@ export function update (newNode, oldNode, parent, refs, index) {
     }
     //If nodes has changed
     else if (nodesDiffs(newNode, oldNode)) {
-        return parent.replaceChild(render(newNode, null, refs), parent.childNodes[index]);
+        return parent.replaceChild(render(null, newNode, refs), parent.childNodes[index]);
     }
     //Change the properties only if element is not an string
     else if (typeof newNode !== "string") {
