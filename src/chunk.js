@@ -22,7 +22,7 @@ export function chunk (blob, size, callback) {
             };
             //Call the provided callback method
             return callback(nextChunk, function (error) {
-                if (typeof error !== "undefined") {
+                if (typeof error !== "undefined" && error !== null) {
                     return reject(error); //Stop the chunk processing
                 }
                 //Next chunk
