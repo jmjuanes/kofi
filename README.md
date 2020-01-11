@@ -193,14 +193,33 @@ let MyApp = kofi.app({
 });
 ```
 
-A kofi app component is just an object with a `render` method. 
+A kofi app component is just an object with a `render` method. This method should return 
 
 #### State and updating
 
-The `state` is an object that holds information about the application and is managed only by the application. Each time the state of the application changes, the application is re-rendered.
+The `state` is an object that holds information about the application that may change over time and is managed only by the application. Each time the state of the application changes, the `render` method of the application will be called again and the DOM will be updated.
+
+Usually the state gets it's initial data in the `oninit()` method. This is the only place where you should update the state manually. 
+To update the state, you should use the `update` method. This method accepts two arguments:
+
+- An object with the new state that will be merged with the current state of the application.
+- A callback method that will be invoked after the application is updated.
+
+```javascript
+kofi.app({
+    "oninit": function () {}
+});
+```
+
+If you call `update` without a new state object, the application will be re-rendered without updating the state.
 
 
-Usually the state gets it's initial data in the `oninit()` method. This is the only place where you should update the state manually.
+#### Passing data
+
+Data can be passed to the application and will be stored as an object in the `props` field of the application. You can use the initial data passed to the application as props to initialize the state.
+
+Note that you should avoid changing the props object. Instead, store the data that may change in the state object.
+
 
 #### App lifecycle
 
