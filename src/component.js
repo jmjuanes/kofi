@@ -1,5 +1,6 @@
 import {render, update} from "./element.js";
-import {isObject, isFunction, freeze} from "./helpers.js";
+import {isObject, isFunction} from "./helpers.js";
+import {object as safeObject} from "./object.js";
 
 //Create a kofi component
 export function component (value) {
@@ -40,7 +41,7 @@ export function mount (parent, obj, props) {
     });
     //Initialize instance state and props
     Object.assign(instance, {
-        "props": freeze((isObject(props) === true) ? props : {}), 
+        "props": safeObject.freeze((isObject(props) === true) ? props : {}), 
         "state": {}, //getDefaultValues(obj.initstate, {}),
         "refs": {},
         "__vdom": null,
