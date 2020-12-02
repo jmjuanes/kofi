@@ -1,15 +1,5 @@
-//Get a value of a cookie
-export function getCookie (name) {
-    let match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);
-    if (typeof match[1] !== "undefined") {
-        return decodeURIComponent(match[1]); // Decode and return the matched value
-    }
-    //Default, cookie not found --> return null
-    return null;
-}
-
-//Set a new cookie with the given value and options
-export function setCookie (name, value, options) {
+//Set a cookie
+let setCookie = function (name, value, options) {
     if (typeof options !== "object" || options === null) {
         options = {};
     }
@@ -30,12 +20,28 @@ export function setCookie (name, value, options) {
     });
     //Save the new cookie
     document.cookie = cookieContent.join("; ");
-}
+};
 
-//Delete a cookie
-export function deleteCookie (name, options) {
-    return setCookie(name, "", Object.assign(options, {
-        "expires": (-1) * 60 * 60 * 24
-    }));
-}
+//Cookies manager
+export const cookie = {
+    //Get a value of a cookie
+    "get": function (name) {
+        let match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);
+        if (typeof match[1] !== "undefined") {
+            return decodeURIComponent(match[1]); // Decode and return the matched value
+        }
+        //Default, cookie not found --> return null
+        return null;
+    },
+    //Set a new cookie with the given value and options
+    "set": function (name, value, options) {
+        return setCookie(name, value, options);
+    },
+    //Delete a cookie
+    "delete": function (name, options) {
+        return setCookie(name, "", Object.assign(options, {
+            "expires": (-1) * 60 * 60 * 24
+        }));
+    }
+};
 
