@@ -27,19 +27,6 @@ export function delay (timeout, callback) {
     });
 }
 
-//Returns an array of a given object's own enumerable property values. 
-//It's a ponyfill of the [`Object.values`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values) method. 
-export function values (obj) {
-    return Object.keys(obj).map(function (key) { 
-        return obj[key]; 
-    });
-}
-
-//Object.freeze secure call
-export function freeze (obj) {
-    return (typeof Object.freeze === "function") ? Object.freeze(obj) : obj;
-}
-
 //Generates a unique random string of 15 chracters.
 //tempid(); // -> "wv1ufiqj5e6xd3k"
 export function tempid () {
@@ -85,22 +72,6 @@ export function timestamp (pattern, currentDate) {
         }
         return value;
         //return pad(result[match], match.length);
-    });
-}
-
-// Replace all handlebars expressions from `str` with values of `obj`.
-// format("My car is {{ color }}!", { color: 'blue' }); // --> "My car is blue!"
-export function format (str, obj) {
-    if (typeof obj === "undefined") { 
-        return str; 
-    }
-    return str.replace(/\{\{([^{}]+)\}\}/g, function (match, found) {
-        found = found.trim();
-        if (typeof obj[found] !== "undefined") {
-            return obj[found].toString();
-        } else {
-            return match;
-        }
     });
 }
 
