@@ -1,5 +1,5 @@
 import {isObject, isArray, delay} from "./helpers.js";
-import {buildQueryString} from "./query-string.js";
+import {qs} from "./query-string.js";
 
 //HTTP error class
 export class HTTPError extends Error {
@@ -162,7 +162,7 @@ export function request (options) {
             //Check for form data
             if (options.form) {
                 xhttp.setRequestHeader("content-type", "application/x-www-form-urlencoded");
-                data = (options.processData) ? buildQueryString(options.form) : options.form;
+                data = (options.processData) ? qs.encode(options.form) : options.form;
             }
             //Check for formdata object provided
             else if (options.formData) {
