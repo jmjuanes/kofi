@@ -1,6 +1,6 @@
 //Create a dom element
 export function element (type, props) {
-    if(typeof props !== "object" || props === null) { 
+    if (typeof props !== "object" || props === null) { 
         props = {}; 
     }
     let children = []; //Initialize the chinldren list
@@ -125,13 +125,13 @@ function nodesDiffs (node1, node2) {
 }
 
 //Set a property
-function setProperty (parent, name, value, refs) {
+export function setProperty (parent, name, value, refs) {
     //Check for null value --> Remove the property
     if (value === null || value === false) { 
         return removeProperty(parent, name, value, refs); 
     }
     //Check for reference 
-    else if (name === "ref") {
+    else if (name === "ref" && refs !== null) {
         refs[value] = parent;
     }
     //Check for class|checked|value  property
@@ -164,7 +164,7 @@ function setProperty (parent, name, value, refs) {
 }
 
 //Remove a property
-function removeProperty (parent, name, value, refs) {
+export function removeProperty (parent, name, value, refs) {
     if (name === "className") {
         parent.removeAttribute("class");
     }
