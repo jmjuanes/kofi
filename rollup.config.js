@@ -12,54 +12,33 @@ banner.push(" * LICENSE file in the root directory of this source tree.");
 banner.push(" */");
 banner.push("");
 
-//Initialize the configuration object
-let config = {
-    "input": "src/index.js",
-    "output": Object.values({
-        "umdExport": {
-            "file": "./dist/kofi.umd.js",
-            "format": "umd",
-            "name": "kofi",
-            "banner": banner.join("\n")
-        },
-        "umdMinExport": {
-            "file": "./dist/kofi.umd.min.js",
-            "format": "umd",
-            "name": "kofi",
-            "banner": banner.join("\n")
-        },
-        "cjsExport": {
-            "file": "./dist/kofi.cjs.js",
-            "format": "cjs",
-            "banner": banner.join("\n")
-        },
-        "cjsMinExport": {
-            "file": "./dist/kofi.cjs.min.js",
-            "format": "cjs",
-            "banner": banner.join("\n")
-        },
-        "esmExport": {
-            "file": "./dist/kofi.esm.js",
-            "format": "esm",
-            "banner": banner.join("\n")
-        },
-        "esmMinExport": {
-            "file": "./dist/kofi.esm.min.js",
-            "format": "esm",
-            "banner": banner.join("\n")
-        }
-    }),
-    "plugins": [
-        cleanup(),
-        terser({
-            "output": {
-                "comments": "all"
-            },
-            "include": [/^.+\.min\.js$/]
-        })
-    ]
-};
+//Output formats
+let outputFormats = ["umd", "umd.min", "cjs", "cjs.min", "esm", "esm.min"];
 
-//Export the configuration object
-export default config;
+//Initialize the configuration object
+export default {
+    "input": "src/index.js",
+    "output": outputFormats.map(function (ext) {
+        let output = {
+            "file": `./dist/kofi.${ext}.js`,
+            "format": ext.replace(".min", ""),
+            "banner": banner.join("\n")
+        };
+        //Check for UMD format --> add export name
+        if (ext.indexOf("umd") !== -1) {
+            output["name"] = "kofi";
+        }
+        //Check for min format
+        if (ext.indexOf(".min") !== -1) {
+            output["plugins"] = [terser({
+                "output": {
+                    "comments": "all"
+                }
+            })];
+        }
+        //Return the output format config
+        return output;
+    }),
+    "plugins": [cleanup()]
+};
 
