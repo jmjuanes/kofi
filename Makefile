@@ -1,4 +1,4 @@
-.PHONY: setup build dist test version clean clean-all publish
+.PHONY: setup build test clean publish
 
 # Binaries folder
 NODE_BIN=./node_modules/.bin
@@ -11,13 +11,11 @@ help:
 	@echo "  make clean               Clean the bundles of this package"
 	@echo "  make install             Install all dependencies"
 	@echo "  make test                Run tests"
-	@echo "  male version             Display the current version"
 	@echo ""
 
 # Install all dependencies of the repository
 install:
 	npm install
-	rm package-lock.json
 
 # Build bundles 
 build:
@@ -30,16 +28,10 @@ clean:
 
 # Publish the package 
 publish: 
-	echo "Publishing version v$(shell make version)" 
-	sleep 5 
 	${MAKE} build
 	cp README.md ./dist/
 	cp package.json ./dist/
 	cd ./dist && npm publish
-
-# Display the version of the package
-version: 
-	node ./scripts/version.js
 
 # Run tests
 test: 
