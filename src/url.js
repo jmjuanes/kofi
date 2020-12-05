@@ -1,6 +1,3 @@
-//Default delimiter
-let delimiter = "/";
-
 //Export url manager
 export const url = {
     //Resolves a target URL relative to a base URL
@@ -14,17 +11,17 @@ export const url = {
     },
     //Join urls
     "join": function (base) {
-        let joinedUrl = (base.charAt(base.length -1) !== delimiter) ? base + delimiter : base;
+        let joinedUrl = (base.charAt(base.length -1) !== "/") ? base + "/" : base;
         //Append all urls
         for (let i = 1; i < arguments.length; i++) {
             let segment = arguments[i];
             //Check the segment initial value
-            while (segment.charAt(0) === delimiter || segment.charAt(0) === ".") {
+            while (segment.charAt(0) === "/" || segment.charAt(0) === ".") {
                 segment = segment.substr(1);
             }
             //Check the final value
-            if (segment.charAt(segment.length - 1) !== delimiter && i + 1 < arguments.length) {
-                segment = segment + delimiter;
+            if (segment.charAt(segment.length - 1) !== "/" && i + 1 < arguments.length) {
+                segment = segment + "/";
             }
             //Append to the joined url
             joinedUrl = joinedUrl + segment;
@@ -34,7 +31,7 @@ export const url = {
     },
     //Split an url
     "split": function (path) {
-        return path.split(delimiter).filter(function (path) {
+        return path.split("/").filter(function (path) {
             return path.length !== 0;
         });
     }
