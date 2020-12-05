@@ -4,15 +4,14 @@ import {chunk, chunkDefaultSize} from "./chunk.js";
 import {cookie} from "./cookies.js";
 import {dispatch} from "./dispatch.js";
 import {dom} from "./dom.js";
-import {element, render} from "./element.js";
-import {isObject, isArray, isFunction} from "./helpers.js";
-import {delay, tempid, timestamp} from "./helpers.js";
+import {element, render, stringify} from "./element.js";
+//import {isObject, isArray, isFunction} from "./helpers.js";
+import {delay, tempid, timestamp, values, entries, format, escape} from "./helpers.js";
 import {each} from "./each.js";
-import {object} from "./object.js";
 import {ready} from "./ready.js";
-import {qs} from "./query-string.js";
+import {qs, buildQueryString, parseQueryString} from "./query-string.js";
 import {HTTPError, httpMethods, request} from "./request.js";
-import {string} from "./string.js";
+//import {json, object, string} from "./types.js";
 import {url} from "./url.js";
 
 //Build kofi object
@@ -27,22 +26,23 @@ const kofi = {
     dom,
     element,
     render,
-    isObject,
-    isArray,
-    isFunction,
+    stringify,
     request,
     httpMethods,
     HTTPError,
     ready,
-    element,
     url,
-    object,
-    string,
     delay,
     each,
     qs,
+    buildQueryString,
+    parseQueryString,
     tempid,
-    timestamp
+    timestamp,
+    format,
+    values,
+    entries,
+    escape
 };
 
 //Export kofi object
