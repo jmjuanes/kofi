@@ -1,3 +1,6 @@
+//Non closing tags
+let nonClosingTags = ["link", "meta", "input", "br", "img", "hr"];
+
 //Create a dom element
 export function element (type, props) {
     if (typeof props !== "object" || props === null) { 
@@ -58,6 +61,56 @@ export function render (parent, el, refs) {
     }
     return node;
 }
+
+//Convert a VDOM element to string
+export function stringify (el, delimiter) {
+    if (typeof el === "string") {
+        return el; //String node --> nothing to do
+    }
+    //Build attributes of this element
+    let attr = Object.keys(el.props).map(function (name) {
+        let value = el.props[name]; //Get attribute value
+        //Check for ref or event attribute --> ignore
+        if (name === "ref" || typeof value === "function" || value === null) {
+            return "";
+        }
+        //Check for boolean value
+        else if (value === true) {
+            return name; //Return only the property name
+        }
+        //Check for className attribute
+        else if (name === "className" && typeof value === "string") {
+            return `class="${value}"`;
+        }
+        //Check for style and object value
+        else if (name === "style" && typeof value === "object") {
+            //Convert all style values to string to snake-case format
+            let styleValues = Object.keys(value).map(function (key) {
+                return `${key.split(/(?=[A-Z])/).join("-").toLowerCase()}:${value[key]}`;
+            });
+            return `style="${styleValues.join(";")}"`;
+        }
+        //Check for string value --> set the value
+        else if (typeof value === "string") {
+            return `${name}="${value}"`;
+        }
+        //Other value --> nothing to do
+        return "";
+    }).filter(function (value) {
+        return value.length > 0;
+    });
+    //Check if this tag is in the non closing tags list
+    if (nonClosingTags.indexOf(el.type) > -1) {
+        return `<${el.type} ${attrs.join(" ")} />`;
+    }
+    //Build the content of the element
+    let content = el.children.map(function (child) {
+        return stringify(child, delimiter);
+    });
+    //Return the element with the content
+    return `<${el.type} ${attrs.join(" ")}>${content.join(delimiter || "")}</${el.type}>`;
+};
+
 
 //Update an element
 export function update (newNode, oldNode, parent, refs, index) {
@@ -140,13 +193,20 @@ export function setProperty (parent, name, value, refs) {
     }
     //Check for style property
     else if (name === "style") {
-        if (typeof value !== "object") {
+        //Check for string --> set as css text
+        if (typeof value === "string") {
+            parent.style.cssText = value;
+        }
+        //Check for object --> set each style as property
+        else if (typeof value === "object") {
+            Object.keys(value).forEach(function (key) {
+                parent.style[key] = value[key];
+            });
+        }
+        //Other value --> throw error
+        else {
             throw new Error("Styles must be an object");
         }
-        //Assign all styles to the element
-        Object.keys(value).forEach(function (key) {
-            parent.style[key] = value[key];
-        });
     }
     //Check for event listener property
     else if (typeof value === "function" && name.startsWith("on")) {
