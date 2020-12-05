@@ -519,6 +519,11 @@ let obj = {
 let values = kofi.values(obj); // -> values = [1, 2, "hello"]
 ```
 
+### kofi.entries(obj)
+
+Returns an array of a given object's own enumerable string-keyed property `[key, value]` pairs. It is a ponyfill of the [`Object.entries`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries) method.
+
+
 ### kofi.format(str, obj)
 
 Replace all handlebars expressions from `str` with values of `obj`.
