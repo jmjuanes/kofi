@@ -13,6 +13,27 @@ export function isFunction (value) {
     return typeof value === "function";
 }
 
+//Get entries of the provided object
+//Ponyfill of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
+export function entries (obj) {
+    return Object.keys(obj).map(function (key) {
+        return [key, obj[key]];
+    });
+}
+
+//Returns an array of a given object's own enumerable property values. 
+//Ponyfill of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values
+export function values (obj) {
+    return Object.keys(obj).map(function (key) {
+        return obj[key];
+    });
+}
+
+//Object.freeze secure call
+export function freeze (obj) {
+    return (typeof Object.freeze === "function") ? Object.freeze(obj) : obj;
+}
+
 //Export timeout wrapper
 //Executes the callback at the provided timeout
 //If no callback is provided, returns a promise that resolves at the given delay time
@@ -75,4 +96,35 @@ export function timestamp (pattern, currentDate) {
     });
 }
 
+//Map special chars to html codes
+let htmlEscapes = {
+  "&": "&amp;",
+  "<": "&lt;",
+  ">": "&gt;",
+  '"': "&quot;",
+  "'": "&#39;"
+};
+
+//Escape html >> converts '<', '>', '&', '"' and "'" chars to html codes
+export function escape (unsafe) {
+    return unsafe.replace(/[&<>"']/g, function (match) {
+        return htmlEscapes[match];
+    });
+}
+
+// Replace all handlebars expressions from `str` with values of `obj`.
+// format("My car is {{ color }}!", { color: 'blue' }); // --> "My car is blue!"
+export function format (str, obj) {
+    if (typeof obj === "undefined") { 
+        return str; 
+    }
+    return str.replace(/\{\{([^{}]+)\}\}/g, function (match, found) {
+        found = found.trim();
+        if (typeof obj[found] !== "undefined") {
+            return obj[found].toString();
+        } else {
+            return match;
+        }
+    });
+}
 
