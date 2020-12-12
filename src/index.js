@@ -13,6 +13,7 @@ import {qs, buildQueryString, parseQueryString} from "./query-string.js";
 import {HTTPError, httpMethods, request} from "./request.js";
 //import {json, object, string} from "./types.js";
 import {url} from "./url.js";
+import {http} from "./http.js";
 
 //Build kofi object
 const kofi = {
