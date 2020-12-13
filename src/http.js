@@ -2,16 +2,16 @@ import {buildQueryString} from "./query-string.js";
 import {HTTPError} from "./request.js";
 
 //Export http module
-export function http (options) {
-    //Check for string value --> use it as options.url parameter
-    if (typeof options === "string") {
-        options = {"url": options};
+export function http (url, options) {
+    //Check for no options provided --> initialize as empty object
+    if (typeof options !== "object" || options === null) {
+        options = {};
     }
     //Return a new promise that resolves when the request is completed
     return new Promise(function (resolve, reject) {
         let request = new XMLHttpRequest();
         let body = options.body || null; //Default to empty message
-        request.open(options.method || "get", options.url, true); //Open connection
+        request.open(options.method || "get", url, true); //Open connection
         //Register load listener --> process response
         request.addEventListener("load", function () {
             //Check for request error
@@ -81,14 +81,14 @@ export function http (options) {
 
 //Register some HTTP aliases to automatically convert http responses
 Object.assign(http, {
-    "text": function (opt) {
-        return http(opt).then(function (res) { return res.text(); });
+    "text": function (url, opt) {
+        return http(url, opt).then(function (res) { return res.text(); });
     },
-    "json": function (opt) {
-        return http(opt).then(function (res) { return res.json(); });
+    "json": function (url, opt) {
+        return http(url, opt).then(function (res) { return res.json(); });
     },
-    "blob": function (opt) {
-        return http(opt).then(function (res) { return res.blob(); });
+    "blob": function (url, opt) {
+        return http(url, opt).then(function (res) { return res.blob(); });
     }
 });
 
