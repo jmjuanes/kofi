@@ -39,7 +39,7 @@ export const dom = {
         parent.appendChild(node);
     },
     //Remove all children of a dom node
-    "clean": function (node) {
+    "clear": function (node) {
         while (node.firstChild) {
             node.removeChild(node.firstChild);
         }
