@@ -14,6 +14,7 @@ import {HTTPError, httpMethods, request} from "./request.js";
 import {url} from "./url.js";
 import {file} from "./file.js";
 import {http} from "./http.js";
+import {md} from "./md.js";
 
 //Build kofi object
 const kofi = {
@@ -42,7 +43,8 @@ const kofi = {
     format,
     values,
     entries,
-    escape
+    escape,
+    md
 };
 
 //Export kofi object
