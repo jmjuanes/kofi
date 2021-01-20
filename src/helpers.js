@@ -98,16 +98,20 @@ export function timestamp (pattern, currentDate) {
 
 //Map special chars to html codes
 let htmlEscapes = {
-  "&": "&amp;",
-  "<": "&lt;",
-  ">": "&gt;",
-  '"': "&quot;",
-  "'": "&#39;"
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+    "(": "&#40;",
+    ")": "&#41;",
+    "[": "&#91;",
+    "]": "&#93;"
 };
 
 //Escape html >> converts '<', '>', '&', '"' and "'" chars to html codes
 export function escape (unsafe) {
-    return unsafe.replace(/[&<>"']/g, function (match) {
+    return unsafe.replace(/[&<>"'()[\]]/g, function (match) {
         return htmlEscapes[match];
     });
 }
