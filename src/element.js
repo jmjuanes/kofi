@@ -7,7 +7,11 @@ export function element (type, props) {
         props = {}; 
     }
     let children = []; //Initialize the chinldren list
-    if (arguments.length >= 3) {
+    //Check for only one argument and is an array
+    if (arguments.length === 3 && Array.isArray(arguments[2])) {
+        children = arguments[2]; //Save as array
+    }
+    else if (arguments.length >= 3) {
         //Insert all children elements
         for (let i = 2; i < arguments.length; i++) {
             if (typeof arguments[i] !== "undefined" && arguments[i] !== null) {
@@ -68,7 +72,7 @@ export function stringify (el, delimiter) {
         return el; //String node --> nothing to do
     }
     //Build attributes of this element
-    let attr = Object.keys(el.props).map(function (name) {
+    let attrs = Object.keys(el.props).map(function (name) {
         let value = el.props[name]; //Get attribute value
         //Check for ref or event attribute --> ignore
         if (name === "ref" || typeof value === "function" || value === null) {
@@ -101,7 +105,7 @@ export function stringify (el, delimiter) {
     });
     //Check if this tag is in the non closing tags list
     if (nonClosingTags.indexOf(el.type) > -1) {
-        return `<${el.type} ${attrs.join(" ")} />`;
+        return `<${el.type} ${attrs.join(" ")}/>`;
     }
     //Build the content of the element
     let content = el.children.map(function (child) {
