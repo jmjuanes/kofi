@@ -44,7 +44,8 @@ const kofi = {
     values,
     entries,
     escape,
-    md
+    md,
+    http
 };
 
 //Export kofi object
