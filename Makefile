@@ -35,6 +35,6 @@ publish:
 
 # Run tests
 test: 
-	${MAKE} build 
-	./node_modules/.bin/mocha --reporter spec 
+	#${MAKE} build 
+	./node_modules/.bin/jest test 
 
