@@ -37,8 +37,8 @@ export const cookie = {
     "set": function (name, value, options) {
         return setCookie(name, value, options);
     },
-    //Delete a cookie
-    "delete": function (name, options) {
+    //Remove a cookie
+    "remove": function (name, options) {
         return setCookie(name, "", Object.assign(options, {
             "expires": (-1) * 60 * 60 * 24
         }));
