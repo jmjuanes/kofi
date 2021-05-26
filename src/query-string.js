@@ -13,8 +13,8 @@ export function buildQueryString (obj, delimiter) {
     }
     let items = [];
     Object.keys(obj).forEach(function (key) {
-        let items = (Array.isArray(obj[key]) === true) ? obj[key] : [obj[key]];
-        items.forEach(function (value) {
+        const item = (Array.isArray(obj[key]) === true) ? obj[key] : [obj[key]];
+        item.forEach(function (value) {
             items.push(encodeURIComponent(key) + "=" + encodeURIComponent(value));
         });
     });
