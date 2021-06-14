@@ -1,5 +1,7 @@
+import {isFunction, isString} from "./helpers.js";
+
 //Non closing tags
-let nonClosingTags = ["link", "meta", "input", "br", "img", "hr"];
+const nonClosingTags = ["link", "meta", "input", "br", "img", "hr"];
 
 //Create a dom element
 export function element (type, props) {
@@ -24,7 +26,7 @@ export function element (type, props) {
         }
     }
     //Parse the element type
-    if (typeof type === "string") {
+    if (isString(type)) {
         return {
             "type": type.toLowerCase().trim(), 
             "props": props, 
@@ -52,12 +54,21 @@ export function render (parent, el, refs) {
         //Create the new DOM element and assign the element properties
         node = document.createElement(el.type);
         Object.keys(el.props).forEach(function(name) {
-            return setProperty(node, name, el.props[name], refs);
+            if (name !== "html") {
+                return setProperty(node, name, el.props[name], refs);
+            }
         });
-        //Mount each children in the new node
-        el.children.forEach(function(child) {
-            return render(node, child, refs);
-        });
+        //Check if html property has been provided
+        if (typeof el.props.html === "string") {
+            node.innerHTML = el.props.html; //Inject html
+        }
+        //If no html proerty has been provided
+        else {
+            //Mount each children in the new node
+            el.children.forEach(function(child) {
+                return render(node, child, refs);
+            });
+        }
     }
     //Mount the new node
     if (typeof parent !== "undefined" && parent !== null) {
@@ -71,11 +82,12 @@ export function stringify (el, delimiter) {
     if (typeof el === "string") {
         return el; //String node --> nothing to do
     }
+    const props = el.props || {};
     //Build attributes of this element
-    let attrs = Object.keys(el.props).map(function (name) {
-        let value = el.props[name]; //Get attribute value
+    const attrs = Object.keys(props).map(function (name) {
+        const value = props[name]; //Get attribute value
         //Check for ref or event attribute --> ignore
-        if (name === "ref" || typeof value === "function" || value === null) {
+        if (name === "ref" || typeof value === "function" || value === null || value === "html") {
             return "";
         }
         //Check for boolean value
@@ -89,7 +101,7 @@ export function stringify (el, delimiter) {
         //Check for style and object value
         else if (name === "style" && typeof value === "object") {
             //Convert all style values to string to snake-case format
-            let styleValues = Object.keys(value).map(function (key) {
+            const styleValues = Object.keys(value).map(function (key) {
                 return `${key.split(/(?=[A-Z])/).join("-").toLowerCase()}:${value[key]}`;
             });
             return `style="${styleValues.join(";")}"`;
@@ -108,7 +120,7 @@ export function stringify (el, delimiter) {
         return `<${el.type} ${attrs.join(" ")}/>`;
     }
     //Build the content of the element
-    let content = el.children.map(function (child) {
+    const content = isString(props.html) ? [props.html] : el.children.map(function (child) {
         return stringify(child, delimiter);
     });
     //Return the element with the content
