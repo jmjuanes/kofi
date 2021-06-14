@@ -13,6 +13,11 @@ export function isFunction (value) {
     return typeof value === "function";
 }
 
+//Check if the provided value is a string
+export function isString (value) {
+    return typeof value === "string";
+}
+
 //Get entries of the provided object
 //Ponyfill of https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries
 export function entries (obj) {
