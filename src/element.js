@@ -1,4 +1,4 @@
-import {isFunction, isString} from "./helpers.js";
+import {isString} from "./helpers.js";
 
 //Non closing tags
 const nonClosingTags = ["link", "meta", "input", "br", "img", "hr"];
@@ -87,7 +87,7 @@ export function stringify (el, delimiter) {
     const attrs = Object.keys(props).map(function (name) {
         const value = props[name]; //Get attribute value
         //Check for ref or event attribute --> ignore
-        if (name === "ref" || typeof value === "function" || value === null || value === "html") {
+        if (name === "ref" || typeof value === "function" || value === null || name === "html") {
             return "";
         }
         //Check for boolean value
