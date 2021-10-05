@@ -1,47 +1,35 @@
-//Set a cookie
-let setCookie = function (name, value, options) {
-    if (typeof options !== "object" || options === null) {
-        options = {};
-    }
-    //Build the cokie content
-    let cookieContent = [name + "=" + encodeURIComponent(value)];
-    Object.keys(options).forEach(function (key) {
+// Get a cookie by name
+const getCookie = (name) => {
+    const match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);
+    return match[1] ? decodeURIComponent(match[1]) : null;
+};
+
+// Set a cookie
+const setCookie = (name, value, options) => {
+    options = options || {};
+    const cookieContent = [name + "=" + encodeURIComponent(value)];
+    Object.keys(options).forEach(key => {
         if (key === "secure") {
-            cookieContent.push("secure"); //Add secure option
+            return cookieContent.push("secure"); //Add secure option
         }
-        else if (key === "expires") {
-            //Add the expiration date
-            cookieContent.push(`expires=${new Date(options.expires).toUTCString()}`);
+        // Expiration date
+        if (key === "expires") {
+            return cookieContent.push(`expires=${new Date(options.expires).toUTCString()}`);
         }
-        else {
-            //Default --> set the cookie option value
-            cookieContent.push(`${key}=${options[key]}`);
-        }
+        //Default --> set the cookie option value
+        cookieContent.push(`${key}=${options[key]}`);
     });
     //Save the new cookie
     document.cookie = cookieContent.join("; ");
 };
 
-//Cookies manager
-export const cookie = {
-    //Get a value of a cookie
-    "get": function (name) {
-        let match = document.cookie.match(`(?:(?:^|.*; *)${name} *= *([^;]*).*$)|^.*$`);
-        if (typeof match[1] !== "undefined") {
-            return decodeURIComponent(match[1]); // Decode and return the matched value
-        }
-        //Default, cookie not found --> return null
-        return null;
-    },
-    //Set a new cookie with the given value and options
-    "set": function (name, value, options) {
-        return setCookie(name, value, options);
-    },
-    //Remove a cookie
-    "remove": function (name, options) {
+// Cookies manager
+export const cookies = {
+    "get": getCookie,
+    "set": setCookie,
+    "remove": (name, options) => {
         return setCookie(name, "", Object.assign(options, {
             "expires": (-1) * 60 * 60 * 24
         }));
-    }
+    },
 };
-
