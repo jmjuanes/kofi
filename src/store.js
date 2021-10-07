@@ -1,39 +1,30 @@
 // Export store manager
-export const store = (initialState) => {
-    let state = {...initialState}; 
-    let listeners = [];
-
-    // Get the current state
-    const get = () => state;
-
-    // Update the state
-    const update = (mutation) => {
+export const store = (initialState) => ({
+    state: {...(initialState || {})},
+    listeners: [],
+    // Methods to manipulate the state
+    get: () => this.state,
+    update: (mutation) => {
         if (typeof mutation === "function") {
-            state = {...state, ...mutation(state)};
+            Object.assign(this.state, mutation(this.state));
         }
         else if (typeof mutation === "object") {
-            state = {...state, ...mutation};
+            Object.assign(this.state, mutation || {});
         }
         // Run the listeners with the new state
-        listeners.forEach(f => f(state));
-    };
-
-    //Subscribe to state changes
-    const subscribe = (listener) => {
-        listeners.push(listener);
-        listener(state); // Call the listener with the current state
+        this.listeners.forEach(f => f(this.state));
+    },
+    mutate: (fn) => {
+        return (...args) => this.update(fn(this.state, ...args));
+    },
+    // Subscribe to state changes
+    subscribe: (fn) => {
+        this.listeners.push(fn);
+        fn(this.state); // Call the listener with the current state
 
         // Return an unsubscribe function
         return () => {
-            listeners = listeners.filter(f => f !== listener);
+            this.listeners = this.listeners.filter(f => f !== fn);
         };
-    };
-
-    // Generate a mutator
-    const mutate = (fn) => {
-        return (...args) => update(fn(state, ...args));
-    };
-
-    //Return store methods
-    return {get, update, subscribe, mutate};
-};
+    },
+});
