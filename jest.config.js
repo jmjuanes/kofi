@@ -1,4 +1,5 @@
 module.exports = {
-    "clearMocks": true
+    "clearMocks": true,
+    "testEnvironment": "jsdom",
 };
 
