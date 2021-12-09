@@ -1,9 +1,7 @@
 node_modules
 package-lock.json
 *.swp
-dist
-tmp
 .DS_Store
-__pycache__
-vendor
+*.esm.js
+*.umd.js
 
