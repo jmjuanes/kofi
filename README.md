@@ -301,22 +301,21 @@ This will render the first time as follows:
 
 Each time that the user clicks on the button, the `count` variable will be increment in one unit and the DOM will be updated with the new count value.
 
+### kofi.http(url [, options])
 
-### kofi.request(options)
+Performs a request to the specified url, and returns a promise that:
+- resolves if the request has been successful executed, with a response object.
+- rejects if there was an error performing the request.
 
-Performs a request to the specified url in the `options` object, and returns a new Promise that resolves if the request has been successful executed, or rejects if there was an error performing the request.
+The additional `options` argument is an object with all the options to perform the request. The following entries are allowed: 
 
-The `options` argument is an object with all the options to perform the request. The following entries are allowed: 
-
-- `url` **mandatory**: a string with the url. This is the only mandatory field of the options object.
 - `method`: a string with the http method. Default is `"get"`.
 - `headers`: an object with the HTTP headers. Default is `{}`.
-- `body`: a string data to be sent with the request (not working with GET requests). If the `json` option is set to `true`, `body` must be a valid JSON object that will be converted to string using `JSON.stringify`.
-- `json`: if set to `true`, the request body is serialized as a JSON and adds the `Content-type: application/json` header to the request. It also evaluates the response body as a JSON and returns a JSON object instead of a string. Default is `false`.
-- `form`: if an object is passed on this option, the request body is set to it's query-string representation. It also adds the `Content-type: application/x-www-form-urlencoded` header to the request.
+- `body`: a string data to be sent with the request (not allowed in GET requests). 
+- `json`: an object or array to send as the `body`. It will add the `Content-type: application/json` header to the request.
+- `form`: an object that will be encoded as a query string and sent as the `body`. It will add the `Content-type: application/x-www-form-urlencoded` header to the request.
 - `formData`: an instance of [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) with the data to perform a `multipart/form-data` request. 
-- `processData`: set to `false` to send non-process data with the request (data passed with the `form` option won't be serialized as a query-string, and the body won't be serialized as a JSON when the `json` option is set to `true`). Default is `true`.
-- `validateStatus`: a function to define if the request should be resolved or rejected for a given HTTP response status code. If this method returns `true`, the promise will be resolved. By default, all status >= 300 will be rejected. 
+- `credentials`: a boolean to specify if credentials should be included in the request.
 
 #### Response schema
 
