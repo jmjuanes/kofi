@@ -495,6 +495,33 @@ store.update(prevState => {
 After merge is done, all listeners registered with `store.subscribe` will be called.
 
 
+### kofi.router(initialPath, routes)
+
+Generates a tiny router that you can use to execute functions when the path matches the route path. The following arguments are required to generate a router:
+
+- `initialPath`: the router initial path, for example `"/"`.
+- `routes`: an object whose keys are the route strings and values are a function that will be called when the route path string matches the current path.
+
+```javascript
+const router = kofi.router("/", {
+    "/": req => {
+        return console.log("Home");
+    },
+    "/about": req => {
+        return console.log("About page");
+    },
+});
+```
+
+#### router.get()
+
+Returns the lastly resolved routing path.
+
+#### router.set(newPath)
+
+Redirects to the matching route, executing the function bound to the route string.
+
+
 ### kofi.each(items, fn)
 
 Async iterates over an `array` or an `object` and returns a new promise that resolves if all items has been processed, or rejects if there was an error processing an item.
