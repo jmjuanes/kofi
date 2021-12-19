@@ -43,7 +43,7 @@ Executes the provided function `fn` when the DOM becomes ready. This utility is 
 
 ```javascript 
 //Execute this function when the DOM is ready
-kofi.ready(function () {
+kofi.ready(() => {
     console.log("DOM is ready");
 });
 ```
@@ -59,6 +59,7 @@ kofi.element("div", {}, "Hello world"); // --> <div>Hello world</div>
 ```
 
 This method does not return a DOM element. It returns a Virtual DOM Node element, which is a JSON representation of the DOM element. 
+
 To transform it into a real DOM element, use `kofi.render`.
 
 #### Type
@@ -71,9 +72,10 @@ kofi.element("a", {"href": "https://google.es"}, "Click me!");
 //Renders to: <a href="https://google.es">Click me!</a>
 
 //Using a function
-let Welcome = function (props, children) {
+const Welcome = (props, children) => {
     return kofi.element("span", {}, `Hello ${props.name}`);
 };
+
 kofi.element(Welcome, {"name": "Bob"}); 
 //Renders to: <span>Hello Bob</span>
 ```
@@ -85,8 +87,8 @@ The `props` argument is an object with the data of the element. This can include
 ```javascript
 kofi.element("div", {
     "className": "button",
-    "onclick": function (event) { /* Handle click event */},
-    "id": "button1"
+    "onclick": event => { /* Handle click event */ },
+    "id": "button1",
 });
 ```
 
@@ -104,9 +106,9 @@ Attach a callback listener to an event.
 
 ```javascript
 kofi.element("div", {
-    "onclick": function (event) { /* Handle click event */},
-    "onmousedown": function (event) { /* Handle mouse down event */},
-    "onmouseup": function (event) { /* Handle mouse up event */}
+    "onclick": event => { /* Handle click event */ },
+    "onmousedown": event => { /* Handle mouse down event */ },
+    "onmouseup": event => { /* Handle mouse up event */ },
 });
 ```
 
@@ -118,7 +120,7 @@ You can provide an object with the style of the element. All styles attributes s
 kofi.element("div", {
     "style": {
         "backgroundColor": "blue",
-        "color": "white"
+        "color": "white",
     },
     "align": "center"
 }, "Hello");
@@ -135,7 +137,7 @@ This example using JSX:
 /** @jsx kofi.element */
 import kofi from "kofi";
 
-let user = (
+const user = (
     <div>
         <img className="avatar" src="/path/to/user.png" />
         <span>Hello user</span>
@@ -147,11 +149,11 @@ Compiles to:
 
 ```javascript
 /** @jsx kofi.element */
-let kofi = require("kofi");
+const kofi = require("kofi");
 
-let user = kofi.element("div", null, 
+const user = kofi.element("div", null, 
     kofi.element("img", {"className": "avatar", "src": "/path/to/user.png"}),
-    kofi.element("span", null, "Hello user")
+    kofi.element("span", null, "Hello user"),
 );
 ```
 
@@ -160,7 +162,7 @@ let user = kofi.element("div", null,
 Renders a VDOM Node to the DOM.
 
 ```javascript
-let el = kofi.element("div", {}, "Hello world!");
+const el = kofi.element("div", {}, "Hello world!");
 
 kofi.render(document.getElementById("root"), el);
 ```
@@ -319,70 +321,60 @@ The response of the request will have the following schema:
 
 ```javascript
 {
-    // error: an instance of `Error` if something went wrong doing the request of parsing the response, 
-    // or an instance of `kofi.HTTPError` if the request has been rejected using the validateStatus option.
-    // If the promise has been resolved, this field will be `null`.
-    "error": null,
-    
     // statusCode: a number with the HTTP response status code
     "statusCode": 200,
     
-    // statusMessage: a string with the HTTP response status message
-    "statusMessage": "OK",
+    // statusText: a string with the HTTP response status message
+    "statusText": "OK",
     
-    // method: a string with the request method
-    "method": "get",
-
     // url: a string with the request url
     "url": "/test",
+
+    // raw: the response object returned by XMLHttpRequest
+    "raw": {},
     
     // headers: a parsed object with the response headers
     "headers": {},
-
-    // body: the response body string or object (if the `json` option is provided).
-    "body": null
 }
 ```
+
+In addition to this, the following methods will be provided in the response object:
+
+- `response.text()`: returns a promise that resolves with a text representation of the response body.
+
+- `response.blob()`: returns a promise that resolves with a Blob representation of the response body.
+
+- `response.json()`: returns a promise that resolves with the result of parsing the response body text as a JSON.
+
 
 #### Basic example
 
 ```javascript
-//Import a JSON file
-let request = kofi.request({
-    "method": "get", 
-    "url": "./data.json", 
-    "json": true,
-    "validateStatus": function (code) {
-        return code < 300;
-    }
-});
-
-//Request has been resolved
-request.then(function (response){
-    //Print the response status code
+kofi.http("/data.json").then(response => {
     console.log("Status code: " + response.statusCode);
-    //Print the result
-    console.log(response.body);
-});
-
-//Request has been rejected --> response.error contains the error
-request.catch(function (response) {
-    console.log(response.error);
+    // Process the response as JSON
+    return response.json();
+}).then(data => {
+    // Parse JSON data
+    console.log(data);
+}).catch(error => {
+    // Something went wrong
 });
 ```
 
 #### Sending JSON object
 
 ```javascript
-let request = kofi.request({
-    "url": "/register", 
+kofi.http("/register", {
     "method": "put", 
-    "json": true, 
-    "body": {
+    "json": {
         "name": "Bob",
-        "registered": false,
         "password": "12345"
     }
+}).then(response => {
+    // Process response
+}).catch(error => {
+    // /something went wrong
 });
 ```
 
@@ -391,14 +383,17 @@ let request = kofi.request({
 Use the `form` option to send URL-encoded forms: 
 
 ```javascript
-let request = kofi.request({
-    "url": "/my/service", 
+kofi.http("/users", {
     "method": "post", 
     "form": {
         "name": "Bob",
         "age": "30",
         "city": "New York"
     }
+}).then(response => {
+    // Process response
+}).catch(error => {
+    // /something went wrong
 });
 ```
 
@@ -407,15 +402,18 @@ let request = kofi.request({
 Use the `formData` option to send `multipart/form-data` forms. Check the [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) interface documentation for more information.
 
 ```javascript 
-let formData = new FormData();
+const formData = new FormData();
 formData.append("username", "Bob"); //Append values
 formData.append("userpic", fileInput.files[0], "avatar.jpg"); //Append files
 
 //Send to the server
-let request = kofi.request({
-    "url": "/process/uploads",
+kofi.http("/upload", {
     "method": "post", 
     "formData": formData
+}).then(response => {
+    // Process response
+}).catch(error => {
+    // /something went wrong
 });
 ```
 
