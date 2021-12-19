@@ -460,27 +460,41 @@ Async iterates over an `array` or an `object` and returns a new promise that res
 - `fn`: function that will be called with each item of the `items` array or object with the following arguments: 
   - First argument: the property name if `items` is an object, or the index if `items` is an array.
   - Second argument: the property value if `items` is an object, or the value if `items` is an array.
-  - Last argument: a `next` function. 
 
-Calling the `next` function invokes the next item. If you pass anything to the `next` function, this will be treated as an error, the each loop will be stopped and the promise will be rejected.
+The `fm` function must return a promise that must resolve to continue with the next item, and reject to abort the each function.
 
 ```javascript
 //Iterate over an array 
-kofi.each([1, 2, 3], function (index, value, next) {
+kofi.each([1, 2, 3], (index, value) => {
     console.log(index + " -> " + value);
-    return next();
+    return Promise.resolve();
 });
 // 0 -> 1
 // 1 -> 2
 // 2 -> 3
 
 //Iterate over an object 
-kofi.each({"key1": "value1", "key2": "value2"}, function (key, value, next) {
+kofi.each({"key1": "value1", "key2": "value2"}, (key, value) => {
     console.log(key + " -> " + value);
-    return next();
+    return Promise.resolve();
 });
 // key1 -> value1
 // key2 -> value2
+```
+
+### kofi.retry(times, fn)
+
+Retry the specified `fn` function up to `times` until it returns a resolved promise.
+
+```javascript
+kofi.retry(5, () => {
+    // This function can be executed up to 5 times
+    // Until it returns a resolved promise
+}).then(() => {
+    // Success
+}).catch(error => {
+    // error is the first error returned by the function
+});
 ```
 
 ### kofi.timestamp(pattern)
@@ -499,24 +513,6 @@ kofi.timestamp("Current year: YYYY")
 // -> "Current year: 2018"
 ```
 
-### kofi.values(obj)
-
-Returns an array of a given object's own enumerable property values. It's a ponyfill of the [ `Object.values`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/values) method.
-
-```javascript
-let obj = {
-    a: 1,
-    b: 2,
-    c: "hello"
-};
-let values = kofi.values(obj); // -> values = [1, 2, "hello"]
-```
-
-### kofi.entries(obj)
-
-Returns an array of a given object's own enumerable string-keyed property `[key, value]` pairs. It is a ponyfill of the [`Object.entries`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/entries) method.
-
-
 ### kofi.format(str, obj)
 
 Replace all handlebars expressions from `str` with values of `obj`.
@@ -533,29 +529,13 @@ Generates a unique random string of 15 characters.
 kofi.tempid();  // -> str = "wv1ufiqj5e6xd3k"
 ```
 
-### kofi.parseQueryString(str)
-
-Parse a query string into an object. Leading `?` is ignored.
-
-```javascript
-kofi.parseQueryString("foo=1&bar=2"); // {"foo": "1", "bar": "2"}
-```
-
-### kofi.buildQueryString(obj)
-
-Stringify an object into a query string.
-
-```javascript
-kofi.buildQueryString({"foo": "1", "bar": "2"}); // "foo=1&bar=2"
-```
-
 ### kofi.delay(time, fn)
 
 This is just [`setTimeout`](https://developer.mozilla.org/en-US/docs/Web/API/WindowOrWorkerGlobalScope/setTimeout) 
 but with the arguments reversed (first the delay `time` in ms, then the callback `fn` function).
 
 ```javascript
-kofi.delay(1000, function () {
+kofi.delay(1000, () => {
     console.log("Hello after 1 second!!");
 });
 ```
