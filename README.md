@@ -610,6 +610,21 @@ kofi.delay(1000, () => {
 });
 ```
 
+### kofi.classNames(...)
+
+A tiny utility for conditionally joining classNames. This function takes any number of arguments which can be an string, an object or an array. When providing an object, if the value associated with a given key is truthly, that key will be included in the generated classNames string. Non string values will be also ignored.
+
+```javascript
+kofi.classNames("foo", "bar"); // -> "foo bar"
+kofi.classNames("foo", null, false, "bar"); // -> "foo bar"
+kofi.classNames("foo", ["bar", null]); // -> "foo bar"
+kofi.classNames({
+    "foo": true,
+    "bar": false,
+}); // -> "foo"
+```
+
+
 ## License
 
 **kofi** is released under the [MIT LICENSE](./LICENSE).
