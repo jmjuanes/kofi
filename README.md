@@ -22,20 +22,16 @@ $ npm install --save kofi
 
 ## Getting started
 
-**kofi** is written using **ES2015 Modules**. You can import **kofi** into your ES2015 application as a namespace or importing specific methods from **kofi**:
+**kofi** is written using **ES2015 Modules**. You can import **kofi** into your ES2015 application:
 
 ```javascript
-//Import the whole kofi package as a namespace
 import kofi from "kofi";
-
-//Import only specific methods
-import {request, dispatch} from "kofi";
 ```
 
 **kofi** can be also imported directly in your browser:
 
 ```html
-<script type="text/javascript" src="./node_modules/kofi/dist/kofi.umd.js"></script>
+<script type="text/javascript" src="./node_modules/kofi/kofi.umd.js"></script>
 ```
 
 
