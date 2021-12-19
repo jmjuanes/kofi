@@ -423,34 +423,77 @@ kofi.http("/upload", {
 Generates a new event dispatcher.
 
 ```javascript 
-let dispatcher = kofi.dispatch();
+const dispatcher = kofi.dispatch();
 ```
 
-#### dispatcher.addListener(name, listener)
+#### dispatcher.on(name, listener)
 
 Registers a new `listener` function to the event called `name`.
 
 ```javascript 
-dispatcher.addListener("error", function (message) {
+dispatcher.on("error", message => {
     console.log("New error generated: " + message);
 });
 ```
 
-#### dispatcher.removeListener(name, listener)
+#### dispatcher.off(name, listener)
 
 Removes the specific `listener` function from the event called `name`.
 
-#### dispatcher.removeAllListeners(name)
-
-Removes all listeners of the event called `name`.
-
-#### dispatcher.emit(name[, args...])
+#### dispatcher.dispatch(name[, args...])
 
 Trigger all listeners of the event called `name`. All the extra arguments passed to this function will be passed to all registered listeners.
 
 ```javascript
-dispatcher.emit("error", "Error importing file xxxx.json");
+dispatcher.dispatch("error", "Error importing file xxxx.json");
 ```
+
+### kofi.store(initialState)
+
+Generates a tiny store manager. The `initialState` is an object containing the initial state.
+
+```javascript
+const store = kofi.store({
+    "count": 0,
+});
+```
+
+#### store.get()
+
+Returns the current state.
+
+#### store.subscribe(listener)
+
+Register a listener wich is called when store is updated.
+
+```javascript
+store.subscribe(newState => {
+    // State has been updated
+});
+```
+
+#### store.update(arg)
+
+Updates the current state. The `arg` value can be an object containing the new state, that will be merged with the previous state using `Object.assign`:
+
+```javascript
+store.update({
+    "count": 1,
+});
+```
+
+Also, you can pass a function that will recieve the current state, and must return an object with the new state that will be merged with the previous state using `Object.assign`:
+
+```javascript
+store.update(prevState => {
+    return {
+        "count": prevState + 1,
+    };
+});
+```
+
+After merge is done, all listeners registered with `store.subscribe` will be called.
+
 
 ### kofi.each(items, fn)
 
