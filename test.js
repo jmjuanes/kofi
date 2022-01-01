@@ -93,3 +93,16 @@ describe("kofi.tempid", () => {
         expect(kofi.tempid()).not.toBe(kofi.tempid());
     });
 });
+
+describe("kofi.when", () => {
+    it("should execute the function if the condition is satisfied", () => {
+        const fn = jest.fn();
+        kofi.when(true, fn);
+        expect(fn).toHaveBeenCalled();
+    });
+    it("shouldn't execute the function if the condition is not satisfied", () => {
+        const fn = jest.fn();
+        kofi.when(false, fn);
+        expect(fn).not.toHaveBeenCalled();
+    });
+});
