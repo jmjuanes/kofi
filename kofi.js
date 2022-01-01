@@ -515,10 +515,10 @@ const file = (b, method) => {
 
 // Generate read file methods
 Object.assign(file, {
-    text: (b) => file(b, "Text"),
-    json: (b) => file(b, "Text").then(JSON.parse),
-    dataURL: (b) => file(b, "DataURL"),
-    arrayBuffer: (b) => file(b, "ArrayBuffer"),
+    text: b => file(b, "Text"),
+    json: b => file(b, "Text").then(JSON.parse),
+    dataURL: b => file(b, "DataURL"),
+    arrayBuffer: b => file(b, "ArrayBuffer"),
 });
 
 // Slice a blob in chunks of the provided size, and call a function for each chunk.
@@ -663,6 +663,9 @@ const each = (items, fn) => {
     });
 };
 
+// Conditional as a function
+const when = (condition, fn) => !!condition ? fn() : null;
+
 // Parse a classnames list
 const parseClassNames = items => {
     if (typeof items === "string") {
@@ -703,6 +706,7 @@ const kofi = {
     classNames,
     each,
     retry,
+    when,
     timestamp,
     format,
     delay,
