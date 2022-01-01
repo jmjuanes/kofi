@@ -1,4 +1,3 @@
-// Document aliases
 const $doc = document;
 
 // Escape and unescape helper method
@@ -177,13 +176,15 @@ const setProperty = (el, name, value = null) => {
     }
 };
 
-// Creates a kofi application
+// Create a kofi application
 const app = (parent, component) => {
     let canUpdateComponent = true;
     let oldVdom = null; // Previous vdom
-    let updateComponent = null; // Update component function
+    let debounceUpdate = null; // Update component function
+    const props = {}; // Component props
+    const dispatcher = dispatch();
     const hooks = {index: 0, list: []};
-    const getHook = (value) => {
+    const getHook = value => {
         let hook = hooks.list[hooks.index++];
         if (!hook) {
             hook = {value};
@@ -191,15 +192,20 @@ const app = (parent, component) => {
         }
         return hook;
     };
-    const hooksActions = {
+    // Actions object
+    const actions = {
+        dispatch: dispatcher.dispatch,
+        useProp: (name, defaultValue) => {
+            return typeof props[name] !== "undefined" ? props[name] : defaultValue;
+        },
         useRef: () => ({current: null}),
-        useState: (initialState) => {
+        useState: initialState => {
             const hook = getHook(initialState);
-            const dispatch = (newState) => {
+            const updateState = newState => {
                 hook.value = newState;
-                updateComponent();
+                debounceUpdate();
             };
-            return [hook.value, dispatch];
+            return [hook.value, updateState];
         },
         useEffect: (cb, args) => {
             const hook = getHook(null);
@@ -208,28 +214,55 @@ const app = (parent, component) => {
                 hook.cb = cb;
             }
         },
-        useRouter: () => null,
+        useRouter: (initialPath, routes) => {
+            const hook = getHook(null);
+            if (!hook.value) {
+                hook.value = router(initialPath, routes);
+            }
+            // Create router element and redirect dispatcher
+            const RouterElement = () => hook.value.refresh() || null;
+            const redirect = newPath => {
+                hook.value.path = newPath || "/";
+                return debounceUpdate();
+            };
+            // Return router
+            return [RouterElement, redirect];
+        },
+        useStore: initialStore => {
+            const hook = getHook(null);
+            if (!hook.value) {
+                hook.value = store(initialStore);
+            }
+            // Return current store and update ref
+            return [hook.value.get(), hook.value.update];
+        },
     };
     //Define component update method
-    updateComponent = () => {
-        if (canUpdateComponent) {
-            canUpdateComponent = false;
-            return Promise.resolve().then(() => {
-                canUpdateComponent = true;
-                hooks.index = 0; // Reset hooks index
-                const newVdom = component(hooksActions);
-                oldVdom ? update(parent, newVdom, oldVdom) : render(parent, newVdom);
-                oldVdom = newVdom; // Update current vdom
-                // Call all useEffect hooks
-                hooks.list.filter(h => typeof h?.cb === "function").forEach(hook => {
-                    hook.cb();
-                    delete hook.cb; // Remove callback 
-                });
-            });
-        }
-    };
+    debounceUpdate = debounce(50, () => {
+        hooks.index = 0; // Reset hooks index
+        const newVdom = component(actions);
+        oldVdom ? update(parent, newVdom, oldVdom) : render(parent, newVdom);
+        oldVdom = newVdom; // Update current vdom
+        // Call all useEffect hooks
+        hooks.list.filter(h => typeof h?.cb === "function").forEach(hook => {
+            hook.cb();
+            delete hook.cb; // Remove callback 
+        });
+    });
     clearNode(parent); // Clear parent element
-    return updateComponent(); // First render
+    debounceUpdate(); // First render
+    // Return component manager
+    // return dispatcher;
+    return {
+        on: (name, fn) => dispatcher.on(name, fn),
+        addEventListener: (name, fn) => dispatcher.on(name, fn),
+        setProp: (key, value) => {
+            props[key] = value;
+            debounceUpdate();
+        },
+        getProp: key => props[key],
+        destroy: () => null, // TODO
+    };
 };
 
 // Execute the specified function when the DOM is ready
@@ -274,7 +307,7 @@ const dispatch = () => ({
 });
 
 // Tiny store manager
-const store = (initialState) => ({
+const store = initialState => ({
     state: initialState || {},
     listeners: [],
     // Methods to manipulate the state
@@ -650,12 +683,21 @@ const classNames = (...args) => {
     return (args || []).map(arg => parseClassNames(arg)).flat().join(" ");
 };
 
+// Tiny debounce implementation to reduce the number of timmes the function is called
+const debounce = (wait, fn) => {
+    let timer = null;
+    return () => {
+        clearTimeout(timer);
+        timer = setTimeout(fn, wait || 25);
+    };
+};
+
 // Global kofi object
 const kofi = {
     element,
     render,
     stringify,
-    // app,
+    app,
     ready,
     http,
     classNames,
@@ -676,6 +718,7 @@ const kofi = {
     splitUrl,
     file,
     chunks,
+    debounce,
 };
 
 // Default export
