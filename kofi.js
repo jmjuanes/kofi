@@ -195,6 +195,7 @@ const app = (parent, component) => {
     // Actions object
     const actions = {
         dispatch: dispatcher.dispatch,
+        forceUpdate: () => debounceUpdate(),
         useProp: (name, defaultValue) => {
             return typeof props[name] !== "undefined" ? props[name] : defaultValue;
         },
