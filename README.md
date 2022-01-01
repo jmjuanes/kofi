@@ -5,11 +5,11 @@
 </div>
 <br>
 <div align="center">
-<img src="https://david-dm.org/jmjuanes/kofi/dev-status.svg?style=flat-square">
-<img src="https://img.shields.io/badge/status-on_development-orange.svg?style=flat-square">
-<img src="https://img.shields.io/badge/stability-experimental-orange.svg?style=flat-square">
-<img src="https://img.shields.io/npm/v/kofi.svg?style=flat-square">
-<img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat-square">
+<img src="https://david-dm.org/jmjuanes/kofi/dev-status.svg">
+<img src="https://img.shields.io/badge/status-on_development-orange.svg">
+<img src="https://img.shields.io/badge/stability-experimental-orange.svg">
+<img src="https://img.shields.io/npm/v/kofi.svg">
+<img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </div>
 
 ## Installation
@@ -22,20 +22,81 @@ $ npm install --save kofi
 
 ## Getting started
 
-**kofi** is written using **ES2015 Modules**. You can import **kofi** into your ES2015 application:
-
-```javascript
-import kofi from "kofi";
-```
-
-**kofi** can be also imported directly in your browser:
+The **kofi** package can be used via modules:
 
 ```html
-<script type="text/javascript" src="./node_modules/kofi/kofi.umd.js"></script>
+<script type="module">
+    import kofi from "https://unpkg.com/kofi/kofi.js";
+</script>
 ```
+
+## Usage
+
+You can create an application with **kofi** using `kofi.app`. This function needs:
+
+- A `parent` DOM element to render the application.
+- A `fn` function to generate the application.
+
+
+```javascript
+const parent = document.getElementById("root");
+const app = kofi.app(parent, actions => {
+    const [count, setCount] = actions.useState(0);
+    const handleClick = () => {
+        return setCount(count + 1);
+    };
+    // Return counter
+    return kofi.element("div", {}, 
+        kofi.element("div", {}, `Count: ${count}`),
+        kofi.element("button", {"onclick": handleClick}, "Increment")
+    );
+});
+```
+
+
+### Actions
+
+The second argument of `kofi.app` is a function that must return a `kofi.element` that will be rendered in the DOM. This function will be called with a single argument, that contains a collection of useful actions for your application: application lifecycle, state management, routing, and more!
+
+#### actions.useProp
+
+This action will return a prop value (if exists). The first argument is the prop name and the second argument is a default value if this prop has not provided.
+
+```javascript
+const value = actions.useProp("count", 0);
+```
+
+#### actions.useState
+
+An action to get and update state values in the application. This function accepts the initial state, and returns an array where the first entry is the current state value and the second entry is a function to update the state and trigger an application update.
+
+```javascript
+const [count, setCount] = actions.useState(0);
+```
+
+#### actions.useStore
+
+An action that will generate a `kofi.store` instance. This action is similar to the `actions.useState`, but the initial state must be always an object. This action is useful when your application needs to save complex states.
+
+```javascript
+const [store, setStore] = actions.useStore({
+    name: "Bob",
+    email: "bob@email.com",
+});
+```
+
+#### actions.forceUpdate
+
+This action forces a re-render of the application.
+
 
 
 ## API
+
+### kofi.app(parent, fn)
+
+Generates a new application instance.
+
 
 ### kofi.ready(fn)
 
@@ -169,135 +230,6 @@ kofi.render(document.getElementById("root"), el);
 
 The first argument is the parent DOM element, and the second arguments is the VDOM Node to render. Returns a reference to the rendered DOM element.
 
-
-### kofi.component(spec)
-
-This method creates and validates a new kofi component.
-
-```javascript
-let Counter = kofi.component({
-    "oninit": function () {
-        this.state = {"count": 0};
-    },
-    "handleClick": function () {
-        return this.update({"count": this.state.count + 1});
-    },
-    "render": function () {
-        return kofi.element("div", {}, 
-            kofi.element("div", {}, `Count: ${this.state.count}`),
-            kofi.element("button", {"onclick": this.handleClick}, "Increment")
-        );
-    }
-});
-```
-
-A kofi component is just an object with a `render` method. This method should return a new `kofi.element` that will be rendered in the DOM. Each time the component is updated, the `render` method will be invoked, and the new generated VDOM will replace the current DOM. 
-
-#### State and updating
-
-The `state` is an object that holds information about the component that may change over time and is managed only by the component. Each time the state of the component changes, the `render` method of the component will be called again and the DOM will be updated.
-
-Usually the state gets it's initial data in the `oninit()` method. This is the only place where you should update the state manually. 
-To update the state, you should use the `update` method. This method accepts two arguments:
-
-- An object with the new state that will be merged with the current state of the component.
-- Optionally, a callback method that will be invoked after the component is updated.
-
-The new state will be merged with the current state using `Object.assign`, so you should only pass the new data that has been changed.
-
-```javascript
-kofi.component({
-    "oninit": function () {
-        this.state = {
-            "name": "Bob",
-            "count": 1
-        };
-    },
-    "handleSomeEvent": function () {
-        return this.update({
-            "count": this.state.count + 1
-        });
-    },
-    . . .
-});
-```
-
-If you call `update` without a new state object, the component will be re-rendered without updating the state.
-
-
-#### Passing data
-
-Data can be passed to the component and will be stored as an object in the `props` field of the component. You can use the initial data passed to the component as props to initialize the state.
-
-Note that you should avoid changing the props object. Instead, store the data that may change in the state object.
-
-
-#### Component lifecycle
-
-Components can have lifecycle methods, which will be invoked at various points during the lifecycle of your component. 
-
-##### oninit()
-
-This method is invoked before the app is mounted. This is the recommended place to initialize the component state.
-
-```javascript
-kofi.component({
-    "oninit": function () {
-        this.state = {
-            "count": 0
-        };
-    },
-    . . .
-});
-```
-
-**You should not call update() in the oninit() method**. Instead, update the `this.state` object directly in the **oninit()** method.
-
-##### onmount()
-
-This method is invoked immediately after the component is mounted.
-
-##### onupdate()
-
-This method is invoked immediately after updating occurs. This method is not called for the initial render.
-
-
-### kofi.mount(parent, component, props)
-
-Mounts the result of a `kofi.component` call to the parent DOM element. 
-This method is similar to `kofi.render`, but instead of drawing the DOM element once, it will update the DOM element each time the `update` method is called.
-
-For example, let's mount the following component:
-
-```javascript
-let Counter = kofi.component({
-    "oninit": function () {
-        this.state = {"count": this.props.initialValue};
-    },
-    "handleClick": function () {
-        return this.update({"count": this.state.count + 1});
-    },
-    "render": function () {
-        return kofi.element("div", {}, 
-            kofi.element("div", {}, `Count: ${this.state.count}`),
-            kofi.element("button", {"onclick": this.handleClick}, "Increment")
-        );
-    }
-});
-
-kofi.mount(document.getElementById("root"), Counter, {"initialValue": 0});
-```
-
-This will render the first time as follows:
-
-```html
-<div>
-    <div>Count: 0</div>
-    <button>Increment</button>
-</div>
-```
-
-Each time that the user clicks on the button, the `count` variable will be increment in one unit and the DOM will be updated with the new count value.
 
 ### kofi.http(url [, options])
 
@@ -527,15 +459,11 @@ Redirects to the matching route, executing the function bound to the route strin
 Async iterates over an `array` or an `object` and returns a new promise that resolves if all items has been processed, or rejects if there was an error processing an item.
 
 - `items`: `array` or `object` you want to iterate.
-- `fn`: function that will be called with each item of the `items` array or object with the following arguments: 
-  - First argument: the property name if `items` is an object, or the index if `items` is an array.
-  - Second argument: the property value if `items` is an object, or the value if `items` is an array.
-
-The `fm` function must return a promise that must resolve to continue with the next item, and reject to abort the each function.
+- `fn`: function that will be called with each item of the `items` array or object, and must return a promise that should resolve to continue with the next item, and reject to abort the each function.
 
 ```javascript
 //Iterate over an array 
-kofi.each([1, 2, 3], (index, value) => {
+kofi.each([1, 2, 3], (value, index) => {
     console.log(index + " -> " + value);
     return Promise.resolve();
 });
@@ -544,7 +472,7 @@ kofi.each([1, 2, 3], (index, value) => {
 // 2 -> 3
 
 //Iterate over an object 
-kofi.each({"key1": "value1", "key2": "value2"}, (key, value) => {
+kofi.each({"key1": "value1", "key2": "value2"}, ([key, value]) => {
     console.log(key + " -> " + value);
     return Promise.resolve();
 });
@@ -622,6 +550,17 @@ kofi.classNames({
     "foo": true,
     "bar": false,
 }); // -> "foo"
+```
+
+### kofi.when(condition, fn)
+
+Executes the specified `fn` function when the `condition` arguments is a truthy value.
+
+```javascript
+const condition = /* condition */;
+kofi.when(condition, () => {
+    // This function will be executed if `condition` is a truthy value
+});
 ```
 
 
