@@ -1,7 +1,0 @@
-# Third party packages
-**/node_modules
-
-# Generated bundles
-packages/**/.dist/*.js
-packages/**/.bundle/*.js
-
