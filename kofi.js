@@ -488,39 +488,25 @@ Object.assign(http, {
 });
 
 // Download the provided file content
-const download = (name, type, content) => {
+const downloadFile = (name, content) => {
     const link = render(null, element("a", {
-        "download": name,
-        "href": `data:${type};charset=utf-8,${escape(content)}`,
+        "download": name || "",
+        "href": content,
     }));
     return link.click();
 };
 
-// Register some download aliases
-Object.assign(download, {
-    text: (n, c) => download(n, "text/plain", c),
-    json: (n, c) => download(n, "application/json", typeof c === "object" ? JSON.stringify(c) : c),
-});
-
 // Promised file reader
-const file = (b, method) => {
-    method = method || "Text"; // By default read as text
+// Available methods: readAsArrayBuffer, readAsBinaryString, readAsDataURL, readAsText
+const readFile = (file, method) => {
+    method = method || "readAsText"; // By default read as text
+    const reader = new FileReader();
     return new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.addEventListener("load", e => resolve(e.target.result));
-        reader.addEventListener("error", e => reject(new Error(e.target.result)));
-        // Read the file
-        return reader["readAs" + method](b);
+        reader.addEventListener("load", e => resolve(reader));
+        reader.addEventListener("error", e => reject(e));
+        reader[method](file); // Read the file
     });
 };
-
-// Generate read file methods
-Object.assign(file, {
-    text: b => file(b, "Text"),
-    json: b => file(b, "Text").then(JSON.parse),
-    dataURL: b => file(b, "DataURL"),
-    arrayBuffer: b => file(b, "ArrayBuffer"),
-});
 
 // Slice a blob in chunks of the provided size, and call a function for each chunk.
 // Returns a promise that resolves if all chunks have been processed and rejects if there was an error processing a chunk
@@ -712,7 +698,6 @@ const kofi = {
     format,
     delay,
     tempid,
-    download,
     store,
     dispatch,
     escape,
@@ -721,7 +706,8 @@ const kofi = {
     router,
     joinUrl,
     splitUrl,
-    file,
+    readFile,
+    downloadFile,
     chunks,
     debounce,
 };
