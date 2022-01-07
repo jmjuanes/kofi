@@ -5,10 +5,9 @@
 </div>
 <br>
 <div align="center">
-<img src="https://david-dm.org/jmjuanes/kofi/dev-status.svg">
+<img src="https://img.shields.io/npm/v/kofi.svg">
 <img src="https://img.shields.io/badge/status-on_development-orange.svg">
 <img src="https://img.shields.io/badge/stability-experimental-orange.svg">
-<img src="https://img.shields.io/npm/v/kofi.svg">
 <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg">
 </div>
 
