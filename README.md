@@ -1,7 +1,7 @@
 <h1 align="center">kofi.js</h1>
 
 <div align="center">
-<b>kofi</b> is a micro browser utility library for building modern <b>frontend applications</b>. 
+<b>kofi</b> is a micro browser toolkit for building modern <b>frontend applications</b>. 
 </div>
 <br>
 <div align="center">
@@ -561,6 +561,25 @@ const condition = /* condition */;
 kofi.when(condition, () => {
     // This function will be executed if `condition` is a truthy value
 });
+```
+
+### kofi.downloadFile(name, path)
+
+Download a file from the browser. The first argument is the filename and the second argument is the file url to download. 
+
+```javascript
+const data = JSON.stringify({
+    "key1": true,
+    "key2": false,
+});
+
+// Generate the Url to download the file
+const url = URL.createObjectURL(new Blob([data], {
+    type: "application/json",
+}));
+
+// Download the file
+kofi.downloadFile("data.json", url);
 ```
 
 
