@@ -1,6 +1,6 @@
 {
     "name": "kofi",
-    "version": "0.5.0",
+    "version": "0.5.1",
     "description": "Tasty takeaway frontend toolkit. Just pour it and go!",
     "private": false,
     "main": "kofi.js",
