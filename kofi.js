@@ -1,5 +1,3 @@
-const $doc = document;
-
 // Escape and unescape helper method
 const escape = str => encodeURIComponent(str);
 const unescape = str => decodeURIComponent(str.replace(/\+/g, " "));
@@ -29,11 +27,11 @@ const render = (parent, el) => {
     let node = null; // Initialize output node
     //Check for text node
     if (typeof el === "string") {
-        node = $doc.createTextNode(el);
+        node = document.createTextNode(el);
     }
     else {
         //Create the new DOM element and assign the element properties
-        node = $doc.createElement(el.type);
+        node = document.createElement(el.type);
         Object.keys(el.props || {}).forEach(name => {
             name !== "html" && setProperty(node, name, el.props[name]);
         });
