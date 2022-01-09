@@ -87,7 +87,7 @@ const stringify = (el, delimiter) => {
         return `<${el.type} ${attrs.join(" ")} />`;
     }
     //Build the content of the element
-    const content = el.props?.html ? [el.props.html] : el.children.map(child => {
+    const content = el.props?.html ? [el.props.html] : (el.children || []).map(child => {
         return stringify(child, delimiter);
     });
     //Return the element with the content
