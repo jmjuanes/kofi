@@ -1,0 +1,36 @@
+{
+    "name": "kofi",
+    "version": "0.0.0",
+    "description": "Tasty",
+    "main": "kofi.js",
+    "module": "kofi.js",
+    "repository": "https://github.com/jmjuanes/kofi",
+    "author": "Josemi Juanes <hello@josemi.xyz>",
+    "bugs": "https://github.com/jmjuanes/kofi/issues",
+    "homepage": "https://www.josemi.xyz/kofi",
+    "exports": {
+        ".": "./kofi.js",
+        "./kofi.js": "./kofi.js",
+        "./package.json": "./package.json"
+    },
+    "license": "MIT",
+    "scripts": {
+        "test": "jest test.js"
+    },
+    "keywords": [
+        "template literals",
+        "tagged template",
+        "html"
+    ],
+    "files": [
+        "kofi.js",
+        "LICENSE",
+        "README.md"
+    ],
+    "devDependencies": {
+        "@babel/core": "^7.16.0",
+        "@babel/preset-env": "^7.16.4",
+        "jest": "^29.7.0",
+        "jest-environment-jsdom": "^29.7.0"
+    }
+}
