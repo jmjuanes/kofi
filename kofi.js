@@ -68,8 +68,8 @@ const compile = template => {
     return element;
 };
 
-// Returns a HTM template object
-export const htm = (literal, ...values) => {
+// Returns a HTML template object
+export const html = (literal, ...values) => {
     return {literal, values};
 };
 
