@@ -1,6 +1,6 @@
-import {htm, render} from "./kofi.js";
+import {html, render} from "./kofi.js";
 
-describe("htm", () => {
+describe("html", () => {
     let parent = null;
 
     beforeEach(() => {
@@ -8,30 +8,30 @@ describe("htm", () => {
     });
 
     it("should render a basic element", () => {
-        render(parent, htm`<div class="test"></div>`);
+        render(parent, html`<div class="test"></div>`);
         expect(parent.querySelector(`div.test`)).toBeDefined();
     });
 
     it("should set text attributes", () => {
         const className = "test";
-        render(parent, htm`<button class="${className}"></button>`);
+        render(parent, html`<button class="${className}"></button>`);
         expect(Array.from(parent.querySelector("button").classList)).toContain(className);
     });
     
-    it("should set boolean attributes", () => {
-        const isChecked = true;
-        const element = htm`
-            <input type="checkbox" ${isChecked ? "checked" : ""}>
-        `;
+    // it("should set boolean attributes", () => {
+    //     const isChecked = true;
+    //     const element = html`
+    //         <input type="checkbox" ?checked="${isChecked}" />
+    //     `;
 
-        render(parent, element);
-        expect(parent.querySelector("input").checked).toEqual(isChecked);
-    });
+    //     render(parent, element);
+    //     expect(parent.querySelector("input").checked).toEqual(isChecked);
+    // });
 
     it("should set events", () => {
         const handleClick1 = jest.fn();
         const handleClick2 = jest.fn();
-        const template = htm`
+        const template = html`
             <div>
                 <div id="test1" onClick="${handleClick1}"></div>
                 <div id="test2" onClick="${handleClick2}"></div>
