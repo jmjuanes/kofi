@@ -18,7 +18,7 @@ const registerElementEvents = (element, callback) => {
     }
     // Iterate over child nodes
     element.childNodes.forEach(child => {
-        if (child.nodeType === 8) {
+        if (child.nodeType === 1) {
             registerElementEvents(child, callback);
         }
     });
