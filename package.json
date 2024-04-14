@@ -1,6 +1,6 @@
 {
     "name": "kofi",
-    "version": "0.5.1",
+    "version": "0.6.0",
     "description": "Tasty takeaway Virtual DOM toolkit. Just pour it and go!",
     "private": false,
     "type": "module",
