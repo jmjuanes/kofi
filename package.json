@@ -1,35 +1,32 @@
 {
     "name": "kofi",
     "version": "0.5.1",
-    "description": "Tasty takeaway frontend toolkit. Just pour it and go!",
+    "description": "Tasty takeaway Virtual DOM toolkit. Just pour it and go!",
     "private": false,
-    "main": "kofi.js",
-    "module": "kofi.js",
-    "repository": "https://github.com/jmjuanes/kofi.git",
-    "author": "Josemi Juanes <josemijuanes@gmail.com>",
+    "type": "module",
+    "repository": "https://github.com/jmjuanes/kofi",
+    "author": "Josemi Juanes <hello@josemi.xyz>",
     "bugs": "https://github.com/jmjuanes/kofi/issues",
     "license": "MIT",
+    "main": "kofi.js",
+    "module": "kofi.js",
+    "exports": {
+        ".": "./kofi.js",
+        "./kofi.js": "./kofi.js",
+        "./package.json": "./package.json"
+    },
     "keywords": [
         "kofi",
-        "helpers",
-        "utility",
-        "utils",
-        "browser",
-        "fronted"
+        "vdom",
+        "virtual-dom",
+        "browser"
     ],
     "files": [
         "kofi.js",
         "LICENSE",
         "README.md"
     ],
-    "devDependencies": {
-        "@babel/core": "^7.16.0",
-        "@babel/preset-env": "^7.16.4",
-        "@testing-library/jest-dom": "^5.16.1",
-        "jest": "^27.4.3"
-    },
     "scripts": {
-        "build": "echo 'Nothing to build'",
-        "test": "jest test.js"
+        "test": "node test.js"
     }
 }
