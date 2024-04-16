@@ -20,7 +20,7 @@ const setProperty = (el, name, value = null) => {
     // Default: set the property value
     else if (name !== "html") {
         // el.setAttribute(key, value)
-        el[key] = value;
+        el[name] = value;
     }
 };
 
@@ -191,7 +191,7 @@ kofi.ready = fn => {
 };
 
 // Join class names
-kodi.classNames = (...args) => {
+kofi.classNames = (...args) => {
     const names = (args || []).map(item => {
         if (typeof item === "string") {
             return item.split(" ").filter(value => !!value);
