@@ -64,4 +64,11 @@ describe("kofi.template", () => {
     it("should return nodes with components as tags", () => {
         assert.deepStrictEqual(jsx`<${Component}>Hello</${Component}>`, [Component, {}, ["Hello"]]);
     });
+
+    it("should parse with multines", () => {
+        const vdom = jsx`
+            <div className="foo">bar</div>
+        `;
+        assert.deepStrictEqual(vdom, ["div", {className: "foo"}, ["bar"]]);
+    });
 });
