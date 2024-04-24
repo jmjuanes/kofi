@@ -139,6 +139,30 @@ const user = k("div", null,
 );
 ```
 
+### kofi.html
+
+A JavaScript [template tag](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Template_literals#tagged_templates) that converts a JSX-like syntax into a VDOM tree, that you can use with `kofi.render`.
+
+Example:
+
+```javascript
+import k from "kofi";
+
+const user = k.html`
+    <div align="center">
+        <img className="avatar" src="/path/to/user.png" />
+        <span>Hello user</span>
+    </div>
+`;
+```
+
+Features:
+- Custom components: `<${Foo}></${Foo}>` or `<${Foo} />`.
+- Dynamic props: `<div align="${currentAlign}" />`.
+- Dynamic content: `<div>Hello ${name}</div>`.
+- Events: `<div onClick="${() => console.log("clicked")}"></div>`.
+- Spread props: `<div ...${extraProps}>`.
+
 ### kofi.render(parent, element)
 
 Renders a VDOM Node to the DOM.
