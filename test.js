@@ -71,4 +71,8 @@ describe("kofi.template", () => {
         `;
         assert.deepStrictEqual(vdom, ["div", {className: "foo"}, ["bar"]]);
     });
+
+    it("should expand props", () => {
+        assert.deepStrictEqual(jsx`<a ...${{align: "center"}}></a>`, ["a", {align: "center"}, []]);
+    });
 });

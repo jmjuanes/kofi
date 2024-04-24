@@ -177,6 +177,11 @@ kofi.template = (h, literal, values, ctx = {i: 0, j: 0}, closing = null) => {
                     ctx.j = ctx.j + 1;
                 }
             }
+            // Check if we are in PROP_NAME and current prop is '...'
+            else if (mode === HTML_TEMPLATE_MODE.PROP_NAME && buffer === "...") {
+                Object.assign(current[1], values[ctx.i]);
+                buffer = "";
+            }
             // Check if we are in TAG_START or TAG_END modes
             else if (mode === HTML_TEMPLATE_MODE.TAG_START || mode === HTML_TEMPLATE_MODE.TAG_END) {
                 buffer = values[ctx.i];
