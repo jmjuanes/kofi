@@ -1,108 +1,67 @@
+import {describe, it} from "node:test";
+import assert from "node:assert";
 import kofi from "./kofi.js";
 
+describe("kofi.template", () => {
+    const jsx = (literal, ...values) => {
+        return kofi.template((t, p, ...c) => ([t, p, c]), literal, values)[0];
+    };
+    const Component = () => {};
 
-describe("kofi.store", () => {
-    it("should update the store", () => {
-        const newStore = kofi.store({"count": 0});
-        newStore.update({"count": 1});
-        expect(newStore.get().count).toBe(1);
+    it("sould return 'undefined' on empty string", () => {
+        assert.equal(jsx``, undefined);
     });
 
-    it("should call listeners when store changes", () => {
-        const listener = jest.fn();
-        const newStore = kofi.store({"count": 0});
-        newStore.subscribe(listener);
-        expect(listener).toHaveBeenCalledWith(newStore.get());
-        newStore.update({"count": 1});
-        expect(listener).toHaveBeenCalledWith(newStore.get());
-    });
-});
-
-describe("kofi.retry", () => {
-    it("should exit on the first completed iteration", () => {
-        return kofi.retry(5, (index) => {
-            return Promise.resolve(index);
-        }).then(index => {
-            expect(index).toBe(0);            
-        });
+    it("should return the provided string if no HTML code is present", () => {
+        assert.equal(jsx`Hello World`, "Hello World");
     });
 
-    it("should retry the fn if it fails", (done) => {
-        const totalRetries = 5;
-        let counter = 0;
-        kofi.retry(totalRetries, () => {
-            counter = counter + 1;
-            return Promise.reject("Error");
-        }).catch(() => {
-            expect(counter).toBe(totalRetries);
-            return done();
-        });
-    });
-});
-
-describe("kofi.each", () => {
-    const list = [0, 1, 2, 3];
-    it("calls a function with each value in the array", () => {
-        expect.assertions(list.length);
-        return kofi.each(list, (value, index) => {
-            expect(value).toBe(list[index]);
-            return Promise.resolve();
-        });
+    it("should return single VDOM nodes", () => {
+        assert.deepStrictEqual(jsx`<div />`, ["div", {}, []]);
+        assert.deepStrictEqual(jsx`<span />`, ["span", {}, []]);
+        assert.deepStrictEqual(jsx`<h1 />`, ["h1", {}, []]);
+        assert.deepStrictEqual(jsx`<foo />`, ["foo", {}, []]);
     });
 
-    it("stops the loop when the returned promise is rejected", done => {
-        let executed = 0;
-        expect.assertions(1);
-        kofi.each(list, (value, index) => {
-            executed = executed + 1;
-            return index === 2 ? Promise.reject() : Promise.resolve();
-        }).then(() => {
-            expect(executed).toBe(0);
-        }).catch(() => {
-            expect(executed).toBe(3);
-            return done();
-        });
+    it("should return nodes with empty content", () => {
+        assert.deepStrictEqual(jsx`<div></div>`, ["div", {}, []]);
     });
 
-    it("works also with objects", () => {
-        const obj = {"a": 0, "b": 1};
-        return kofi.each(obj, entry => {
-            expect(obj[entry[0]]).toBe(entry[1]);
-            return Promise.resolve();
-        });
+    it("should return nodes with text content", () => {
+        assert.deepStrictEqual(jsx`<div>Hello</div>`, ["div", {}, ["Hello"]]);
     });
-});
 
-describe("kofi.format", () => {
-    it("replaces all {} expressions", () => {
-        const str = kofi.format("my car is {{ color }}", {color: "blue"});
-        expect(str.indexOf("color")).toBe(-1);
-        expect(str.indexOf("blue")).not.toBe(-1);
+    it("should return nodes with dynamic content", () => {
+        assert.deepStrictEqual(jsx`<div>Hello ${"World"}</div>`, ["div", {}, ["Hello ", "World"]]);
     });
-});
 
-describe("kofi.timestamp", () => {
-    it("returns a formatted timestamp", () => {
-        const d = new Date();
-        expect(kofi.timestamp("YYYY", d)).toBe(d.getFullYear().toString());
+    it("should return nodes with inner nodes", () => {
+        assert.deepStrictEqual(jsx`<div>Hello <b>Bob</b></div>`, ["div", {}, ["Hello ", ["b", {}, ["Bob"]]]]);
     });
-});
 
-describe("kofi.tempid", () => {
-    it("generates unique ids", () => {
-        expect(kofi.tempid()).not.toBe(kofi.tempid());
+    it("should parse string props", () => {
+        assert.deepStrictEqual(jsx`<div align="center">Hello</div>`, ["div", {align: "center"}, ["Hello"]]);
+        assert.deepStrictEqual(jsx`<div align="center"/>`, ["div", {align: "center"}, []]);
+        assert.deepStrictEqual(jsx`<a title="Hello World"/>`, ["a", {title: "Hello World"}, []]);
     });
-});
 
-describe("kofi.when", () => {
-    it("should execute the function if the condition is satisfied", () => {
-        const fn = jest.fn();
-        kofi.when(true, fn);
-        expect(fn).toHaveBeenCalled();
+    it("should parse empty string props", () => {
+        assert.deepStrictEqual(jsx`<a href="">Hello</a>`, ["a", {href: ""}, ["Hello"]]);
     });
-    it("shouldn't execute the function if the condition is not satisfied", () => {
-        const fn = jest.fn();
-        kofi.when(false, fn);
-        expect(fn).not.toHaveBeenCalled();
+
+    it("should parse boolean props", () => {
+        assert.deepStrictEqual(jsx`<input disabled />`, ["input", {disabled: true}, []]);
+        assert.deepStrictEqual(jsx`<input disabled/>`, ["input", {disabled: true}, []]);
+        assert.deepStrictEqual(jsx`<a disabled></a>`, ["a", {disabled: true}, []]);
+    });
+
+    it("should parse props with dynamic values", () => {
+        assert.deepStrictEqual(jsx`<input disabled=${false} />`, ["input", {disabled: false}, []]);
+        assert.deepStrictEqual(jsx`<a href="${"localhost"}" />`, ["a", {href: "localhost"}, []]);
+        assert.deepStrictEqual(jsx`<div style="${{color: "white"}}">Hello</div>`, ["div", {style: {color: "white"}}, ["Hello"]]);
+    });
+
+    it("should return nodes with components as tags", () => {
+        assert.deepStrictEqual(jsx`<${Component}>Hello</${Component}>`, [Component, {}, ["Hello"]]);
     });
 });
