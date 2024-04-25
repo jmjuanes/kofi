@@ -1,7 +1,7 @@
 {
     "name": "kofi",
-    "version": "0.6.1",
-    "description": "Tasty takeaway Virtual DOM toolkit. Just pour it and go!",
+    "version": "0.7.0",
+    "description": "Tasty takeaway frontend toolkit for creating small applications.",
     "private": false,
     "type": "module",
     "repository": "https://github.com/jmjuanes/kofi",
