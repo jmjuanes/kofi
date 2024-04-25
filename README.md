@@ -1,7 +1,7 @@
 <h1 align="center">kofi.js</h1>
 
 <div align="center">
-<b>kofi</b> is a micro Virtual DOM toolkit for building modern <b>frontend applications</b>. 
+<b>kofi</b> is a micro toolkit (less than 400 lines of code) for building small <b>frontend applications</b>. 
 </div>
 <br>
 <div align="center">
