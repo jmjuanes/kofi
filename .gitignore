@@ -1,0 +1,8 @@
+## Node and package managers files
+node_modules
+package-lock.json
+yarn.lock
+
+## Other system and editor files
+*.swp
+.DS_Store
