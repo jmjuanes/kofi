@@ -1,7 +1,7 @@
 // Self closing tags
 const selfClosingTags = new Set(["link", "meta", "input", "br", "img", "hr"]);
 
-// Modes for parsing template literal to VDOM
+const KOFI_VDOM_KEY = "_$kofi_vdom"; // key used to get the previously vdom rendered in the element
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
     TAG_START: 2,
@@ -214,9 +214,8 @@ kofi.render = (el, parent = null, options = null) => {
     const shouldUpdateParent = !!parent && !options?.skipUpdatingParent;
     let node = null;
     // check if we have to update the previously rendered content
-    if (shouldUpdateParent && parent?.["_$kofi_vdom"]) {
-        kofi.update(parent, el, parent["_$kofi_vdom"]);
-        parent._$kofi_vdom = el;
+    if (shouldUpdateParent && parent?.[KOFI_VDOM_KEY]) {
+        kofi.update(parent, el, parent[KOFI_VDOM_KEY]);
     }
     else {
         // Check for text node
@@ -241,11 +240,11 @@ kofi.render = (el, parent = null, options = null) => {
         // Mount the new node
         if (parent) {
             parent.appendChild(node);
-            // save current vdom as a reference in the parent
-            if (shouldUpdateParent) {
-                parent["_$kofi_vdom"] = el;
-            }
         }
+    }
+    // save current vdom as a reference in the parent
+    if (parent && shouldUpdateParent) {
+        parent[KOFI_VDOM_KEY] = el;
     }
     return node;
 };
