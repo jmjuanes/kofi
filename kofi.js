@@ -1,7 +1,7 @@
 // Self closing tags
 const selfClosingTags = new Set(["link", "meta", "input", "br", "img", "hr"]);
 
-// Modes for parsing template literal to VDOM
+const KOFI_VDOM_KEY = "_$kofi_vdom"; // key used to get the previously vdom rendered in the element
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
     TAG_START: 2,
@@ -210,30 +210,41 @@ kofi.html = (literal, ...values) => {
 };
 
 // Render an element
-kofi.render = (parent = null, el) => {
+kofi.render = (el, parent = null, options = null) => {
+    const shouldUpdateParent = !!parent && !options?.skipUpdatingParent;
     let node = null;
-    // Check for text node
-    if (typeof el === "string") {
-        node = document.createTextNode(el);
+    // check if we have to update the previously rendered content
+    if (shouldUpdateParent && parent?.[KOFI_VDOM_KEY]) {
+        kofi.update(parent, el, parent[KOFI_VDOM_KEY]);
     }
     else {
-        // Create the new DOM element and assign the element properties
-        node = document.createElement(el.type);
-        Object.keys(el.props || {}).forEach(name => {
-            name !== "html" && setProperty(node, name, el.props[name]);
-        });
-        // Check if html property has been provided
-        if (typeof el.props?.html === "string") {
-            node.innerHTML = el.props.html; //Inject html
+        // Check for text node
+        if (typeof el === "string") {
+            node = document.createTextNode(el);
         }
-        // If no html property has been provided
         else {
-            (el.children || []).forEach(child => kofi.render(node, child));
+            // Create the new DOM element and assign the element properties
+            node = document.createElement(el.type);
+            Object.keys(el.props || {}).forEach(name => {
+                name !== "html" && setProperty(node, name, el.props[name]);
+            });
+            // Check if html property has been provided
+            if (typeof el.props?.html === "string") {
+                node.innerHTML = el.props.html; //Inject html
+            }
+            // If no html property has been provided
+            else {
+                (el.children || []).forEach(child => kofi.render(child, node));
+            }
+        }
+        // Mount the new node
+        if (parent) {
+            parent.appendChild(node);
         }
     }
-    // Mount the new node
-    if (parent) {
-        parent.appendChild(node);
+    // save current vdom as a reference in the parent
+    if (parent && shouldUpdateParent) {
+        parent[KOFI_VDOM_KEY] = el;
     }
     return node;
 };
@@ -288,7 +299,7 @@ kofi.update = (parent, newNode, oldNode, index) => {
     const child = parent.childNodes[index];
     // Check for no old node --> mount this new element
     if (!oldNode) { 
-        return kofi.render(parent, newNode); 
+        return kofi.render(newNode, parent, {skipUpdatingParent: true}); 
     }
     // If there is not new element --> remove the old element
     else if (!newNode) { 
@@ -296,7 +307,7 @@ kofi.update = (parent, newNode, oldNode, index) => {
     }
     // If nodes has changed
     else if (nodesDiffs(newNode, oldNode)) {
-        return parent.replaceChild(kofi.render(null, newNode), child);
+        return parent.replaceChild(kofi.render(newNode), child);
     }
     // Change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
@@ -315,17 +326,6 @@ kofi.update = (parent, newNode, oldNode, index) => {
             kofi.update(child, newNode.children[i], oldNode.children[i], i);
         }
     }
-};
-
-// @description
-kofi.mount = (parent, fn) => {
-    parent.replaceChildren(); // Clear parent element
-    let oldVdom = null; // Previous vdom
-    return props => {
-        const newVdom = fn(props);
-        oldVdom ? kofi.update(parent, newVdom, oldVdom) : kofi.render(parent, newVdom);
-        oldVdom = newVdom; // Update current vdom
-    };
 };
 
 // Execute the specified function when the DOM is ready

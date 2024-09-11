@@ -159,7 +159,6 @@ const user = k.html`
 ```
 
 Features:
-- Custom components: `<${Foo}></${Foo}>` or `<${Foo} />`.
 - Dynamic props: `<div align="${currentAlign}" />`.
 - Dynamic content: `<div>Hello ${name}</div>`.
 - Events: `<div onClick="${() => console.log("clicked")}"></div>`.
@@ -172,10 +171,10 @@ Renders a VDOM Node to the DOM.
 ```javascript
 const el = kofi("div", {}, "Hello world!");
 
-kofi.render(document.getElementById("root"), el);
+kofi.render(el, document.getElementById("root"));
 ```
 
-The first argument is the parent DOM element, and the second arguments is the VDOM Node to render. Returns a reference to the rendered DOM element.
+The first arguments is the VDOM Node to render, and the second argument is the parent DOM element. Returns a reference to the rendered DOM element.
 
 ### kofi.ready(fn)
 
