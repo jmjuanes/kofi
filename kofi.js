@@ -210,30 +210,37 @@ kofi.html = (literal, ...values) => {
 };
 
 // Render an element
-kofi.render = (parent = null, el) => {
+kofi.render = (el, parent = null, options = null) => {
     let node = null;
-    // Check for text node
-    if (typeof el === "string") {
-        node = document.createTextNode(el);
+    // check if we have to update the previously rendered content
+    if (parent && parent?._$kofi_vdom && !options?.skipUpdatingParent) {
+        kofi.update(parent, el, parent._$kofi_vdom);
+        parent._$kofi_vdom = el;
     }
     else {
-        // Create the new DOM element and assign the element properties
-        node = document.createElement(el.type);
-        Object.keys(el.props || {}).forEach(name => {
-            name !== "html" && setProperty(node, name, el.props[name]);
-        });
-        // Check if html property has been provided
-        if (typeof el.props?.html === "string") {
-            node.innerHTML = el.props.html; //Inject html
+        // Check for text node
+        if (typeof el === "string") {
+            node = document.createTextNode(el);
         }
-        // If no html property has been provided
         else {
-            (el.children || []).forEach(child => kofi.render(node, child));
+            // Create the new DOM element and assign the element properties
+            node = document.createElement(el.type);
+            Object.keys(el.props || {}).forEach(name => {
+                name !== "html" && setProperty(node, name, el.props[name]);
+            });
+            // Check if html property has been provided
+            if (typeof el.props?.html === "string") {
+                node.innerHTML = el.props.html; //Inject html
+            }
+            // If no html property has been provided
+            else {
+                (el.children || []).forEach(child => kofi.render(child, node));
+            }
         }
-    }
-    // Mount the new node
-    if (parent) {
-        parent.appendChild(node);
+        // Mount the new node
+        if (parent) {
+            parent.appendChild(node);
+        }
     }
     return node;
 };
@@ -288,7 +295,7 @@ kofi.update = (parent, newNode, oldNode, index) => {
     const child = parent.childNodes[index];
     // Check for no old node --> mount this new element
     if (!oldNode) { 
-        return kofi.render(parent, newNode); 
+        return kofi.render(newNode, parent, {skipUpdatingParent: true}); 
     }
     // If there is not new element --> remove the old element
     else if (!newNode) { 
@@ -296,7 +303,7 @@ kofi.update = (parent, newNode, oldNode, index) => {
     }
     // If nodes has changed
     else if (nodesDiffs(newNode, oldNode)) {
-        return parent.replaceChild(kofi.render(null, newNode), child);
+        return parent.replaceChild(kofi.render(newNode), child);
     }
     // Change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
@@ -315,17 +322,6 @@ kofi.update = (parent, newNode, oldNode, index) => {
             kofi.update(child, newNode.children[i], oldNode.children[i], i);
         }
     }
-};
-
-// @description
-kofi.mount = (parent, fn) => {
-    parent.replaceChildren(); // Clear parent element
-    let oldVdom = null; // Previous vdom
-    return props => {
-        const newVdom = fn(props);
-        oldVdom ? kofi.update(parent, newVdom, oldVdom) : kofi.render(parent, newVdom);
-        oldVdom = newVdom; // Update current vdom
-    };
 };
 
 // Execute the specified function when the DOM is ready
