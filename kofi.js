@@ -211,10 +211,11 @@ kofi.html = (literal, ...values) => {
 
 // Render an element
 kofi.render = (el, parent = null, options = null) => {
+    const shouldUpdateParent = !!parent && !options?.skipUpdatingParent;
     let node = null;
     // check if we have to update the previously rendered content
-    if (parent && parent?._$kofi_vdom && !options?.skipUpdatingParent) {
-        kofi.update(parent, el, parent._$kofi_vdom);
+    if (shouldUpdateParent && parent?.["_$kofi_vdom"]) {
+        kofi.update(parent, el, parent["_$kofi_vdom"]);
         parent._$kofi_vdom = el;
     }
     else {
@@ -240,6 +241,10 @@ kofi.render = (el, parent = null, options = null) => {
         // Mount the new node
         if (parent) {
             parent.appendChild(node);
+            // save current vdom as a reference in the parent
+            if (shouldUpdateParent) {
+                parent["_$kofi_vdom"] = el;
+            }
         }
     }
     return node;
