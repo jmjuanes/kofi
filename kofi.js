@@ -328,6 +328,31 @@ kofi.update = (parent, newNode, oldNode, index) => {
     }
 };
 
+// Generate a reactive state
+kofi.state = (initialState = {}) => {
+    const state = {
+        current: Object.assign({}, initialState),
+        pendingChanges: {}, // to store pending changes in state
+        listeners: new Set(), // to store state change listeners
+    };
+    // manage state listeners
+    state.current.$on = listener => state.listeners.add(listener);
+    state.current.$off = listener => state.listeners.delete(listener);
+    // update state
+    state.current.$update = (newState = {}) => {
+        Object.assign(state.pendingChanges, newState);
+        return Promise.resolve(1).then(() => {
+            if (Object.keys(state.pendingChanges).length > 0) {
+                Object.assign(state.current, state.pendingChanges);
+                state.pendingChanges = {};
+                Array.from(state.listeners).forEach(fn => fn());
+            }
+        });
+    };
+    // return current state
+    return state.current;
+};
+
 // Execute the specified function when the DOM is ready
 kofi.ready = fn => {
     // Resolve now if DOM has already loaded
