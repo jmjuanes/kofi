@@ -176,12 +176,51 @@ kofi.render(el, document.getElementById("root"));
 
 The first arguments is the VDOM Node to render, and the second argument is the parent DOM element. Returns a reference to the rendered DOM element.
 
+### kofi.state(initialState)
+
+A simplified state management utility for handling object-based state. It provides an easy-to-use API for updating state and managing listeners for state changes. This method returns an object containing the initial state and three special methods: `$update`, `$on`, and `$off`.
+
+This method accepts the following parameters:
+
+- `initialState` (`Object`): The initial state of the object. This is the default state that will be managed.
+
+Adn returns a `state` object containing:
+
+- `state.$update(partialState)`: Updates the current state by merging the `partialState` with the existing state. It only works with object types. After the state is updated, any registered listeners will be notified.
+- `state.$on(listener)`: Registers a listener function that will be called whenever the state is updated.
+- `state.$off(listener)`: Unregisters a previously registered listener, preventing it from being called on future state updates.
+
+Example usage:
+
+```javascript
+// Initialize state with an object
+const state = kofi.state({ count: 0 });
+
+// Update state
+state.$update({ count: state.count + 1 });
+
+// Register a listener for state changes
+const listener = () => {
+    console.log("Count updated:", state.count);
+};
+state.$on(listener);
+
+// Remove the listener when no longer needed
+state.$off(listener);
+```
+
+Notes:
+- State changes are shallow, meaning only top-level properties are merged. Nested objects will not be deeply merged.
+- You can register multiple listeners, and they will all be notified upon a state change.
+- Updating the state is an async operation. The `state.$update` method returns a promise that will resolve when the state have been updated.
+
+
 ### kofi.ready(fn)
 
 Executes the provided function `fn` when the DOM becomes ready. This utility is similar to [jQuery's ready method](https://api.jquery.com/ready/).
 
 ```javascript 
-//Execute this function when the DOM is ready
+// Execute this function when the DOM is ready
 kofi.ready(() => {
     console.log("DOM is ready");
 });
