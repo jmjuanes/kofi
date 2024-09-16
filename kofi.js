@@ -1,6 +1,4 @@
-// Self closing tags
 const selfClosingTags = new Set(["link", "meta", "input", "br", "img", "hr"]);
-
 const KOFI_VDOM_KEY = "_$kofi_vdom"; // key used to get the previously vdom rendered in the element
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
@@ -8,6 +6,31 @@ const HTML_TEMPLATE_MODE = {
     TAG_END: 3,
     PROP_NAME: 4,
     PROP_VALUE: 5,
+};
+const KOFI_NAMESPACES = {
+    "svg": "http://www.w3.org/2000/svg",
+    "xhtml": "http://www.w3.org/1999/xhtml",
+    "xlink": "http://www.w3.org/1999/xlink",
+    "xml": "http://www.w3.org/XML/1998/namespace",
+    "xmlns": "http://www.w3.org/2000/xmlns/",
+};
+
+// extract the namespace from a node tag
+// "svg:g" => ["g", "http://www.w3.org/2000/svg"]
+// "svg"   => ["svg", "http://www.w3.org/2000/svg"]
+// "div"   => ["div", null]
+const extractNamespace = tagName => {
+    // 1. tag has the namespace on it (for example 'svg:g')
+    if (tagName.indexOf(":") > 1) {
+        const [space, tag] = tagName.split(":");
+        return [tag, KOFI_NAMESPACES[space] || null];
+    }
+    // 2. tag has a specific space (for example 'svg')
+    else if (!!KOFI_NAMESPACES[tagName]) {
+        return [tagName, KOFI_NAMESPACES[tagName]];
+    }
+    // namespace not necessary for the provided tag
+    return [tagName, null];
 };
 
 // Set a property
@@ -224,7 +247,8 @@ kofi.render = (el, parent = null, options = null) => {
         }
         else {
             // Create the new DOM element and assign the element properties
-            node = document.createElement(el.type);
+            const [tagName, namespace] = extractNamespace(el.type);
+            node = document.createElementNS(namespace, tagName);
             Object.keys(el.props || {}).forEach(name => {
                 name !== "html" && setProperty(node, name, el.props[name]);
             });
