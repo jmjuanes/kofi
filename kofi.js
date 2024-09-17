@@ -33,27 +33,58 @@ const extractNamespace = tagName => {
     return [tagName, null];
 };
 
-// Set a property
+// set a property to the element
 const setProperty = (el, name, value = null) => {
-    // Check for style property and string value --> set as css string
-    if (name === "style") {
-        if (value && typeof value === "object") {
-            el.style.cssText = null; // Clear styles
-            Object.keys(value).forEach(k => el.style[k] = value[k]);
-        }
-        else {
-            el.style.cssText = value;
-        }
+    if (value === null || value === false) { 
+        return removeProperty(el, name, value, refs); 
     }
-    // Check for event listener property
-    else if (name.startsWith("on")) {
-        el[key.toLowerCase()] = value;
-    }
-    // Default: set the property value
-    else if (name !== "html") {
+    else if (name === "className" || name === "checked" || name === "value") {
         el[name] = value;
     }
+    else if (name === "style") {
+        if (typeof value === "string") {
+            el.style.cssText = value;
+        }
+        else if (typeof value === "object") {
+            Object.keys(value).forEach(function (key) {
+                el.style[key] = value[key];
+            });
+        }
+        else {
+            throw new Error("Styles must be an object");
+        }
+    }
+    else if (typeof value === "function" && name.startsWith("on")) {
+        el.addEventListener(name.slice(2).toLowerCase(), value);
+    }
+    else if (value === true) {
+        el[name] = true;
+        el.setAttribute(name, "true");
+    }
+    else {
+        el.setAttribute(name, value);
+    }
 };
+
+// remove the provided property from the element
+const removeProperty = (el, name, value) => {
+    if (name === "className") {
+        el.removeAttribute("class");
+    }
+    else if (name === "style") {
+        el.style = null;
+    }
+    else if (typeof value === "function" && name.startsWith("on")) {
+        el.removeEventListener(name.slice(2).toLowerCase(), value);
+    }
+    else if (value === false) {
+        el[name] = false;
+        el.removeAttribute(name);
+    }
+    else {
+        el.removeAttribute(name);
+    }
+}
 
 // Check if there are differences between two nodes
 const nodesDiffs = (node1, node2) => {
@@ -233,41 +264,42 @@ kofi.html = (literal, ...values) => {
 };
 
 // Render an element
-kofi.render = (el, parent = null, options = null) => {
-    const shouldUpdateParent = !!parent && !options?.skipUpdatingParent;
+kofi.mount = (el, parent = null) => {
     let node = null;
-    // check if we have to update the previously rendered content
-    if (shouldUpdateParent && parent?.[KOFI_VDOM_KEY]) {
-        kofi.update(parent, el, parent[KOFI_VDOM_KEY]);
+    // check for text node
+    if (typeof el !== "object" || !el) {
+        node = document.createTextNode(el ?? "");
     }
     else {
-        // Check for text node
-        if (typeof el === "string") {
-            node = document.createTextNode(el);
-        }
-        else {
-            // Create the new DOM element and assign the element properties
-            const [tagName, namespace] = extractNamespace(el.type);
-            node = document.createElementNS(namespace, tagName);
-            Object.keys(el.props || {}).forEach(name => {
-                name !== "html" && setProperty(node, name, el.props[name]);
-            });
-            // Check if html property has been provided
-            if (typeof el.props?.html === "string") {
-                node.innerHTML = el.props.html; //Inject html
-            }
-            // If no html property has been provided
-            else {
-                (el.children || []).forEach(child => kofi.render(child, node));
-            }
-        }
-        // Mount the new node
-        if (parent) {
-            parent.appendChild(node);
-        }
+        // Create the new DOM element and assign the element properties
+        const [tagName, namespace] = extractNamespace(el.type);
+        node = namespace ? document.createElementNS(namespace, tagName) : document.createElement(tagName);
+        Object.keys(el.props || {}).forEach(name => {
+            name !== "html" && setProperty(node, name, el.props[name]);
+        });
+        // mount children
+        (el.children || []).forEach(child => kofi.mount(child, node));
     }
-    // save current vdom as a reference in the parent
-    if (parent && shouldUpdateParent) {
+    // mount the new node
+    if (parent) {
+        parent.appendChild(node);
+    }
+    return node;
+};
+
+// render an element
+kofi.render = (el, parent = null) => {
+    let node = null;
+    // 1. no parent has been provided or is the first time the element is rendered
+    if (!parent || !parent?.[KOFI_VDOM_KEY]) {
+        node = kofi.mount(el, parent);
+    }
+    // 2. There is a previously rendered element
+    if (parent && parent?.[KOFI_VDOM_KEY]) {
+        kofi.update(parent, el, parent[KOFI_VDOM_KEY]);
+    }
+    // 3. save reference to the rendered tree in the parent element
+    if (parent) {
         parent[KOFI_VDOM_KEY] = el;
     }
     return node;
@@ -317,37 +349,40 @@ kofi.stringify = (el, delimiter = "") => {
     return `<${el.type} ${attrs.join(" ")}>${content.join(delimiter || "")}</${el.type}>`;
 };
 
-// Update an element
-kofi.update = (parent, newNode, oldNode, index) => {
-    index = index && typeof index === "number" ? index : 0;
-    const child = parent.childNodes[index];
-    // Check for no old node --> mount this new element
+// update an element
+kofi.update = (parent, newNode, oldNode, index = 0, refs = {}) => {
+    // check for no old node --> mount this new element
     if (!oldNode) { 
-        return kofi.render(newNode, parent, {skipUpdatingParent: true}); 
+        return kofi.mount(newNode, parent);
     }
-    // If there is not new element --> remove the old element
+    // if there is not new element --> remove the old element
     else if (!newNode) { 
-        return parent.removeChild(child); 
+        return parent.removeChild(parent.childNodes[index]); 
     }
-    // If nodes has changed
+    // if nodes has changed
     else if (nodesDiffs(newNode, oldNode)) {
-        return parent.replaceChild(kofi.render(newNode), child);
+        return parent.replaceChild(kofi.mount(newNode), parent.childNodes[index]);
     }
-    // Change the properties only if element is not an string
+    // change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
-        // Get the full properties values and update the element attributes
+        // get the full properties values and update the element attributes
         const props = Object.assign({}, newNode.props, oldNode.props);
         Object.keys(props).forEach(name => {
             const newValue = newNode.props[name];
             const oldValue = oldNode.props[name];
-            if (name !== "html" && newValue !== oldValue) {
-                setProperty(child, name, newValue);
+            // check if this property does not exists in the new element
+            if (!newValue) {
+                removeProperty(parent.childNodes[index], name, oldValue, refs);
+            }
+            // check if this property exists in the old element or values are not the same
+            else if (!oldValue || newValue !== oldValue) {
+                setProperty(parent.childNodes[index], name, newValue, refs);
             }
         });
-        // Update the children for all element
-        const maxLength = Math.max(newNode.children.length, oldNode.children.length);
+        // update the children for all element
+        const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
         for (let i = 0; i < maxLength; i++) {
-            kofi.update(child, newNode.children[i], oldNode.children[i], i);
+            kofi.update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i, refs);
         }
     }
 };
