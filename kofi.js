@@ -36,9 +36,12 @@ const extractNamespace = tagName => {
 // set a property to the element
 const setProperty = (el, name, value = null) => {
     if (value === null || value === false) { 
-        return removeProperty(el, name, value, refs); 
+        return removeProperty(el, name, value); 
     }
-    else if (name === "className" || name === "checked" || name === "value") {
+    else if (name === "className" || name === "class") {
+        el.className = value;
+    }
+    else if (name === "checked" || name === "value") {
         el[name] = value;
     }
     else if (name === "style") {
@@ -68,8 +71,8 @@ const setProperty = (el, name, value = null) => {
 
 // remove the provided property from the element
 const removeProperty = (el, name, value) => {
-    if (name === "className") {
-        el.removeAttribute("class");
+    if (name === "className" || name === "class") {
+        el.className = "";
     }
     else if (name === "style") {
         el.style = null;
