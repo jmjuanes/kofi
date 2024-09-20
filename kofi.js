@@ -34,60 +34,42 @@ const extractNamespace = tagName => {
 };
 
 // set a property to the element
-const setProperty = (el, name, value = null) => {
-    if (value === null || value === false) { 
-        return removeProperty(el, name, value); 
+const setProperty = (el, name, newValue = null, oldValue = null) => {
+    if (name === "className" || name === "class") {
+        el.className = newValue || "";
     }
-    else if (name === "className" || name === "class") {
-        el.className = value;
-    }
-    else if (name === "checked" || name === "value") {
-        el[name] = value;
+    else if (name === "checked" || name === "value" || name === "disabled") {
+        el[name] = newValue;
     }
     else if (name === "style") {
-        if (typeof value === "string") {
-            el.style.cssText = value;
+        if (typeof newValue === "string") {
+            el.style.cssText = newValue;
         }
-        else if (typeof value === "object") {
-            Object.keys(value).forEach(function (key) {
-                el.style[key] = value[key];
+        else if (typeof newValue === "object") {
+            Object.keys(newValue).forEach(key => {
+                el.style[key] = newValue[key];
             });
         }
         else {
-            throw new Error("Styles must be an object");
+            el.style.cssText = "";
         }
     }
-    else if (typeof value === "function" && name.startsWith("on")) {
-        el.addEventListener(name.slice(2).toLowerCase(), value);
+    else if (name.startsWith("on")) {
+        const eventName = name.slice(2).toLowerCase();
+        if (typeof oldValue === "function") {
+            el.removeEventListener(eventName, oldValue);
+        }
+        if (typeof newValue === "function") {
+            el.addEventListener(eventName, newValue);
+        }
     }
-    else if (value === true) {
-        el[name] = true;
-        el.setAttribute(name, "true");
+    else if (newValue !== null) {
+        el.setAttribute(name, newValue);
     }
     else {
-        el.setAttribute(name, value);
+        el.removeAttribute(name);
     }
 };
-
-// remove the provided property from the element
-const removeProperty = (el, name, value) => {
-    if (name === "className" || name === "class") {
-        el.className = "";
-    }
-    else if (name === "style") {
-        el.style = null;
-    }
-    else if (typeof value === "function" && name.startsWith("on")) {
-        el.removeEventListener(name.slice(2).toLowerCase(), value);
-    }
-    else if (value === false) {
-        el[name] = false;
-        el.removeAttribute(name);
-    }
-    else {
-        el.removeAttribute(name);
-    }
-}
 
 // Check if there are differences between two nodes
 const nodesDiffs = (node1, node2) => {
@@ -353,7 +335,7 @@ kofi.stringify = (el, delimiter = "") => {
 };
 
 // update an element
-kofi.update = (parent, newNode, oldNode, index = 0, refs = {}) => {
+kofi.update = (parent, newNode, oldNode, index = 0) => {
     // check for no old node --> mount this new element
     if (!oldNode) { 
         return kofi.mount(newNode, parent);
@@ -375,17 +357,17 @@ kofi.update = (parent, newNode, oldNode, index = 0, refs = {}) => {
             const oldValue = oldNode.props[name];
             // check if this property does not exists in the new element
             if (!newValue) {
-                removeProperty(parent.childNodes[index], name, oldValue, refs);
+                setProperty(parent.childNodes[index], name, null, oldValue);
             }
             // check if this property exists in the old element or values are not the same
             else if (!oldValue || newValue !== oldValue) {
-                setProperty(parent.childNodes[index], name, newValue, refs);
+                setProperty(parent.childNodes[index], name, newValue, oldValue)
             }
         });
         // update the children for all element
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
         for (let i = 0; i < maxLength; i++) {
-            kofi.update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i, refs);
+            kofi.update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
         }
     }
 };
