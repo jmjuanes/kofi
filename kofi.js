@@ -353,7 +353,7 @@ kofi.stringify = (el, delimiter = "") => {
 };
 
 // update an element
-kofi.update = (parent, newNode, oldNode, index = 0, refs = {}) => {
+kofi.update = (parent, newNode, oldNode, index = 0) => {
     // check for no old node --> mount this new element
     if (!oldNode) { 
         return kofi.mount(newNode, parent);
@@ -375,17 +375,18 @@ kofi.update = (parent, newNode, oldNode, index = 0, refs = {}) => {
             const oldValue = oldNode.props[name];
             // check if this property does not exists in the new element
             if (!newValue) {
-                removeProperty(parent.childNodes[index], name, oldValue, refs);
+                removeProperty(parent.childNodes[index], name, oldValue);
             }
             // check if this property exists in the old element or values are not the same
             else if (!oldValue || newValue !== oldValue) {
-                setProperty(parent.childNodes[index], name, newValue, refs);
+                removeProperty(parent.childNodes[index], name, oldValue);
+                setProperty(parent.childNodes[index], name, newValue);
             }
         });
         // update the children for all element
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
         for (let i = 0; i < maxLength; i++) {
-            kofi.update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i, refs);
+            kofi.update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
         }
     }
 };
