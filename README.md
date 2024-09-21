@@ -97,6 +97,21 @@ kofi("div", {
 });
 ```
 
+##### References
+
+Use the `ref` property to save a reference of the element.
+
+```javascript
+// 1. use kofi.ref to generate a reference variable
+const inputRef = kofi.ref();
+
+// 2. assign inputRef to an element
+kofi("input", {ref: inputRef});
+
+// 3. now you can access to the referenced element
+console.log(inputRef.current.value);
+```
+
 ##### Styles
 
 You can provide an object with the style of the element. All styles attributes should be in camel-case format.
@@ -163,6 +178,11 @@ Features:
 - Dynamic content: `<div>Hello ${name}</div>`.
 - Events: `<div onClick="${() => console.log("clicked")}"></div>`.
 - Spread props: `<div ...${extraProps}>`.
+
+### kofi.ref()
+
+Returns a new object with a single key `current` initialized to `null`. Use this object to save a reference to rendered elements with `kofi.render`.
+
 
 ### kofi.render(parent, element)
 

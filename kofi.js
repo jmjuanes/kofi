@@ -35,7 +35,15 @@ const extractNamespace = tagName => {
 
 // set a property to the element
 const setProperty = (el, name, newValue = null, oldValue = null) => {
-    if (name === "className" || name === "class") {
+    if (name === "ref") {
+        if (oldValue?.current) {
+            oldValue.current = null;
+        }
+        if (newValue && typeof newValue?.current !== "undefined") {
+            newValue.current = el;
+        }
+    }
+    else if (name === "className" || name === "class") {
         el.className = newValue || "";
     }
     else if (name === "checked" || name === "value" || name === "disabled") {
@@ -297,6 +305,7 @@ kofi.stringify = (el, delimiter = "") => {
     }
     // Build attributes of this element
     const attrs = Object.keys(el.props || {})
+        .filter(name => name !== "ref")
         .map(name => {
             const value = el.props[name]; //Get attribute value
             // Check for boolean value
@@ -372,7 +381,10 @@ kofi.update = (parent, newNode, oldNode, index = 0) => {
     }
 };
 
-// Generate a reactive state
+// generate a reference to an element
+kofi.ref = () => ({current: null});
+
+// generate a reactive state
 kofi.state = (initialState = {}) => {
     const state = {
         current: Object.assign({}, initialState),
