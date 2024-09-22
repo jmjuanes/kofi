@@ -354,8 +354,8 @@ kofi.update = (parent, newNode, oldNode, index = 0) => {
     else if (!newNode) { 
         return parent.removeChild(parent.childNodes[index]); 
     }
-    // if nodes has changed
-    else if (nodesDiffs(newNode, oldNode)) {
+    // if nodes has changed or associated key is different
+    else if (nodesDiffs(newNode, oldNode) || newNode?.props?.key !== oldNode?.props?.key) {
         return parent.replaceChild(kofi.mount(newNode), parent.childNodes[index]);
     }
     // change the properties only if element is not an string
