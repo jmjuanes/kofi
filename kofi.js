@@ -35,47 +35,49 @@ const extractNamespace = tagName => {
 
 // set a property to the element
 const setProperty = (el, name, newValue = null, oldValue = null) => {
-    if (name === "ref") {
-        if (oldValue?.current) {
-            oldValue.current = null;
+    if (name !== "key") {
+        if (name === "ref") {
+            if (oldValue?.current) {
+                oldValue.current = null;
+            }
+            if (newValue && typeof newValue?.current !== "undefined") {
+                newValue.current = el;
+            }
         }
-        if (newValue && typeof newValue?.current !== "undefined") {
-            newValue.current = el;
+        else if (name === "className" || name === "class") {
+            el.className = newValue || "";
         }
-    }
-    else if (name === "className" || name === "class") {
-        el.className = newValue || "";
-    }
-    else if (name === "checked" || name === "value" || name === "disabled") {
-        el[name] = newValue;
-    }
-    else if (name === "style") {
-        if (typeof newValue === "string") {
-            el.style.cssText = newValue;
+        else if (name === "checked" || name === "value" || name === "disabled") {
+            el[name] = newValue;
         }
-        else if (typeof newValue === "object") {
-            Object.keys(newValue).forEach(key => {
-                el.style[key] = newValue[key];
-            });
+        else if (name === "style") {
+            if (typeof newValue === "string") {
+                el.style.cssText = newValue;
+            }
+            else if (typeof newValue === "object") {
+                Object.keys(newValue).forEach(key => {
+                    el.style[key] = newValue[key];
+                });
+            }
+            else {
+                el.style.cssText = "";
+            }
+        }
+        else if (name.startsWith("on")) {
+            const eventName = name.slice(2).toLowerCase();
+            if (typeof oldValue === "function") {
+                el.removeEventListener(eventName, oldValue);
+            }
+            if (typeof newValue === "function") {
+                el.addEventListener(eventName, newValue);
+            }
+        }
+        else if (newValue !== null) {
+            el.setAttribute(name, newValue);
         }
         else {
-            el.style.cssText = "";
+            el.removeAttribute(name);
         }
-    }
-    else if (name.startsWith("on")) {
-        const eventName = name.slice(2).toLowerCase();
-        if (typeof oldValue === "function") {
-            el.removeEventListener(eventName, oldValue);
-        }
-        if (typeof newValue === "function") {
-            el.addEventListener(eventName, newValue);
-        }
-    }
-    else if (newValue !== null) {
-        el.setAttribute(name, newValue);
-    }
-    else {
-        el.removeAttribute(name);
     }
 };
 
@@ -306,7 +308,7 @@ kofi.stringify = (el, delimiter = "") => {
     }
     // Build attributes of this element
     const attrs = Object.keys(el.props || {})
-        .filter(name => name !== "ref")
+        .filter(name => name !== "ref" && name !== "key")
         .map(name => {
             const value = el.props[name]; //Get attribute value
             // Check for boolean value
@@ -362,18 +364,20 @@ kofi.update = (parent, newNode, oldNode, index = 0) => {
     else if (newNode && typeof newNode !== "string") {
         // get the full properties values and update the element attributes
         const props = Object.assign({}, newNode.props, oldNode.props);
-        Object.keys(props).forEach(name => {
-            const newValue = newNode.props[name];
-            const oldValue = oldNode.props[name];
-            // check if this property does not exists in the new element
-            if (!newValue) {
-                setProperty(parent.childNodes[index], name, null, oldValue);
-            }
-            // check if this property exists in the old element or values are not the same
-            else if (!oldValue || newValue !== oldValue) {
-                setProperty(parent.childNodes[index], name, newValue, oldValue)
-            }
-        });
+        Object.keys(props)
+            .filter(name => name !== "key")
+            .forEach(name => {
+                const newValue = newNode.props[name];
+                const oldValue = oldNode.props[name];
+                // check if this property does not exists in the new element
+                if (!newValue) {
+                    setProperty(parent.childNodes[index], name, null, oldValue);
+                }
+                // check if this property exists in the old element or values are not the same
+                else if (!oldValue || newValue !== oldValue) {
+                    setProperty(parent.childNodes[index], name, newValue, oldValue)
+                }
+            });
         // update the children for all element
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
         for (let i = 0; i < maxLength; i++) {
