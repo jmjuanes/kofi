@@ -264,14 +264,15 @@ kofi.mount = (el, parent = null) => {
         node = document.createTextNode(el ?? "");
     }
     else {
-        // Create the new DOM element and assign the element properties
+        // 1. create the new DOM element
         const [tagName, namespace] = extractNamespace(el.type);
         node = namespace ? document.createElementNS(namespace, tagName) : document.createElement(tagName);
-        Object.keys(el.props || {}).forEach(name => {
-            name !== "html" && setProperty(node, name, el.props[name]);
-        });
-        // mount children
+        // 2. mount children
         (el.children || []).forEach(child => kofi.mount(child, node));
+        // 3. assign element props and attributes
+        Object.keys(el.props || {})
+            .filter(propName => propName !== "html")
+            .forEach(propName => setProperty(node, propName, el.props[propName]));
     }
     // mount the new node
     if (parent) {
