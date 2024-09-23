@@ -15,6 +15,10 @@ const KOFI_NAMESPACES = {
     "xmlns": "http://www.w3.org/2000/xmlns/",
 };
 
+// remove all start and wnd whitespaces from the provided tagName
+// note: tags can be also a function
+const cleanTagName = tagName => typeof tagName === "string" ? tagName.replace(/^\s+|\s+$/gm, "") : tagName;
+
 // extract the namespace from a node tag
 // "svg:g" => ["g", "http://www.w3.org/2000/svg"]
 // "svg"   => ["svg", "http://www.w3.org/2000/svg"]
@@ -146,13 +150,13 @@ kofi.template = (h, literal, values, ctx = {i: 0, j: 0}, closing = null) => {
             // We are in TAG_START mode and we found a '>' character
             else if (mode === HTML_TEMPLATE_MODE.TAG_START && char === ">") {
                 ctx.j = ctx.j + 1;
-                children.push(h(buffer, {}, ...(kofi.template(h, literal, values, ctx, buffer) || [])));
+                children.push(h(cleanTagName(buffer), {}, ...(kofi.template(h, literal, values, ctx, cleanTagName(buffer)) || [])));
                 buffer = "";
                 mode = HTML_TEMPLATE_MODE.TEXT;
             }
             // We are in TAG_START mode and we found a whitespace character
             else if (mode === HTML_TEMPLATE_MODE.TAG_START && char === " ") {
-                current = [buffer, {}, [], ""];
+                current = [cleanTagName(buffer), {}, [], ""];
                 buffer = "";
                 mode = HTML_TEMPLATE_MODE.PROP_NAME;
             }
