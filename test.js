@@ -65,11 +65,14 @@ describe("kofi.template", () => {
         assert.deepStrictEqual(jsx`<${Component}>Hello</${Component}>`, [Component, {}, ["Hello"]]);
     });
 
-    it("should parse with multines", () => {
+    it("should parse with multilines", () => {
         const vdom = jsx`
-            <div className="foo">bar</div>
+            <div
+                className="foo"
+                align="center"
+            >bar</div>
         `;
-        assert.deepStrictEqual(vdom, ["div", {className: "foo"}, ["bar"]]);
+        assert.deepStrictEqual(vdom, ["div", {className: "foo", align: "center"}, ["bar"]]);
     });
 
     it("should expand props", () => {
