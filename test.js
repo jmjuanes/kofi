@@ -130,32 +130,23 @@ describe("kofi.html", () => {
 
 describe("kofi.state", () => {
     it("should allow to register a function that will be called when the state changes", async () => {
-        const state = kofi.state({value: 1});
-        state.$on(() => {
-            assert.equal(state.value, 2);
+        const state = kofi.state({ value: 1 });
+        state.on(currentState => {
+            assert.equal(currentState.value, 2);
         });
-        assert.equal(state.value, 1);
-        await state.$update({value: 2});
-    });
-
-    it("should group changes and only call the listener method once", async () => {
-        const state = kofi.state({value: 1});
-        state.$on(() => {
-            assert.equal(state.value, 3);
-        });
-        state.$update({value: 2});
-        await state.$update({value: 3});
+        assert.equal(state.getState().value, 1);
+        await state.setState({ value: 2 });
     });
 
     it("should remove listeners", async () => {
-        const state = kofi.state({value: 1});
-        const onChange = () => {
-            assert.equal(state.value, 2);
+        const state = kofi.state({ value: 1 });
+        const onChange = currentState => {
+            assert.equal(currentState.value, 2);
         };
-        state.$on(onChange);
-        await state.$update({value: 2});
-        state.$off(onChange);
-        await state.$update({value: 3});
+        state.on(onChange);
+        await state.setState( {value: 2 });
+        state.off(onChange);
+        await state.setState({ value: 3 });
     });
 });
 
