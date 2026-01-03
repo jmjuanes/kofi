@@ -350,28 +350,26 @@ kofi.render = (el, parent = null) => {
 kofi.ref = () => ({current: null});
 
 // generate a reactive state
-kofi.state = (initialState = {}) => {
-    const state = {
-        current: Object.assign({}, initialState),
-        pendingChanges: {}, // to store pending changes in state
-        listeners: new Set(), // to store state change listeners
+kofi.state = (state = {}) => {
+    const listeners = new Set();
+    return {
+        // @description get the current state
+        getState: () => state,
+        // @description update the current state
+        setState: (newState = {}) => {
+            return Promise.resolve(1).then(() => {
+                Object.assign(state, newState);
+                Array.from(listeners).forEach(listener => listener(state));
+            });
+        },
+        // @description register/remove update listeners
+        on: listener => {
+            typeof listener === "function" ? listeners.add(listener) : null;
+        },
+        off: listener => {
+            typeof listener === "function" ? listeners.delete(listener) : null;
+        },
     };
-    // manage state listeners
-    state.current.$on = listener => state.listeners.add(listener);
-    state.current.$off = listener => state.listeners.delete(listener);
-    // update state
-    state.current.$update = (newState = {}) => {
-        Object.assign(state.pendingChanges, newState);
-        return Promise.resolve(1).then(() => {
-            if (Object.keys(state.pendingChanges).length > 0) {
-                Object.assign(state.current, state.pendingChanges);
-                state.pendingChanges = {};
-                Array.from(state.listeners).forEach(fn => fn());
-            }
-        });
-    };
-    // return current state
-    return state.current;
 };
 
 // @description generates a tiny message bus
