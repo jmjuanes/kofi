@@ -198,42 +198,48 @@ The first arguments is the VDOM Node to render, and the second argument is the p
 
 ### kofi.state(initialState)
 
-A simplified state management utility for handling object-based state. It provides an easy-to-use API for updating state and managing listeners for state changes. This method returns an object containing the initial state and three special methods: `$update`, `$on`, and `$off`.
-
-This method accepts the following parameters:
-
-- `initialState` (`Object`): The initial state of the object. This is the default state that will be managed.
-
-Adn returns a `state` object containing:
-
-- `state.$update(partialState)`: Updates the current state by merging the `partialState` with the existing state. It only works with object types. After the state is updated, any registered listeners will be notified.
-- `state.$on(listener)`: Registers a listener function that will be called whenever the state is updated.
-- `state.$off(listener)`: Unregisters a previously registered listener, preventing it from being called on future state updates.
-
-Example usage:
+A simplified state management utility for handling object-based state. It provides an easy-to-use API for updating state and managing listeners for state changes.
 
 ```javascript
 // Initialize state with an object
 const state = kofi.state({ count: 0 });
 
 // Update state
-state.$update({ count: state.count + 1 });
+state.setState({ count: state.count + 1 });
 
 // Register a listener for state changes
-const listener = () => {
-    console.log("Count updated:", state.count);
+const listener = currentState => {
+    console.log("Count updated:", currentState.count);
 };
-state.$on(listener);
+state.on(listener);
 
 // Remove the listener when no longer needed
-state.$off(listener);
+state.off(listener);
 ```
+
+This method returns an object containing the following methods:
+
+#### `state.getState()`
+
+Returns the current state.
+
+#### `state.setState(partialState)`
+
+Updates the current state by merging the `partialState` with the existing state. It only works with object types. After the state is updated, any registered listeners will be notified.
+
+#### `state.on(listener)`
+
+Registers a listener function that will be called whenever the state is updated. The listener will be called with the current state.
+
+#### `state.off(listener)`
+
+Unregisters a previously registered listener, preventing it from being called on future state updates.
 
 Notes:
 
 - State changes are shallow, meaning only top-level properties are merged. Nested objects will not be deeply merged.
 - You can register multiple listeners, and they will all be notified upon a state change.
-- Updating the state is an async operation. The `state.$update` method returns a promise that will resolve when the state have been updated.
+- Updating the state is an async operation. The `state.setState` method returns a promise that will resolve when the state have been updated.
 
 ### kofi.bus()
 
