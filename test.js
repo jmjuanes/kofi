@@ -158,3 +158,22 @@ describe("kofi.state", () => {
         await state.$update({value: 3});
     });
 });
+
+describe("kofi.bus", () => {
+    it("should allow to register message listeners", () => {
+        const bus = kofi.bus();
+        bus.on("foo", data => {
+            assert.equal(data, "bar");
+        });
+        bus.emit("foo", "bar");
+    });
+
+    it("should allow to remove message listeners", () => {
+        const bus = kofi.bus();
+        const listener = data => assert.equal(data, "bar");
+        bus.on("foo", listener);
+        bus.emit("foo", "bar");
+        bus.off("foo", listener);
+        bus.emit("foo", "barz");
+    });
+});
