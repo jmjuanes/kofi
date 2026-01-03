@@ -1,6 +1,6 @@
-import {describe, it} from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
-import kofi from "./kofi.js";
+import kofi from "./index.js";
 
 describe("kofi.template", () => {
     const jsx = (literal, ...values) => {
