@@ -138,6 +138,15 @@ describe("kofi.state", () => {
         await state.setState({ value: 2 });
     });
 
+    it("should group changes and only call the listener method once", async () => {
+        const state = kofi.state({ value: 1 });
+        state.on(currentState => {
+            assert.equal(currentState.value, 3);
+        });
+        state.setState({ value: 2 });
+        await state.setState({ value: 3 });
+    });
+
     it("should remove listeners", async () => {
         const state = kofi.state({ value: 1 });
         const onChange = currentState => {

@@ -351,15 +351,20 @@ kofi.ref = () => ({current: null});
 
 // generate a reactive state
 kofi.state = (state = {}) => {
+    const pendingChanges = { current: {} };
     const listeners = new Set();
     return {
         // @description get the current state
         getState: () => state,
         // @description update the current state
         setState: (newState = {}) => {
+            Object.assign(pendingChanges.current, newState);
             return Promise.resolve(1).then(() => {
-                Object.assign(state, newState);
-                Array.from(listeners).forEach(listener => listener(state));
+                if (Object.keys(pendingChanges.current).length > 0) {
+                    Object.assign(state, pendingChanges.current);
+                    pendingChanges.current = {}; // reset pending changes to save
+                    Array.from(listeners).forEach(listener => listener(state));
+                }
             });
         },
         // @description register/remove update listeners
