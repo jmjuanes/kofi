@@ -1,5 +1,3 @@
-const selfClosingTags = new Set(["link", "meta", "input", "br", "img", "hr"]);
-
 const KOFI_VDOM_KEY = "_$kofi_vdom_"; // key used to get the previously vdom rendered in the element
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
@@ -346,51 +344,6 @@ kofi.render = (el, parent = null) => {
         parent[KOFI_VDOM_KEY] = el;
     }
     return node;
-};
-
-// Convert a VDOM element to string
-kofi.stringify = (el, delimiter = "") => {
-    if (typeof el === "string") {
-        return el;
-    }
-    // Build attributes of this element
-    const attrs = Object.keys(el.props || {})
-        .filter(name => name !== "ref" && name !== "key")
-        .map(name => {
-            const value = el.props[name]; //Get attribute value
-            // Check for boolean value
-            if (value === true) {
-                return name; //Return only the property name
-            }
-            // Check for className attribute
-            else if (name === "className" && typeof value === "string") {
-                return `class="${value}"`;
-            }
-            // Check for style and object value
-            else if (name === "style" && typeof value === "object") {
-                // Convert all style values to string to snake-case format
-                const styleValues = Object.keys(value).map(key => {
-                    return `${key.split(/(?=[A-Z])/).join("-").toLowerCase()}:${value[key]}`;
-                });
-                return `style="${styleValues.join(";")}"`;
-            }
-            // Check for string value --> set the value
-            else if (typeof value === "string" && name !== "html") {
-                return `${name}="${value}"`;
-            }
-            return "";
-        })
-        .filter(v => !!v);
-    // Check if this tag is in the non closing tags list
-    if (selfClosingTags.has(el.type)) {
-        return `<${el.type} ${attrs.join(" ")} />`;
-    }
-    // Build the content of the element
-    const content = el.props?.html ? [el.props.html] : (el.children || []).map(child => {
-        return stringify(child, delimiter);
-    });
-    // Return the element with the content
-    return `<${el.type} ${attrs.join(" ")}>${content.join(delimiter || "")}</${el.type}>`;
 };
 
 // generate a reference to an element
