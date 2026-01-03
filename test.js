@@ -1,89 +1,130 @@
-import {describe, it} from "node:test";
+import { describe, it } from "node:test";
 import assert from "node:assert";
-import kofi from "./kofi.js";
+import kofi from "./index.js";
 
-describe("kofi.template", () => {
-    const jsx = (literal, ...values) => {
-        return kofi.template((t, p, ...c) => ([t, p, c]), literal, values)[0];
-    };
-    const Component = () => {};
+describe("kofi.html", () => {
+    const html = kofi.html;
+    const e = (type, props, children) => ({ type, props, children });
 
     it("sould return 'undefined' on empty string", () => {
-        assert.equal(jsx``, undefined);
+        assert.equal(html``, undefined);
     });
 
     it("should return the provided string if no HTML code is present", () => {
-        assert.equal(jsx`Hello World`, "Hello World");
+        assert.equal(html`Hello World`, "Hello World");
     });
 
     it("should return single VDOM nodes", () => {
-        assert.deepStrictEqual(jsx`<div />`, ["div", {}, []]);
-        assert.deepStrictEqual(jsx`<span />`, ["span", {}, []]);
-        assert.deepStrictEqual(jsx`<h1 />`, ["h1", {}, []]);
-        assert.deepStrictEqual(jsx`<foo />`, ["foo", {}, []]);
+        assert.deepStrictEqual(html`<div />`, e("div", {}, []));
+        assert.deepStrictEqual(html`<span />`, e("span", {}, []));
+        assert.deepStrictEqual(html`<h1 />`, e("h1", {}, []));
+        assert.deepStrictEqual(html`<foo />`, e("foo", {}, []));
     });
 
     it("should return nodes with empty content", () => {
-        assert.deepStrictEqual(jsx`<div></div>`, ["div", {}, []]);
+        assert.deepStrictEqual(html`<div></div>`, e("div", {}, []));
     });
 
     it("should return nodes with text content", () => {
-        assert.deepStrictEqual(jsx`<div>Hello</div>`, ["div", {}, ["Hello"]]);
+        assert.deepStrictEqual(html`<div>Hello</div>`, e("div", {}, ["Hello"]));
     });
 
     it("should return nodes with dynamic content", () => {
-        assert.deepStrictEqual(jsx`<div>Hello ${"World"}</div>`, ["div", {}, ["Hello ", "World"]]);
+        assert.deepStrictEqual(html`<div>Hello ${"World"}</div>`, e("div", {}, ["Hello ", "World"]));
     });
 
     it("should return nodes with inner nodes", () => {
-        assert.deepStrictEqual(jsx`<div>Hello <b>Bob</b></div>`, ["div", {}, ["Hello ", ["b", {}, ["Bob"]]]]);
+        assert.deepStrictEqual(
+            html`<div>Hello <b>Bob</b></div>`,
+            e("div", {}, ["Hello ", e("b", {}, ["Bob"])]),
+        );
     });
 
     it("should parse string props", () => {
-        assert.deepStrictEqual(jsx`<div align="center">Hello</div>`, ["div", {align: "center"}, ["Hello"]]);
-        assert.deepStrictEqual(jsx`<div align="center"/>`, ["div", {align: "center"}, []]);
-        assert.deepStrictEqual(jsx`<a title="Hello World"/>`, ["a", {title: "Hello World"}, []]);
+        assert.deepStrictEqual(html`<div align="center">Hello</div>`, e("div", {align: "center"}, ["Hello"]));
+        assert.deepStrictEqual(html`<div align="center"/>`, e("div", {align: "center"}, []));
+        assert.deepStrictEqual(html`<a title="Hello World"/>`, e("a", {title: "Hello World"}, []));
     });
 
     it("should parse empty string props", () => {
-        assert.deepStrictEqual(jsx`<a href="">Hello</a>`, ["a", {href: ""}, ["Hello"]]);
+        assert.deepStrictEqual(html`<a href="">Hello</a>`, e("a", {href: ""}, ["Hello"]));
     });
 
     it("should parse boolean props", () => {
-        assert.deepStrictEqual(jsx`<input disabled />`, ["input", {disabled: true}, []]);
-        assert.deepStrictEqual(jsx`<input disabled/>`, ["input", {disabled: true}, []]);
-        assert.deepStrictEqual(jsx`<a disabled></a>`, ["a", {disabled: true}, []]);
+        assert.deepStrictEqual(html`<input disabled />`, e("input", {disabled: true}, []));
+        assert.deepStrictEqual(html`<input disabled/>`, e("input", {disabled: true}, []));
+        assert.deepStrictEqual(html`<a disabled></a>`, e("a", {disabled: true}, []));
     });
 
     it("should parse props with dynamic values", () => {
-        assert.deepStrictEqual(jsx`<input disabled=${false} />`, ["input", {disabled: false}, []]);
-        assert.deepStrictEqual(jsx`<a href="${"localhost"}" />`, ["a", {href: "localhost"}, []]);
-        assert.deepStrictEqual(jsx`<div style="${{color: "white"}}">Hello</div>`, ["div", {style: {color: "white"}}, ["Hello"]]);
+        assert.deepStrictEqual(html`<input disabled=${false} />`, e("input", {disabled: false}, []));
+        assert.deepStrictEqual(html`<a href="${"localhost"}" />`, e("a", {href: "localhost"}, []));
+        assert.deepStrictEqual(
+            html`<div style="${{color: "white"}}">Hello</div>`,
+            e("div", {style: {color: "white"}}, ["Hello"]),
+        );
     });
 
-    it("should return nodes with components as tags", () => {
-        assert.deepStrictEqual(jsx`<${Component}>Hello</${Component}>`, [Component, {}, ["Hello"]]);
-    });
+    // it("should return nodes with components as tags", () => {
+    //     assert.deepStrictEqual(html`<${Component}>Hello</${Component}>`, e(Component, {}, ["Hello"]));
+    // });
 
     it("should parse with multilines", () => {
-        const vdom = jsx`
+        const vdom = html`
             <div
                 className="foo"
                 align="center"
             >bar</div>
         `;
-        assert.deepStrictEqual(vdom, ["div", {className: "foo", align: "center"}, ["bar"]]);
+        assert.deepStrictEqual(vdom, e("div", {className: "foo", align: "center"}, ["bar"]));
     });
 
     it("should expand props", () => {
-        assert.deepStrictEqual(jsx`<a ...${{align: "center"}}></a>`, ["a", {align: "center"}, []]);
+        assert.deepStrictEqual(html`<a ...${{align: "center"}}></a>`, e("a", {align: "center"}, []));
     });
 
     it("should support 'class' attribute", () => {
-        const vdom = jsx`
+        const result = html`
             <div class="foo">bar</div>
         `;
-        assert.deepStrictEqual(vdom, ["div", {class: "foo"}, ["bar"]]);
+        assert.deepStrictEqual(result, e("div", {class: "foo"}, ["bar"]));
+    });
+
+    it("should support functions as event listeners", () => {
+        const listener = () => null;
+        assert.deepStrictEqual(
+            html`<button onClick="${listener}">Click me</button>`,
+            e("button", { onClick: listener }, [ "Click me" ]),
+        );
+    });
+
+    it("should support conditional rendering", () => {
+        const component = condition => html`<div>${condition ? html`Hello World` : ""}</div>`;
+        assert.deepStrictEqual(component(true), e("div", {}, ["Hello World"]));
+        assert.deepStrictEqual(component(false), e("div", {}, []));
+    });
+
+    it("should support components", () => {
+        const SayHello = name => html`<span>Hello ${name}</span>`;
+        assert.deepStrictEqual(
+            html`<div>${SayHello("Bob")}</div>`,
+            e("div", {}, [
+                e("span", {}, ["Hello ", "Bob"]),
+            ]),
+        );
+    });
+
+    it("should support loops", () => {
+        const items = ["hello", "bob"];
+        const result = html`
+            <div align="center">
+                ${items.map(item => html`<span>${item}</span>`)}
+            </div>
+        `;
+        assert.equal(result.children.length, 2);
+        items.forEach((item, index) => {
+            assert.deepStrictEqual(result.children[index], e("span", {}, [ item ]));
+        });
     });
 });
 

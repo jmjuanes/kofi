@@ -1,4 +1,4 @@
-# Kofi
+# kofi
 
 ![npm version](https://badgen.net/npm/v/kofi?labelColor=1d2734&color=21bf81)
 ![license](https://badgen.net/github/license/jmjuanes/kofi?labelColor=1d2734&color=21bf81)
@@ -27,7 +27,7 @@ The **kofi** package can be used via modules:
 
 ```html
 <script type="module">
-    import kofi from "https://unpkg.com/kofi/kofi.js";
+    import kofi from "node_modules/kofi/index.js";
 </script>
 ```
 
@@ -184,7 +184,7 @@ Features:
 Returns a new object with a single key `current` initialized to `null`. Use this object to save a reference to rendered elements with `kofi.render`.
 
 
-### kofi.render(parent, element)
+### kofi.render(element, parent)
 
 Renders a VDOM Node to the DOM.
 

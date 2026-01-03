@@ -7,11 +7,10 @@
     "author": "Josemi Juanes <hello@josemi.xyz>",
     "bugs": "https://github.com/jmjuanes/kofi/issues",
     "license": "MIT",
-    "main": "kofi.js",
-    "module": "kofi.js",
+    "main": "index.js",
+    "module": "index.js",
     "exports": {
-        ".": "./kofi.js",
-        "./kofi.js": "./kofi.js",
+        ".": "./index.js",
         "./package.json": "./package.json"
     },
     "scripts": {
@@ -24,7 +23,7 @@
         "ui"
     ],
     "files": [
-        "kofi.js",
+        "index.js",
         "LICENSE",
         "README.md"
     ]
