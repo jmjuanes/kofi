@@ -27,7 +27,7 @@ The **kofi** package can be used via modules:
 
 ```html
 <script type="module">
-    import kofi from "https://unpkg.com/kofi/kofi.js";
+    import kofi from "node_modules/kofi/index.js";
 </script>
 ```
 
