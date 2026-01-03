@@ -230,10 +230,60 @@ state.$off(listener);
 ```
 
 Notes:
+
 - State changes are shallow, meaning only top-level properties are merged. Nested objects will not be deeply merged.
 - You can register multiple listeners, and they will all be notified upon a state change.
 - Updating the state is an async operation. The `state.$update` method returns a promise that will resolve when the state have been updated.
 
+### kofi.bus()
+
+A tiny event emitter designed for simple message passing between parts of your application. Create a new bus instance by calling:
+
+```javascript
+const bus = kofi.bus();
+```
+
+Each bus instance is isolated and manages its own set of listeners. A bus exposes three methods:
+
+#### `bus.on(name, listener)`
+
+Registers a listener for a given event name.
+
+```javascript
+bus.on("ready", () => {
+    console.log("The app is ready");
+});
+```
+Listeners are stored in order of registration and are called synchronously.
+
+#### `bus.off(name, listener)`
+
+Removes a previously registered listener.
+
+```javascript
+function onReady() {
+    console.log("Ready!");
+};
+
+bus.on("ready", onReady);
+bus.off("ready", onReady);
+```
+
+If the listener is not registered, the call is ignored.
+
+#### `bus.emit(name, data)`
+
+Emits an event, calling all listeners registered under that name. Listeners receive the payload as their only argument.
+
+```javascript
+bus.emit("ready", { time: Date.now() });
+```
+
+Notes about the bus implementation: 
+
+-  The bus is intentionally minimal: no wildcard events, no once - listeners, no async scheduling.
+-  Perfect for small apps, local communication, or lightweight state propagation.
+-  Multiple bus instances can coexist without interfering with each other.
 
 ### kofi.ready(fn)
 
