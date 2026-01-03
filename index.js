@@ -374,6 +374,42 @@ kofi.state = (initialState = {}) => {
     return state.current;
 };
 
+// @description generates a tiny message bus
+kofi.bus = () => {
+    const listeners = {};
+    return {
+        // @description register a new listener to the provided event name
+        // @param name {string} event name
+        // @param listener {function} listener to execute
+        on: (name, listener) => {
+            if (typeof name === "string" && typeof listener === "function") {
+                if (typeof listeners[name] === "undefined") {
+                    listeners[name] = new Set();
+                }
+                listeners[name].add(listener);
+            }
+        },
+        // @description removes an event listener with the provided event name
+        // @param name {string} event name
+        // @param listener {function} listener to remove
+        off: (name, listener) => {
+            if (typeof name === "string" && typeof listener === "function") {
+                if (typeof listeners[name] !== "undefined") {
+                    listeners[name].delete(listener);
+                }
+            }
+        },
+        // @description dispatch an event with the provided data
+        // @param name {string} name of the listeners to dispatch
+        // @param data {any} data to pass to the listeners
+        emit: (name, data = {}) => {
+            if (typeof name === "string" && typeof listeners[name] !== "undefined") {
+                Array.from(listeners[name]).forEach(listener => listener(data));
+            }
+        }, 
+    };
+};
+
 // Execute the specified function when the DOM is ready
 kofi.ready = fn => {
     // Resolve now if DOM has already loaded
