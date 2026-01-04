@@ -300,7 +300,7 @@ const update = (parent, newNode, oldNode, index = 0) => {
             });
         // update the children for all element
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
-        for (let i = 0; i < maxLength; i++) {
+        for (let i = maxLength - 1; i >= 0; i--) {
             update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
         }
     }
