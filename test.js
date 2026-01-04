@@ -153,7 +153,7 @@ describe("kofi.state", () => {
             assert.equal(currentState.value, 5);
         });
         await state.setState(prevState => {
-            return { value: prevState + 4 };
+            return { value: prevState.value + 4 };
         });
     });
 
