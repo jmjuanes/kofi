@@ -201,19 +201,21 @@ The first arguments is the VDOM Node to render, and the second argument is the p
 A simplified state management utility for handling object-based state. It provides an easy-to-use API for updating state and managing listeners for state changes.
 
 ```javascript
-// Initialize state with an object
+// 1. initialize state with an object
 const state = kofi.state({ count: 0 });
 
-// Update state
-state.setState({ count: state.count + 1 });
+// 2. update state
+state.setState(prevState => {
+    return { count: prevState.count + 1 };
+});
 
-// Register a listener for state changes
+// 3. register a listener for state changes
 const listener = currentState => {
     console.log("Count updated:", currentState.count);
 };
 state.on(listener);
 
-// Remove the listener when no longer needed
+// 4. remove the listener when no longer needed
 state.off(listener);
 ```
 
@@ -225,7 +227,15 @@ Returns the current state.
 
 #### `state.setState(partialState)`
 
-Updates the current state by merging the `partialState` with the existing state. It only works with object types. After the state is updated, any registered listeners will be notified.
+Updates the current state by merging the `partialState` with the existing state. It also supports a function as argument that will be called with the current state object.
+
+```javascript
+state.setState(prevState => {
+    // return a new object with the derivered state
+});
+```
+
+After the state is updated, any registered listeners will be notified.
 
 #### `state.on(listener)`
 

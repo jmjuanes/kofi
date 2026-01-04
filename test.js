@@ -147,6 +147,16 @@ describe("kofi.state", () => {
         await state.setState({ value: 3 });
     });
 
+    it("should support functions in setState", async () => {
+        const state = kofi.state({ value: 1 });
+        state.on(currentState => {
+            assert.equal(currentState.value, 5);
+        });
+        await state.setState(prevState => {
+            return { value: prevState.value + 4 };
+        });
+    });
+
     it("should remove listeners", async () => {
         const state = kofi.state({ value: 1 });
         const onChange = currentState => {

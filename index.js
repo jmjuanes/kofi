@@ -357,8 +357,9 @@ kofi.state = (state = {}) => {
         // @description get the current state
         getState: () => state,
         // @description update the current state
-        setState: (newState = {}) => {
-            Object.assign(pendingChanges.current, newState);
+        setState: newState => {
+            const newStateObj = typeof newState === "function" ? newState({...state}) : newState;
+            Object.assign(pendingChanges.current, newStateObj || {});
             return Promise.resolve(1).then(() => {
                 if (Object.keys(pendingChanges.current).length > 0) {
                     Object.assign(state, pendingChanges.current);
