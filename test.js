@@ -164,7 +164,7 @@ describe("kofi.render", () => {
     it("should update child nodes", () => {
         kofi.render(kofi.html`
             <div align="center">
-                <span>Hello world</span>
+                <span>Hello World</span>
             </div>
         `, root);
         assert.equal(root.querySelector("span")?.textContent, "Hello World");
