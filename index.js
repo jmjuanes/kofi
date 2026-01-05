@@ -267,18 +267,18 @@ const mount = (el, parent = null) => {
 };
 
 // @private update an element
-const update = (parent, newNode, oldNode, index = 0) => {
+const update = (parent, child, newNode, oldNode) => {
     // check for no old node --> mount this new element
     if (!oldNode) { 
         return mount(newNode, parent);
     }
     // if there is not new element --> remove the old element
     else if (!newNode) { 
-        return parent.removeChild(parent.childNodes[index]); 
+        return parent.removeChild(child); 
     }
     // if nodes has changed or associated key is different
     else if (diff(newNode, oldNode) || newNode?.props?.key !== oldNode?.props?.key) {
-        return parent.replaceChild(mount(newNode), parent.childNodes[index]);
+        return parent.replaceChild(mount(newNode), child);
     }
     // change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
@@ -291,17 +291,18 @@ const update = (parent, newNode, oldNode, index = 0) => {
                 const oldValue = oldNode.props[name];
                 // check if this property does not exists in the new element
                 if (!newValue) {
-                    setProperty(parent.childNodes[index], name, null, oldValue);
+                    setProperty(child, name, null, oldValue);
                 }
                 // check if this property exists in the old element or values are not the same
                 else if (!oldValue || newValue !== oldValue) {
-                    setProperty(parent.childNodes[index], name, newValue, oldValue)
+                    setProperty(child, name, newValue, oldValue)
                 }
             });
         // update the children for all element
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
-        for (let i = maxLength - 1; i >= 0; i--) {
-            update(parent.childNodes[index], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
+        const childNodes = Array.from(child.childNodes) || [];
+        for (let i = 0; i < maxLength; i++) {
+            update(child, childNodes[i], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
         }
     }
 };
@@ -337,7 +338,7 @@ kofi.render = (el, parent = null) => {
     }
     // 2. There is a previously rendered element
     if (parent && parent?.[KOFI_VDOM_KEY]) {
-        update(parent, el, parent[KOFI_VDOM_KEY]);
+        update(parent, parent.childNodes[0], el, parent[KOFI_VDOM_KEY]);
     }
     // 3. save reference to the rendered tree in the parent element
     if (parent) {
