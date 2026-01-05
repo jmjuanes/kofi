@@ -267,7 +267,7 @@ const mount = (el, parent = null) => {
 };
 
 // @private update an element
-const update = (parent, child, newNode, oldNode, index = 0) => {
+const update = (parent, child, newNode, oldNode) => {
     // check for no old node --> mount this new element
     if (!oldNode) { 
         return mount(newNode, parent);
