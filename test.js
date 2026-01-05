@@ -160,6 +160,28 @@ describe("kofi.render", () => {
         kofi.render(kofi.html`<div>Hello Susan</div>`, root);
         assert.equal(root.querySelector("div")?.textContent, "Hello Susan");
     });
+
+    it("should update child nodes", () => {
+        kofi.render(kofi.html`
+            <div align="center">
+                <span>Hello world</span>
+            </div>
+        `, root);
+        assert.equal(root.querySelector("span")?.textContent, "Hello World");
+        kofi.render(kofi.html`
+            <div>
+                <button>Button 1</button>
+                <button>Button 2</button>
+                <div className="separator">Separator</div>
+                <button>Button 3</button>
+            </div>    
+        `, root);
+        const buttons = Array.from(root.querySelectorAll("button"));
+        assert.equal(buttons.length, 3);
+        assert.equal(buttons[1].textContent, "Button 2");
+        assert.equal(buttons[2].textContent, "Button 3");
+        assert.equal(buttons[2].previousSibling.textContent, "Separator");
+    });
 });
 
 describe("kofi.state", () => {
