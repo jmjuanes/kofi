@@ -1,6 +1,20 @@
-import { describe, it } from "node:test";
+import { describe, it, beforeEach } from "node:test";
 import assert from "node:assert";
+import { JSDOM } from "jsdom";
 import kofi from "./index.js";
+
+const createDOM = (html = '<!DOCTYPE html><html><body></body></html>') => {
+    // 1. create the new JSDOM instance
+    const dom = new JSDOM(html, {
+        url: "http://localhost",
+        pretendToBeVisual: true,
+    });
+    // 2. set globals like in a web browser
+    global.window = dom.window;
+    global.document = dom.window.document;
+    // 3. return the dom instance
+    return dom;
+};
 
 describe("kofi.html", () => {
     const html = kofi.html;
@@ -125,6 +139,26 @@ describe("kofi.html", () => {
         items.forEach((item, index) => {
             assert.deepStrictEqual(result.children[index], e("span", {}, [ item ]));
         });
+    });
+});
+
+describe("kofi.render", () => {
+    let root = null;
+    beforeEach(() => {
+        createDOM(`<!DOCTYPE html><html><body><div id="root"></div></body></html>`);
+        root = document.querySelector("#root");
+    });
+
+    it("should render the provided vdom", () => {
+        kofi.render(kofi.html`<span>Hello World</span>`, root);
+        assert.equal(root.querySelector("span")?.textContent, "Hello World");
+    });
+
+    it("should update previously rendered vdom elements", () => {
+        kofi.render(kofi.html`<div>Hello Bob</div>`, root);
+        assert.equal(root.querySelector("div")?.textContent, "Hello Bob");
+        kofi.render(kofi.html`<div>Hello Susan</div>`, root);
+        assert.equal(root.querySelector("div")?.textContent, "Hello Susan");
     });
 });
 
