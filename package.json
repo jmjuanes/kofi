@@ -16,6 +16,9 @@
     "scripts": {
         "test": "node test.js"
     },
+    "devDependencies": {
+        "jsdom": "^27.4.0"
+    },
     "keywords": [
         "vdom",
         "frontend",
