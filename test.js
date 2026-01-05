@@ -153,6 +153,13 @@ describe("kofi.render", () => {
         kofi.render(kofi.html`<span>Hello World</span>`, root);
         assert.equal(root.querySelector("span")?.textContent, "Hello World");
     });
+
+    it("should update previously rendered vdom elements", () => {
+        kofi.render(kofi.html`<div>Hello Bob</div>`, root);
+        assert.equal(root.querySelector("div")?.textContent, "Hello Bob");
+        kofi.render(kofi.html`<div>Hello Susan</div>`, root);
+        assert.equal(root.querySelector("div")?.textContent, "Hello Susan");
+    });
 });
 
 describe("kofi.state", () => {
