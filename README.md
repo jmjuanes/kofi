@@ -251,40 +251,40 @@ Notes:
 - You can register multiple listeners, and they will all be notified upon a state change.
 - Updating the state is an async operation. The `state.setState` method returns a promise that will resolve when the state have been updated.
 
-### kofi.bus(initialEvents)
+### kofi.emitter(initialEvents)
 
-A tiny event emitter designed for simple message passing between parts of your application. Create a new bus instance by calling:
+A tiny event emitter designed for simple message passing between parts of your application. Create a new emitter instance by calling:
 
 ```javascript
-const bus = kofi.bus();
+const emitter = kofi.emitter();
 ```
 
 You can also use the constructor to register message listeners:
 
 ```javascript
-const bus = kofi.bus({
+const emitter = kofi.emitter({
     "foo": data => {
         console.log(data);
     },
 });
 
-bus.emit("foo", "bar");
+emitter.emit("foo", "bar");
 ```
 
-Each bus instance is isolated and manages its own set of listeners. A bus exposes three methods:
+Each emitter instance is isolated and manages its own set of listeners. An emitter exposes three methods:
 
-#### `bus.on(name, listener)`
+#### `emitter.on(name, listener)`
 
 Registers a listener for a given event name.
 
 ```javascript
-bus.on("ready", () => {
+emitter.on("ready", () => {
     console.log("The app is ready");
 });
 ```
 Listeners are stored in order of registration and are called synchronously.
 
-#### `bus.off(name, listener)`
+#### `emitter.off(name, listener)`
 
 Removes a previously registered listener.
 
@@ -293,25 +293,26 @@ function onReady() {
     console.log("Ready!");
 };
 
-bus.on("ready", onReady);
-bus.off("ready", onReady);
+emitter.on("ready", onReady);
+emitter.off("ready", onReady);
 ```
 
 If the listener is not registered, the call is ignored.
 
-#### `bus.emit(name, data)`
+#### `emitter.emit(name, data)`
 
 Emits an event, calling all listeners registered under that name. Listeners receive the payload as their only argument.
 
 ```javascript
-bus.emit("ready", { time: Date.now() });
+emitter.emit("ready", { time: Date.now() });
 ```
 
-Notes about the bus implementation: 
+Notes about the emitter implementation: 
 
 -  The bus is intentionally minimal: no wildcard events, no once - listeners, no async scheduling.
 -  Perfect for small apps, local communication, or lightweight state propagation.
 -  Multiple bus instances can coexist without interfering with each other.
+- You can also use `kofi.bus` as an alias of `kofi.emitter`.
 
 ### kofi.ready(fn)
 
