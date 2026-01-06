@@ -358,7 +358,7 @@ kofi.state = (initialState = {}, changes = {}) => {
         getState: () => emitter.state,
         // @description update the current state
         setState: (newState = {}) => {
-            const newStateObj = typeof newState === "function" ? newState({...state}) : newState;
+            const newStateObj = typeof newState === "function" ? newState({...emitter.state}) : newState;
             changes.current = Object.assign(changes.current || {}, newStateObj || {});
             return Promise.resolve(1).then(() => {
                 if (Object.keys(changes.current || {}).length > 0) {
