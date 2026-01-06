@@ -361,8 +361,8 @@ kofi.state = (initialState = {}, changes = {}) => {
             const newStateObj = typeof newState === "function" ? newState({...state}) : newState;
             changes.current = Object.assign(changes.current || {}, newStateObj || {});
             return Promise.resolve(1).then(() => {
-                if (Object.keys(pendingChanges.current).length > 0) {
-                    Object.assign(emitter.state, pendingChanges.current);
+                if (Object.keys(changes.current || {}).length > 0) {
+                    Object.assign(emitter.state, changes.current || {});
                     changes.current = {}; // reset pending changes to save
                     emitter.emit("update", emitter.state);
                 }
