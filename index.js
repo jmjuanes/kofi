@@ -351,40 +351,35 @@ kofi.render = (el, parent = null) => {
 kofi.ref = () => ({current: null});
 
 // generate a reactive state
-kofi.state = (state = {}) => {
-    const pendingChanges = { current: {} };
-    const listeners = new Set();
-    return {
+kofi.state = (initialState = {}, changes = {}) => {
+    const emitter = kofi.emitter({}, initialState);
+    return Object.freeze({
         // @description get the current state
-        getState: () => state,
+        getState: () => emitter.state,
         // @description update the current state
-        setState: newState => {
+        setState: (newState = {}) => {
             const newStateObj = typeof newState === "function" ? newState({...state}) : newState;
-            Object.assign(pendingChanges.current, newStateObj || {});
+            changes.current = Object.assign(changes.current || {}, newStateObj || {});
             return Promise.resolve(1).then(() => {
                 if (Object.keys(pendingChanges.current).length > 0) {
-                    Object.assign(state, pendingChanges.current);
-                    pendingChanges.current = {}; // reset pending changes to save
-                    Array.from(listeners).forEach(listener => listener(state));
+                    Object.assign(emitter.state, pendingChanges.current);
+                    changes.current = {}; // reset pending changes to save
+                    emitter.emit("update", emitter.state);
                 }
             });
         },
         // @description register/remove update listeners
-        on: listener => {
-            typeof listener === "function" ? listeners.add(listener) : null;
-        },
-        off: listener => {
-            typeof listener === "function" ? listeners.delete(listener) : null;
-        },
-    };
+        on: listener => emitter.on("update", listener),
+        off: listener => emitter.off("update", listener),
+    });
 };
 
 // @description generates a tiny message bus
-kofi.emitter = (initialEvents = {}) => {
+kofi.emitter = (initialEvents = {}, initialState = {}) => {
     const listeners = {};
     const emitter = Object.freeze({
         // @description shared object for events data
-        state: {},
+        state: Object.assign({}, initialState || {}),
         // @description register a new listener to the provided event name
         // @param name {string} event name
         // @param listener {function} listener to execute
@@ -411,7 +406,7 @@ kofi.emitter = (initialEvents = {}) => {
         // @param data {any} data to pass to the listeners
         emit: (name, data = {}) => {
             if (typeof name === "string" && typeof listeners[name] !== "undefined") {
-                Array.from(listeners[name]).forEach(listener => listener(data));
+                Array.from(listeners[name]).forEach(listener => listener(data, emitter));
             }
         }, 
     });
