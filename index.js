@@ -380,9 +380,9 @@ kofi.state = (state = {}) => {
 };
 
 // @description generates a tiny message bus
-kofi.bus = () => {
+kofi.bus = (initialEvents = {}) => {
     const listeners = {};
-    return {
+    const emitter = Object.freeze({
         // @description register a new listener to the provided event name
         // @param name {string} event name
         // @param listener {function} listener to execute
@@ -412,7 +412,13 @@ kofi.bus = () => {
                 Array.from(listeners[name]).forEach(listener => listener(data));
             }
         }, 
-    };
+    });
+    // initialize events
+    if (typeof initialEvents === "object" && !!initialEvents) {
+        Object.keys(initialEvents || {}).forEach(eventName => emitter.on(eventName, initialEvents[eventName]));
+    }
+    // return emitter instance
+    return emitter;
 };
 
 // Execute the specified function when the DOM is ready
