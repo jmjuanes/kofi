@@ -251,12 +251,24 @@ Notes:
 - You can register multiple listeners, and they will all be notified upon a state change.
 - Updating the state is an async operation. The `state.setState` method returns a promise that will resolve when the state have been updated.
 
-### kofi.bus()
+### kofi.bus(initialEvents)
 
 A tiny event emitter designed for simple message passing between parts of your application. Create a new bus instance by calling:
 
 ```javascript
 const bus = kofi.bus();
+```
+
+You can also use the constructor to register message listeners:
+
+```javascript
+const bus = kofi.bus({
+    "foo": data => {
+        console.log(data);
+    },
+});
+
+bus.emit("foo", "bar");
 ```
 
 Each bus instance is isolated and manages its own set of listeners. A bus exposes three methods:
