@@ -383,6 +383,8 @@ kofi.state = (state = {}) => {
 kofi.bus = (initialEvents = {}) => {
     const listeners = {};
     const emitter = Object.freeze({
+        // @description shared object for events data
+        state: {},
         // @description register a new listener to the provided event name
         // @param name {string} event name
         // @param listener {function} listener to execute
