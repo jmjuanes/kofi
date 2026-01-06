@@ -242,4 +242,13 @@ describe("kofi.bus", () => {
         bus.off("foo", listener);
         bus.emit("foo", "barz");
     });
+
+    it("should allow to initialize events", () => {
+        const bus = kofi.bus({
+            "foo": data => {
+                assert.equal(data, "bar");
+            },
+        });
+        bus.emit("foo", "bar");
+    });
 });
