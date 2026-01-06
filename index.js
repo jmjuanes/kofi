@@ -380,7 +380,7 @@ kofi.state = (state = {}) => {
 };
 
 // @description generates a tiny message bus
-kofi.bus = (initialEvents = {}) => {
+kofi.emitter = (initialEvents = {}) => {
     const listeners = {};
     const emitter = Object.freeze({
         // @description shared object for events data
@@ -422,6 +422,9 @@ kofi.bus = (initialEvents = {}) => {
     // return emitter instance
     return emitter;
 };
+
+// @description keep kofi.bus as an alias to kofi.emitter
+kofi.bus = kofi.emitter;
 
 // Execute the specified function when the DOM is ready
 kofi.ready = fn => {
