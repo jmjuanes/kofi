@@ -225,9 +225,9 @@ describe("kofi.state", () => {
     });
 });
 
-describe("kofi.bus", () => {
+describe("kofi.emitter", () => {
     it("should allow to register message listeners", () => {
-        const bus = kofi.bus();
+        const bus = kofi.emitter();
         bus.on("foo", data => {
             assert.equal(data, "bar");
         });
@@ -235,7 +235,7 @@ describe("kofi.bus", () => {
     });
 
     it("should allow to remove message listeners", () => {
-        const bus = kofi.bus();
+        const bus = kofi.emitter();
         const listener = data => assert.equal(data, "bar");
         bus.on("foo", listener);
         bus.emit("foo", "bar");
@@ -244,7 +244,7 @@ describe("kofi.bus", () => {
     });
 
     it("should allow to initialize events", () => {
-        const bus = kofi.bus({
+        const bus = kofi.emitter({
             "foo": data => {
                 assert.equal(data, "bar");
             },
