@@ -1,4 +1,5 @@
 const KOFI_VDOM_KEY = "_$kofi_vdom_"; // key used to get the previously vdom rendered in the element
+const KOFI_PORTAL_KEY = "_$kofi_portal_";
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
     TAG_START: 2,
@@ -345,6 +346,11 @@ kofi.render = (el, parent = null) => {
         parent[KOFI_VDOM_KEY] = el;
     }
     return node;
+};
+
+// @description allow to render some children elements into a different part of the DOM
+kofi.portal = (children, parent) => {
+    return kofi(KOFI_PORTAL_KEY, { parent: parent, children: children });
 };
 
 // generate a reference to an element
