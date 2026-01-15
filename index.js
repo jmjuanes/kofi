@@ -59,7 +59,7 @@ const setProperty = (el, name, newValue = null, oldValue = null) => {
             if (typeof newValue === "string") {
                 el.style.cssText = newValue;
             }
-            else if (typeof newValue === "object") {
+            else if (typeof newValue === "object" && !!newValue) {
                 Object.keys(newValue).forEach(key => {
                     el.style[key] = newValue[key];
                 });
