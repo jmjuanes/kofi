@@ -185,13 +185,20 @@ describe("kofi.render", () => {
 
     it("should remove styles", () => {
         kofi.render(kofi.html`
-            <div style="${{ color: "white" }}">Hello World</div>
+            <div style="${{ backgroundColor: "red", color: "white" }}" />
         `, root);
         assert.equal(root.querySelector("div")?.style.color, "white");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "red");
         kofi.render(kofi.html`
-            <div>Hello World</div>
+            <div style="${{ color: "white" }}" />  
+        `, root);
+        assert.equal(root.querySelector("div")?.style.color, "white");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "");
+        kofi.render(kofi.html`
+            <div />
         `, root);
         assert.equal(root.querySelector("div")?.style?.color, "");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "");
     });
 });
 
