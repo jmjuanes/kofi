@@ -1,4 +1,5 @@
 const KOFI_VDOM_KEY = "_$kofi_vdom_"; // key used to get the previously vdom rendered in the element
+const KOFI_PORTAL_KEY = "_$kofi_portal_";
 const HTML_TEMPLATE_MODE = {
     TEXT: 1,
     TAG_START: 2,
@@ -86,19 +87,23 @@ const setProperty = (el, name, newValue = null, oldValue = null) => {
 
 // Check if there are differences between two nodes
 const diff = (node1, node2) => {
-    // Check if nodes have the same type
+    // 1. check if nodes have the same type
     if (typeof node1 !== typeof node2) { 
         return true; 
     }
-    // Check if nodes are strings
+    // 2. check if nodes are strings
     else if (typeof node1 === "string" && node1 !== node2) { 
         return true; 
     }
-    // Check if nodes has not the same tag
+    // 3. check if nodes has not the same tag
     else if (node1.type !== node2.type) { 
         return true; 
     }
-    // Default, nodes are the same
+    // 4. check if nodes are portals
+    else if (node1.type === KOFI_PORTAL_KEY && node1.props.parent !== node2.props.parent) {
+        return true;
+    }
+    // 5. default, nodes are the same
     return false;
 };
 
@@ -242,22 +247,32 @@ const compile = (h, literal, values, ctx = {i: 0, j: 0}, closing = null) => {
 // @private mount an element
 const mount = (el, parent = null) => {
     let node = null;
-    // check for text node
-    if (typeof el !== "object" || !el) {
+    // 1. check for portal element
+    if (el?.type === KOFI_PORTAL_KEY) {
+        node = document.createComment("kofi-portal");
+        (el.children || []).forEach(childElement => {
+            return mount(childElement, el.props.parent);
+        });
+    }
+    // 2. check for text node
+    else if (typeof el !== "object" || !el) {
         node = document.createTextNode(el ?? "");
     }
+    // 3. other element type
     else {
-        // 1. create the new DOM element
+        // 3.1. create the new DOM element
         const [tagName, namespace] = extractNamespace(el.type);
         node = namespace ? document.createElementNS(namespace, tagName) : document.createElement(tagName);
-        // 2. mount children
-        (el.children || []).forEach(child => mount(child, node));
-        // 3. assign element props and attributes
-        Object.keys(el.props || {})
-            .filter(propName => propName !== "html")
-            .forEach(propName => setProperty(node, propName, el.props[propName]));
+        // 3.2. mount children
+        (el.children || []).forEach(childElement => {
+            return mount(childElement, node);
+        });
+        // 3.3. assign element props and attributes
+        Object.keys(el.props || {}).forEach(propName => {
+            setProperty(node, propName, el.props[propName]);
+        });
     }
-    // mount the new node
+    // 4. mount the new node
     if (parent) {
         parent.appendChild(node);
     }
@@ -266,19 +281,33 @@ const mount = (el, parent = null) => {
 
 // @private update an element
 const update = (parent, child, newNode, oldNode) => {
-    // check for no old node --> mount this new element
+    // 1. check for no old node --> mount this new element
     if (!oldNode) { 
         return mount(newNode, parent);
     }
-    // if there is not new element --> remove the old element
+    // 2. if there is not new element --> remove the old element
     else if (!newNode) { 
+        // 2.1. we have to check if the old node is a portal
+        if (oldNode.type === KOFI_PORTAL_KEY) {
+            oldNode.props.parent.replaceChildren();
+        }
+        // 2.2. remove the child/placeholder element
         return parent.removeChild(child); 
     }
-    // if nodes has changed or associated key is different
+    // 3. if nodes has changed or associated key is different
     else if (diff(newNode, oldNode) || newNode?.props?.key !== oldNode?.props?.key) {
+        // 3.1. check if the old node is a portal, so we have to replace the children
+        if (oldNode.type === KOFI_PORTAL_KEY) {
+            oldNode.props.parent.replaceChildren();
+        }
+        // 3.2. replace the child with the new mounted node
         return parent.replaceChild(mount(newNode), child);
     }
-    // change the properties only if element is not an string
+    // 4. check if both are portals
+    else if (newNode.type === KOFI_PORTAL_KEY) {
+        return update(newNode.props.parent, newNode.props.parent.childNodes[0], newNode.children[0], oldNode.children[0]);
+    }
+    // 4. change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
         // get the full properties values and update the element attributes
         const props = Object.assign({}, newNode.props, oldNode.props);
@@ -343,6 +372,11 @@ kofi.render = (el, parent = null) => {
         parent[KOFI_VDOM_KEY] = el;
     }
     return node;
+};
+
+// @description allow to render some children elements into a different part of the DOM
+kofi.portal = (children, parent) => {
+    return kofi(KOFI_PORTAL_KEY, { parent: parent }, children);
 };
 
 // generate a reference to an element
