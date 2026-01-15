@@ -305,7 +305,7 @@ const update = (parent, child, newNode, oldNode) => {
     }
     // 4. check if both are portals
     else if (newNode.type === KOFI_PORTAL_KEY) {
-        return update(newNode.props.parent, newNode.props.parent.childNodes[0], newNode, oldNode);
+        return update(newNode.props.parent, newNode.props.parent.childNodes[0], newNode.children[0], oldNode.children[0]);
     }
     // 4. change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
