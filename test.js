@@ -184,6 +184,93 @@ describe("kofi.render", () => {
     });
 });
 
+describe("kofi.portal", () => {
+    let root = null, portalRoot = null;
+    beforeEach(() => {
+        createDOM(`<!DOCTYPE html><html><body><div id="root"></div><div id="portal-root"></div></body></html>`);
+        root = document.querySelector("#root");
+        portalRoot = document.querySelector("#portal-root");
+    });
+
+    it("should mount portal content into the provided parent", () => {
+        const vnode = kofi.portal(kofi.html`<div id="inside">Hello Portal</div>`, portalRoot);
+        kofi.render(vnode, root);
+        assert.equal(root.childNodes.length, 1); // placeholder
+        assert.equal(root.childNodes[0].nodeType, 8); // comment node
+        assert.equal(portalRoot.querySelector(`#inside`)?.textContent, "Hello Portal");
+    });
+
+    it("should update portal content when re-rendered", () => {
+        // initial render
+        kofi.render(kofi.portal(kofi.html`<span>One</span>`, portalRoot), root);
+        assert.equal(portalRoot.textContent, "One");
+
+        // second render
+        kofi.render(kofi.portal(kofi.html`<span>Two</span>`, portalRoot), root);
+        assert.equal(portalRoot.textContent, "Two");
+    });
+
+    it("should remove portal content when portal is removed", () => {
+        // initialize rendering
+        kofi.render(kofi.portal(kofi.html`<div>Hi</div>`, portalRoot), root);
+        assert.equal(portalRoot.textContent, "Hi");
+
+        // remove portal
+        kofi.render(null, root);
+        assert.equal(portalRoot.textContent, "");
+        assert.equal(root.childNodes.length, 0);
+    });
+
+    it("should replace portal with normal node when type changes", () => {
+        // initialize
+        kofi.render(kofi.portal(kofi.html`<div>Portal</div>`, portalRoot), root);
+        assert.equal(portalRoot.textContent, "Portal");
+
+        // replace portal with normal div
+        kofi.render(kofi.html`<div id="normal">Normal</div>`, root);
+        assert.equal(portalRoot.textContent, ""); // portal removed
+        assert.equal(root.querySelector("#normal").textContent, "Normal");
+    });
+
+    it("should replace normal node with portal", () => {
+        // initialize
+        kofi.render(kofi.html`<div id="normal">Normal</div>`, root);
+        assert.equal(root.querySelector("#normal").textContent, "Normal");
+
+        // replace with portal
+        kofi.render(kofi.portal(kofi.html`<div id="p">Portal</div>`, portalRoot), root);
+        assert.equal(root.childNodes[0].nodeType, 8); // placeholder
+        assert.equal(portalRoot.querySelector("#p").textContent, "Portal");
+    });
+
+    it("should move portal content if parent changes", () => {
+        const otherRoot = document.createElement("div");
+        document.body.appendChild(otherRoot);
+
+        kofi.render(kofi.portal(kofi.html`<span id="x">X</span>`, portalRoot), root);
+        assert.ok(portalRoot.querySelector("#x"));
+        assert.ok(!otherRoot.querySelector("#x"));
+
+        // change parent
+        kofi.render(kofi.portal(kofi.html`<span id="x">X</span>`, otherRoot), root);
+        assert.ok(!portalRoot.querySelector("#x"));
+        assert.ok(otherRoot.querySelector("#x"));
+    });
+
+    it("should work inside a larger tree", () => {
+        kofi.render(kofi.html`
+            <div>
+                <h1>Title</h1>
+                ${kofi.portal(kofi.html`<span id="p">Portal</span>`, portalRoot)}
+                <p>Footer</p>
+            </div>
+        `, root);
+        assert.equal(root.querySelector("h1").textContent, "Title");
+        assert.equal(root.querySelector("p").textContent, "Footer");
+        assert.equal(portalRoot.querySelector("#p").textContent, "Portal");
+    });
+});
+
 describe("kofi.state", () => {
     it("should allow to register a function that will be called when the state changes", async () => {
         const state = kofi.state({ value: 1 });
