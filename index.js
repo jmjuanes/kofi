@@ -56,16 +56,14 @@ const setProperty = (el, name, newValue = null, oldValue = null) => {
             el[name] = newValue;
         }
         else if (name === "style") {
-            if (typeof newValue === "string") {
+            el.style.cssText = ""; // force to reset styles
+            if (typeof newValue === "string" && !!newValue) {
                 el.style.cssText = newValue;
             }
             else if (typeof newValue === "object" && !!newValue) {
                 Object.keys(newValue).forEach(key => {
                     el.style[key] = newValue[key];
                 });
-            }
-            else {
-                el.style.cssText = "";
             }
         }
         else if (name.startsWith("on")) {
