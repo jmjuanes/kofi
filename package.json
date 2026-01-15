@@ -1,6 +1,6 @@
 {
     "name": "kofi",
-    "version": "0.12.0",
+    "version": "0.12.1",
     "description": "Tasty takeaway frontend library for creating small applications.",
     "type": "module",
     "repository": "https://github.com/jmjuanes/kofi",

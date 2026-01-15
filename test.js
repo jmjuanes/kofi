@@ -182,6 +182,24 @@ describe("kofi.render", () => {
         assert.equal(buttons[2].textContent, "Button 3");
         assert.equal(buttons[2].previousSibling.textContent, "Separator");
     });
+
+    it("should remove styles", () => {
+        kofi.render(kofi.html`
+            <div style="${{ backgroundColor: "red", color: "white" }}" />
+        `, root);
+        assert.equal(root.querySelector("div")?.style.color, "white");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "red");
+        kofi.render(kofi.html`
+            <div style="${{ color: "white" }}" />  
+        `, root);
+        assert.equal(root.querySelector("div")?.style.color, "white");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "");
+        kofi.render(kofi.html`
+            <div />
+        `, root);
+        assert.equal(root.querySelector("div")?.style?.color, "");
+        assert.equal(root.querySelector("div")?.style.backgroundColor, "");
+    });
 });
 
 describe("kofi.portal", () => {
