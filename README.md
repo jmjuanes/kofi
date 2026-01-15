@@ -196,6 +196,40 @@ kofi.render(el, document.getElementById("root"));
 
 The first arguments is the VDOM Node to render, and the second argument is the parent DOM element. Returns a reference to the rendered DOM element.
 
+### kofi.portal(child, parent)
+
+Creates a special VDOM node that renders its child into a different DOM container. Portals allow you to place UI elements outside of their natural position in the DOM tree while keeping them inside the same VDOM tree.
+
+This is useful for modals, tooltips, dropdowns, and any UI that must visually escape its parent container.
+
+```javascript
+const App = (state) => {
+    return kofi.html`
+        <div>
+            <button onClick="${() => state.open = true}">
+                Open modal
+            </button>
+            ${state.open ? kofi.portal(kofi.html`
+                <div class="modal">
+                    <p>This is a modal</p>
+                    <button onClick="${() => state.open = false}">
+                        Close
+                    </button>
+                </div>
+            `, document.querySelector("#modal-root")) : ""}
+        </div>
+    `;
+};
+
+kofi.render(App({ open: false }), document.body);
+```
+
+Notes:
+
+- `child` must be a single VDOM node (e.g. the result of `kofi.html`).
+- The portal does not support arrays of children.
+- The `parent` must be a real DOM element.
+
 ### kofi.state(initialState)
 
 A simplified state management utility for handling object-based state. It provides an easy-to-use API for updating state and managing listeners for state changes.
