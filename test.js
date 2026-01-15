@@ -182,6 +182,17 @@ describe("kofi.render", () => {
         assert.equal(buttons[2].textContent, "Button 3");
         assert.equal(buttons[2].previousSibling.textContent, "Separator");
     });
+
+    it("should remove styles", () => {
+        kofi.render(kofi.html`
+            <div style="${{ color: "white" }}">Hello World</div>
+        `, root);
+        assert.equal(root.querySelector("div")?.style.color, "white");
+        kofi.render(kofi.html`
+            <div>Hello World</div>
+        `, root);
+        assert.equal(root.querySelector("div")?.style?.color, "");
+    });
 });
 
 describe("kofi.state", () => {
