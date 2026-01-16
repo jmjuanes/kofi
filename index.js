@@ -92,7 +92,7 @@ const diff = (node1, node2) => {
         return true; 
     }
     // 2. check if nodes are strings
-    else if (typeof node1 === "string" && node1 !== node2) { 
+    else if ((typeof node1 === "string" || typeof node1 === "number") && node1 !== node2) { 
         return true; 
     }
     // 3. check if nodes has not the same tag
@@ -282,11 +282,11 @@ const mount = (el, parent = null) => {
 // @private update an element
 const update = (parent, child, newNode, oldNode) => {
     // 1. check for no old node --> mount this new element
-    if (!oldNode) { 
+    if (oldNode === null || typeof oldNode === "undefined") { 
         return mount(newNode, parent);
     }
     // 2. if there is not new element --> remove the old element
-    else if (!newNode) { 
+    else if (newNode === null || typeof newNode === "undefined") { 
         // 2.1. we have to check if the old node is a portal
         if (oldNode.type === KOFI_PORTAL_KEY) {
             oldNode.props.parent.replaceChildren();
@@ -307,7 +307,7 @@ const update = (parent, child, newNode, oldNode) => {
     else if (newNode.type === KOFI_PORTAL_KEY) {
         return update(newNode.props.parent, newNode.props.parent.childNodes[0], newNode.children[0], oldNode.children[0]);
     }
-    // 4. change the properties only if element is not an string
+    // 5. change the properties only if element is not an string
     else if (newNode && typeof newNode !== "string") {
         // get the full properties values and update the element attributes
         const props = Object.assign({}, newNode.props, oldNode.props);
@@ -329,7 +329,10 @@ const update = (parent, child, newNode, oldNode) => {
         const maxLength = Math.max(newNode?.children?.length || 0, oldNode?.children?.length || 0);
         const childNodes = Array.from(child.childNodes) || [];
         for (let i = 0; i < maxLength; i++) {
-            update(child, childNodes[i], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
+            const newChild = i < (newNode?.children?.length || 0) ? newNode.children[i] : null;
+            const oldChild = i < (oldNode?.children?.length || 0) ? oldNode.children[i] : null;
+            update(child, childNodes[i], newChild, oldChild, i);
+            // update(child, childNodes[i], newNode.children?.[i] || null, oldNode.children?.[i] || null, i);
         }
     }
 };
@@ -340,7 +343,9 @@ const kofi = (type, props, ...children) => {
         return {
             type: type.toLowerCase().trim(), 
             props: props || {}, 
-            children: (children || []).flat().filter(c => !!c),
+            children: (children || []).flat().filter(child => {
+                return child !== null && typeof child !== "undefined";
+            }),
         };
     }
     // Check for function type

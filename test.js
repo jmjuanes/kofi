@@ -115,7 +115,7 @@ describe("kofi.html", () => {
     it("should support conditional rendering", () => {
         const component = condition => html`<div>${condition ? html`Hello World` : ""}</div>`;
         assert.deepStrictEqual(component(true), e("div", {}, ["Hello World"]));
-        assert.deepStrictEqual(component(false), e("div", {}, []));
+        assert.deepStrictEqual(component(false), e("div", {}, [""]));
     });
 
     it("should support components", () => {
