@@ -373,6 +373,33 @@ kofi.classNames({
 }); // -> "foo"
 ```
 
+## Directives
+
+Directives are small declarative utilities that extend template behavior without adding weight to kofi’s core. They act as focused, opt‑in building blocks you can apply directly in your markup, keeping components expressive and intention‑driven.
+
+Unlike generic helpers, directives are designed to feel native to kofi’s philosophy: minimal, predictable, and free of hidden mechanics. Each directive does one thing, does it well, and stays out of the rendering pipeline unless explicitly used.
+
+All directives live under the `kofi.directives` namespace and can be used inside any kofi template literal.
+
+### `kofi.directives.uid(size)`
+
+Generates a unique, stable identifier for the lifetime of a component instance. Ideal for attributes like `id`, `for`, or any scenario where you need a collision‑free value without manually managing state.
+
+The directive is evaluated once per template instance, ensuring the value remains consistent across renders.
+
+```javascript
+import kofi from "kofi";
+
+const MyInput = () => {
+    const uid = kofi.directives.uid();
+    return kofi.html`
+        <label for=${uid}>Name</label>
+        <input id=${uid} type="text" />
+    `;
+};
+```
+
+
 ## License
 
 **kofi** is released under the [MIT LICENSE](./LICENSE).
