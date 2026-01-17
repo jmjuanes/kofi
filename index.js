@@ -470,24 +470,6 @@ kofi.ready = fn => {
     });
 };
 
-// Join class names
-kofi.classNames = (...args) => {
-    const names = (args || []).map(item => {
-        if (typeof item === "string") {
-            return item.split(" ").filter(value => !!value);
-        }
-        else if (Array.isArray(item)) {
-            return item.filter(value => typeof value === "string" && !!value); 
-        }
-        else if (typeof item === "object") {
-            return Object.keys(item || {}).filter(key => !!item[key]);
-        }
-        // Over value --> return an empty array
-        return [];
-    });
-    return names.flat().join(" ");
-};
-
 // @description kofi directives
 kofi.directives = {
     // @description utility method to generate random ids
@@ -498,6 +480,26 @@ kofi.directives = {
         window.crypto.getRandomValues(randomArray);
         return Array.from(randomArray, d => d.toString(16).padStart(2, "0")).join("");
     },
+    // @description join classNames
+    classMap: (...args) => {
+        const names = (args || []).map(item => {
+            if (typeof item === "string") {
+                return item.split(" ").filter(value => !!value);
+            }
+            else if (Array.isArray(item)) {
+                return item.filter(value => typeof value === "string" && !!value); 
+            }
+            else if (typeof item === "object") {
+                return Object.keys(item || {}).filter(key => !!item[key]);
+            }
+            // Over value --> return an empty array
+            return [];
+        });
+        return names.flat().join(" ");
+    },
 };
+
+// @deprecated: kofi.classNames has been renamed as kofi.directives.classMap
+kofi.classNames = kofi.directives.classMap;
 
 export default kofi;

@@ -359,21 +359,9 @@ kofi.ready(() => {
 });
 ```
 
-### kofi.classNames(...)
-
-A tiny utility for conditionally joining classNames. This function takes any number of arguments which can be an string, an object or an array. When providing an object, if the value associated with a given key is truthly, that key will be included in the generated classNames string. Non string values will be also ignored.
-
-```javascript
-kofi.classNames("foo", "bar"); // -> "foo bar"
-kofi.classNames("foo", null, false, "bar"); // -> "foo bar"
-kofi.classNames("foo", ["bar", null]); // -> "foo bar"
-kofi.classNames({
-    "foo": true,
-    "bar": false,
-}); // -> "foo"
-```
-
 ## Directives
+
+> Added in `v0.14.0`.
 
 Directives are small declarative utilities that extend template behavior without adding weight to kofi’s core. They act as focused, opt‑in building blocks you can apply directly in your markup, keeping components expressive and intention‑driven.
 
@@ -397,6 +385,20 @@ const MyInput = () => {
         <input id=${uid} type="text" />
     `;
 };
+```
+
+### kofi.directives.classMap(...)
+
+A tiny utility for conditionally joining classNames. This function takes any number of arguments which can be an string, an object or an array. When providing an object, if the value associated with a given key is truthly, that key will be included in the generated classNames string. Non string values will be also ignored.
+
+```javascript
+kofi.directives.classMap("foo", "bar"); // -> "foo bar"
+kofi.directives.classMap("foo", null, false, "bar"); // -> "foo bar"
+kofi.directives.classMap("foo", ["bar", null]); // -> "foo bar"
+kofi.directives.classMap({
+    "foo": true,
+    "bar": false,
+}); // -> "foo"
 ```
 
 
