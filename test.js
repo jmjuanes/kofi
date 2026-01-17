@@ -388,4 +388,26 @@ describe("directives", () => {
             assert.equal(className, "foo bar");
         });
     });
+
+    describe("kofi.directives.styleMap", () => {
+        it("should generate a valid style string", () => {
+            const styleName = kofi.directives.styleMap({
+                "background-color": "red",
+                "margin": "5px 0px",
+            });
+            assert.equal(styleName, "background-color:red;margin:5px 0px;");
+        });
+
+        it("should accept style attributes in camelCase format", () => {
+            const styleName = kofi.directives.styleMap({
+                backgroundColor: "red",
+                paddingTop: "1rem",
+            });
+            assert.equal(styleName, "background-color:red;padding-top:1rem;");
+        });
+
+        it("should return an empty string if no style object is provided", () => {
+            assert.equal(kofi.directives.styleMap(), "");
+        });
+    });
 });
