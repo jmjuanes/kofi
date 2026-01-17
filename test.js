@@ -410,4 +410,18 @@ describe("directives", () => {
             assert.equal(kofi.directives.styleMap(), "");
         });
     });
+
+    describe("kofi.directives.when", () => {
+        it("should execute the trueCase argument when the condition is a true value", () => {
+            assert.equal(kofi.directives.when(true, () => "TRUE", () => "FALSE"), "TRUE")
+        });
+
+        it("should execute the falseCase argument when the condition is a false value", () => {
+            assert.equal(kofi.directives.when(false, () => "TRUE", () => "FALSE"), "FALSE");
+        });
+
+        it("should return 'undefined' if no falseCase is provided", () => {
+            assert.equal(typeof kofi.directives.when(false, () => "TRUE"), "undefined");
+        });
+    });
 });

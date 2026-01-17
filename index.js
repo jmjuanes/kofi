@@ -506,6 +506,10 @@ kofi.directives = {
     styleMap: (style = {}) => {
         return Object.keys(style).map(k => `${camelToKebabCase(k)}:${style[k]};`).join("");
     },
+    // @description renders one of the both templates based on a condition
+    when: (condition, trueCase, falseCase) => {
+        return condition ? trueCase() : falseCase?.();
+    },
 };
 
 // @deprecated: kofi.classNames has been renamed as kofi.directives.classMap
