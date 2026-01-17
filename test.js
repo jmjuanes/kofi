@@ -378,4 +378,14 @@ describe("directives", () => {
             assert.equal(value.length, 30);
         });
     });
+
+    describe("kofi.directives.classMap", () => {
+        it("should join classNames", () => {
+            const className = kofi.directives.classMap({
+                "foo bar": true,
+                "barz": false,
+            });
+            assert.equal(className, "foo bar");
+        });
+    });
 });
