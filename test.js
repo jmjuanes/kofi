@@ -357,3 +357,25 @@ describe("kofi.emitter", () => {
         bus.emit("foo", "bar");
     });
 });
+
+describe("directives", () => {
+    describe("kofi.directives.uid", () => {
+        it("should generate a non empty string", () => {
+            const value = kofi.directives.uid();
+            assert.equal(typeof value, "string");
+            assert.notEqual(value.length, 0);
+        });
+
+        it("should generate different strings", () => {
+            const value1 = kofi.directives.uid();
+            const value2 = kofi.directives.uid();
+            assert.equal(typeof value1, typeof value2);
+            assert.notEqual(value1, value2);
+        });
+
+        it("should allow to customize the size of the random string", () => {
+            const value = kofi.directives.uid(30);
+            assert.equal(value.length, 30);
+        });
+    });
+});
