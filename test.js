@@ -388,4 +388,40 @@ describe("directives", () => {
             assert.equal(className, "foo bar");
         });
     });
+
+    describe("kofi.directives.styleMap", () => {
+        it("should generate a valid style string", () => {
+            const styleName = kofi.directives.styleMap({
+                "background-color": "red",
+                "margin": "5px 0px",
+            });
+            assert.equal(styleName, "background-color:red;margin:5px 0px;");
+        });
+
+        it("should accept style attributes in camelCase format", () => {
+            const styleName = kofi.directives.styleMap({
+                backgroundColor: "red",
+                paddingTop: "1rem",
+            });
+            assert.equal(styleName, "background-color:red;padding-top:1rem;");
+        });
+
+        it("should return an empty string if no style object is provided", () => {
+            assert.equal(kofi.directives.styleMap(), "");
+        });
+    });
+
+    describe("kofi.directives.when", () => {
+        it("should execute the trueCase argument when the condition is a true value", () => {
+            assert.equal(kofi.directives.when(true, () => "TRUE", () => "FALSE"), "TRUE")
+        });
+
+        it("should execute the falseCase argument when the condition is a false value", () => {
+            assert.equal(kofi.directives.when(false, () => "TRUE", () => "FALSE"), "FALSE");
+        });
+
+        it("should return 'undefined' if no falseCase is provided", () => {
+            assert.equal(typeof kofi.directives.when(false, () => "TRUE"), "undefined");
+        });
+    });
 });

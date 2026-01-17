@@ -15,6 +15,11 @@ const KOFI_NAMESPACES = {
     "xmlns": "http://www.w3.org/2000/xmlns/",
 };
 
+// @private convert an string in camelCase format to kebab-case
+const camelToKebabCase = str => {
+    return str.replace(/[A-Z]/g, letter => `-${letter.toLowerCase()}`);
+};
+
 // remove all start and wnd whitespaces from the provided tagName
 // note: tags can be also a function
 const cleanTagName = tagName => {
@@ -496,6 +501,14 @@ kofi.directives = {
             return [];
         });
         return names.flat().join(" ");
+    },
+    // @description join styles
+    styleMap: (style = {}) => {
+        return Object.keys(style).map(k => `${camelToKebabCase(k)}:${style[k]};`).join("");
+    },
+    // @description renders one of the both templates based on a condition
+    when: (condition, trueCase, falseCase) => {
+        return condition ? trueCase() : falseCase?.();
     },
 };
 
