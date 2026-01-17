@@ -488,4 +488,16 @@ kofi.classNames = (...args) => {
     return names.flat().join(" ");
 };
 
+// @description kofi directives
+kofi.directives = {
+    // @description utility method to generate random ids
+    // @params {number} size - size of the generated id
+    // @returns {string} uid - random string
+    uid: (size = 30) => {
+        const randomArray = new Uint8Array(size / 2);
+        window.crypto.getRandomValues(randomArray);
+        return Array.from(randomArray, d => d.toString(16).padStart(2, "0")).join("");
+    },
+};
+
 export default kofi;
