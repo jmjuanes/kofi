@@ -369,7 +369,7 @@ Unlike generic helpers, directives are designed to feel native to kofi’s philo
 
 All directives live under the `kofi.directives` namespace and can be used inside any kofi template literal.
 
-### `kofi.directives.uid(size)`
+### kofi.directives.uid(size)
 
 Generates a unique, stable identifier for the lifetime of a component instance. Ideal for attributes like `id`, `for`, or any scenario where you need a collision‑free value without manually managing state.
 
@@ -400,6 +400,25 @@ kofi.directives.classMap({
     "bar": false,
 }); // -> "foo"
 ```
+
+### kofi.directives.styleMap({ ... })
+
+The `styleMap` directive is a function that takes an object as input, where keys represent CSS attribute names, and values represent corresponding attribute values. It returns a valid CSS style string based on the input object.
+
+```javascript
+const styles = kofi.directives.styleMap({
+    fontSize: "16px",
+    color: "blue",
+    backgroundColor: "lightgray",
+});
+
+console.log(styles);
+// Output: 'font-size: 16px; color: blue; background-color: lightgray;'
+```
+
+### kofi.directives.when(condition, trueTemplate, falseTemplate)
+
+Renders one of the two templates based on the value of `condition`.
 
 
 ## License
