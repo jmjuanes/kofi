@@ -510,6 +510,16 @@ kofi.directives = {
     when: (condition, trueCase, falseCase) => {
         return condition ? trueCase() : falseCase?.();
     },
+    // @description iterate over the provided list
+    // @param {array} items - an array containing the items to iterate
+    // @param {function} fn - function to execute on each item
+    // @returns {array} an array containing the result of executing the function fn on each item
+    map: (items = [], fn) => {
+        if (!!items && Array.isArray(items) && typeof fn === "function") {
+            return items.map((item, index) => fn(item, index));
+        }
+        return [];
+    },
 };
 
 // @deprecated: kofi.classNames has been renamed as kofi.directives.classMap

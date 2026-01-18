@@ -424,4 +424,16 @@ describe("directives", () => {
             assert.equal(typeof kofi.directives.when(false, () => "TRUE"), "undefined");
         });
     });
+
+    describe("kofi.directives.map", () => {
+        it("should execute the provided function on each item", () => {
+            const result = kofi.directives.map([0, 1, 2], item => item + 1);
+            assert.deepStrictEqual(result, [1, 2, 3]);
+        });
+
+        it("should an empty array if no items or function is provided", () => {
+            assert.equal(kofi.directives.map(null, i => i + 1).length, 0);
+            assert.equal(kofi.directives.map([0, 1, 2], null).length, 0);
+        });
+    });
 });

@@ -420,6 +420,18 @@ console.log(styles);
 
 Renders one of the two templates based on the value of `condition`.
 
+```javascript
+const result = kofi.directives.when(user.admin, () => "Is an Admin", () => "Is not an Admin");
+```
+
+### kofi.directives.map(items, fn)
+
+Returns a new array containing the result of evaluating the provided function `fn` on each item of the provided `items` array.
+
+```javascript
+const result = kofi.directives.map([0, 1, 2], item => item + 1); // --> [1, 2, 3]
+```
+
 
 ## License
 
